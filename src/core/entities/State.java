@@ -12,5 +12,7 @@ abstract public class State {
 	
 	public State (int i){ init(i); }
 	abstract protected void init(int i);
-	
+
+	public int getX(){ return x; }
+	public int getY(){ return y; }
 }

@@ -41,7 +41,7 @@ public class WorldBuilder {
 							this.index = i;
 							this.name = Constants.COUNTRY_NAMES[i];
 							this.x = Constants.COUNTRY_COORD[i][0];
-							this.y = Constants.COUNTRY_COORD[i][0];
+							this.y = Constants.COUNTRY_COORD[i][1];
 							this.adjacent = Constants.ADJACENT[i];
 							this.continent = continents.get( Constants.CONTINENT_IDS[i] );
 							continent_ownership.get( Constants.CONTINENT_IDS[i] ).add( this );
