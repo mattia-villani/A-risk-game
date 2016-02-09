@@ -16,6 +16,7 @@ public class MapRenderer extends JComponent {
 	private World world;
 	private AffineTransform matrix;
 	private AffineTransform inverted_matrix;
+	private double displayed_width, displayed_height;
 	
 	/**
 	 * 
@@ -53,8 +54,8 @@ public class MapRenderer extends JComponent {
 		double height_ratio = ((double)height) / (double)World.VIRTUAL_HEIGHT;
 		double ratio = Math.min(width_ratio, height_ratio);
 		assert ratio != 0 : "something wired is happening: ratio should be diff from 0";
-		double displayed_width = ratio * (double)World.VIRTUAL_WIDTH;
-		double displayed_height = ratio * (double)World.VIRTUAL_HEIGHT;
+		displayed_width = ratio * (double)World.VIRTUAL_WIDTH;
+		displayed_height = ratio * (double)World.VIRTUAL_HEIGHT;
 		double x_offset = (width - displayed_width)/2.0;
 		double y_offset = (height - displayed_height)/2.0;
 		
@@ -77,7 +78,9 @@ public class MapRenderer extends JComponent {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.transform( matrix );
 		
-		Rectangle box = new Rectangle(0,0,World.VIRTUAL_WIDTH,World.VIRTUAL_HEIGHT);
+		GraphDrawer.drawGraph( g2, world, (int)displayed_width, (int)displayed_height );
+		
+		Rectangle box = new Rectangle(0,0,World.VIRTUAL_WIDTH-1,World.VIRTUAL_HEIGHT-1);
 		g2.draw(box);
 		
 		g2.transform( inverted_matrix );

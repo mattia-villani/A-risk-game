@@ -15,4 +15,16 @@ abstract public class World {
 	
 	abstract protected void init();
 	
+	public List<Continent> getContinents(){
+		return continents;
+	}
+
+	public List<State> getStates(){
+		return states;
+	}
+	
+	public State getState( int index ){
+		return states.get(index);
+	}
+	
 }

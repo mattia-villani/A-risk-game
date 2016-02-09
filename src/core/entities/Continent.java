@@ -1,8 +1,9 @@
 package core.entities;
 
+import java.util.Iterator;
 import java.util.List;
 
-abstract public class Continent {
+abstract public class Continent implements Iterable<State>{
 
 	protected String name;
 	protected int index;
@@ -12,5 +13,10 @@ abstract public class Continent {
 
 	public Continent (int i){ init(i); }
 	abstract protected void init(int i);
+	
+	@Override
+	public Iterator<State> iterator() {
+		return states.iterator();
+	}
 	
 }
