@@ -2,7 +2,9 @@ package core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import core.entities.Continent;
 import core.entities.State;
 import core.entities.World;
 
@@ -17,6 +19,20 @@ public class WorldBuilder {
 			@Override
 			protected void init(){
 				ArrayList <State> states = new ArrayList<>();
+				ArrayList <Continent> continents = new ArrayList<>();
+				ArrayList <List<State>> continent_ownership = new ArrayList<>();
+				
+				for ( int i=0; i<Constants.NUM_CONTINENTS; i++ )
+					continents.add( new Continent(i){
+						@Override
+						protected void init(int i){
+							this.name = Constants.CONTINENT_NAMES[i];
+							this.index = i;
+							this.value = Constants.CONTINENT_VALUES[i];
+							this.states = new ArrayList<State>();
+							continent_ownership.add( this.states );
+						}
+					} );
 				
 				for ( int i=0; i<Constants.NUM_COUNTRIES; i++ )
 					states.add( new State( i ){
@@ -24,11 +40,16 @@ public class WorldBuilder {
 						protected void init(int i) {
 							this.index = i;
 							this.name = Constants.COUNTRY_NAMES[i];
-							
+							this.x = Constants.COUNTRY_COORD[i][0];
+							this.y = Constants.COUNTRY_COORD[i][0];
+							this.adjacent = Constants.ADJACENT[i];
+							this.continent = continents.get( Constants.CONTINENT_IDS[i] );
+							continent_ownership.get( Constants.CONTINENT_IDS[i] ).add( this );
 						}
 					});
-				
+
 				this.states = Collections.unmodifiableList( states );
+				this.continents = Collections.unmodifiableList( continents );
 			}
 		};
 	}

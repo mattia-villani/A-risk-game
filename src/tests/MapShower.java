@@ -2,6 +2,7 @@ package tests;
 
 import javax.swing.*;
 
+import core.WorldBuilder;
 import gui.map.MapRenderer;
 
 public class MapShower {
@@ -12,7 +13,7 @@ public class MapShower {
 		frame.setTitle("Just visualize the map");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		frame.add(new MapRenderer());
+		frame.add(new MapRenderer( WorldBuilder.Build() ));
 	}
 
 }
