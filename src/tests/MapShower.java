@@ -1,5 +1,8 @@
 package tests;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
 import javax.swing.*;
 
 import core.WorldBuilder;
@@ -13,7 +16,15 @@ public class MapShower {
 		frame.setTitle("Just visualize the map");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		frame.add(new MapRenderer( WorldBuilder.Build() ));
+		JPanel pannel = new JPanel( new BorderLayout());
+		frame.add(pannel);
+		JComponent component = new MapRenderer( WorldBuilder.Build() );
+		frame.setPreferredSize(new Dimension(1200, 700));
+		component.setPreferredSize(frame.getPreferredSize());
+		pannel.add(component, BorderLayout.CENTER);
+		frame.pack();
+		
+		
 	}
 
 }

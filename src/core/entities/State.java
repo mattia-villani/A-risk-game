@@ -1,5 +1,7 @@
 package core.entities;
 
+import core.Constants;
+
 abstract public class State {
 	
 	protected int index;
@@ -9,7 +11,6 @@ abstract public class State {
 	protected Continent continent;
 	
 	public State (int i){ init(i); }
-	
 	abstract protected void init(int i);
 	
 }
