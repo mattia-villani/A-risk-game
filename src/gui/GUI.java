@@ -1,8 +1,12 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+
+import core.WorldBuilder;
+import gui.map.MapRenderer;
 
 public class GUI implements ActionListener {
 	private JFrame uiFrame;
@@ -19,12 +23,17 @@ public class GUI implements ActionListener {
 		uiFrame.getContentPane().setLayout(null);
 		uiFrame.setResizable(false);
 		
-		// Placeholder for the map
+		// Placeholder for the map 
+		/*
 		JLabel Map = new JLabel();
 		Map.setBounds(0, 0, 1000, 600);
 		Map.setIcon(new ImageIcon("images/PlaceholderMap.jpg"));
-		uiFrame.getContentPane().add(Map);
-	
+		uiFrame.getContentPane().add(Map);*/
+		
+		JComponent worldMap = new MapRenderer( WorldBuilder.Build() );
+		worldMap.setBounds(0, 0, 1000, 600);
+		uiFrame.getContentPane().add(worldMap);
+		
 		textLog = new JTextArea(50, 100);
 		textLog.setBounds(0, 600, 1000, 65);
 		textLog.setEditable(false);
