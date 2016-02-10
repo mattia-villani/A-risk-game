@@ -20,6 +20,7 @@ abstract public class State {
 
 	public int getX(){ return x; }
 	public int getY(){ return y; }
+	public String getName(){ return name; }
 	public Continent getContinet(){ return continent; }
 	public List<State> getSmallerAdjacent(World world){
 		if ( smaller_adjacent != null ) return smaller_adjacent;

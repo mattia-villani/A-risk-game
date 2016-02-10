@@ -1,28 +1,61 @@
 package gui.map;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+
+import javax.swing.UIManager;
 
 import core.entities.Continent;
 import core.entities.State;
 import core.entities.World;
 
 public class GraphDrawer {
-	static final float margin = 0.8f;
-	static final int circle_ray = 10;
-	static final int thickness = 8;
+	static final float margin = 0.9f;
+	static final int circle_ray = 12;
+	static final int thickness = 9;
+	static final int font_size = 14;
+	static final int font_type = Font.BOLD;
+	static final int size_state_view_width = 100;
+	static final int size_state_view_height = 30;
+	
 	static BufferedImage graph;
 	
+	static public void stateView(Graphics2D g, State s){
+		int off_x = size_state_view_width - (int)g.getFontMetrics().getStringBounds(s.getName(),g).getWidth();
+		off_x/=2;
+		g.setColor(Color.BLACK);
+		g.drawString(s.getName(), off_x, size_state_view_height);
+	}
+	
 	static public void drawStateValues(Graphics2D g, State s){
+		int x0 = s.getX()-size_state_view_width/2;
+		int y0 = s.getY()-size_state_view_height/2;
 		
+		Font font = new Font(g.getFont().getFontName(), font_type, font_size);
+		g.setFont(font);
+		
+		Shape clipSave = g.getClip();
+		g.translate( x0, y0 );
+		g.setClip(0, 0, size_state_view_width, size_state_view_height);
+	
+		stateView(g,s);
+		
+		g.translate( -x0, -y0 );
+		g.setClip(clipSave);
 	}
 	
 	static public void drawGraph( Graphics2D comp_g, World world, int width, int height ){
-		if ( graph == null || width>graph.getWidth() || height>graph.getHeight() || width<graph.getWidth()*margin || height<graph.getHeight()*margin ){
+		if ( graph == null 
+				|| width>graph.getWidth()*(1.0f-margin) 
+				|| height>graph.getHeight()*(1.0f-margin) 
+				|| width<graph.getWidth()*margin 
+				|| height<graph.getHeight()*margin ){
 			graph = new BufferedImage ( width, height, BufferedImage.TYPE_INT_ARGB );
 			Graphics2D g = (Graphics2D) graph.getGraphics();
 			g.scale( ((double)width)/(double)World.VIRTUAL_WIDTH, ((double)height)/(double)World.VIRTUAL_HEIGHT);
@@ -54,10 +87,11 @@ public class GraphDrawer {
 							g.drawLine( a, b, c, d );
 					}
 					g.fillOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
-					drawStateValues(g,s);
 				}
 			}
-			
+			for (State s:world.getStates())
+				drawStateValues(g,s);
+
 			g.dispose();
 		}
 		
