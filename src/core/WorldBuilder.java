@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import core.entities.Continent;
+import core.entities.NeutralPlayer;
 import core.entities.State;
 import core.entities.World;
 
@@ -38,6 +39,7 @@ public class WorldBuilder {
 						}
 					} );
 				
+				NeutralPlayer default_player = new NeutralPlayer("Default");
 				for ( int i=0; i<Constants.NUM_COUNTRIES; i++ )
 					states.add( new State( i ){
 						@Override
@@ -48,6 +50,7 @@ public class WorldBuilder {
 							this.y = Constants.COUNTRY_COORD[i][1];
 							this.adjacent = Constants.ADJACENT[i];
 							this.continent = continents.get( Constants.CONTINENT_IDS[i] );
+							this.setOwner(default_player);
 							continent_ownership.get( Constants.CONTINENT_IDS[i] ).add( this );
 						}
 					});

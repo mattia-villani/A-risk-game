@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import core.entities.World;
 
 public class MapRenderer extends JComponent {
+	static private MapRenderer this_class ;
 	
 	private World world;
 	private AffineTransform matrix;
@@ -25,6 +26,7 @@ public class MapRenderer extends JComponent {
 
 	public MapRenderer( World w ){
 		super();
+		this_class = this;
 		world = w;
 		this.addComponentListener(new ComponentListener(){
 			//http://stackoverflow.com/questions/1088595/how-to-do-something-on-swing-component-resizing
@@ -85,4 +87,9 @@ public class MapRenderer extends JComponent {
 		
 		g2.transform( inverted_matrix );
 	}
+	
+	public static void Invalidate(){
+		if ( this_class != null ) this_class.invalidate();
+	}
 }
+

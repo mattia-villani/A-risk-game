@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import core.Constants;
-
 abstract public class State {
 	
+	private Player owner;
+	private int army;
+
 	protected int index;
 	protected String name;
 	protected int x,y;
@@ -15,7 +16,11 @@ abstract public class State {
 	protected List<State> smaller_adjacent;
 	protected Continent continent;
 	
-	public State (int i){ init(i); }
+	public State (int i){ 
+		army=0; 
+		init(i); 
+	}
+	
 	abstract protected void init(int i);
 
 	public int getX(){ return x; }
@@ -31,4 +36,13 @@ abstract public class State {
 		smaller_adjacent = Collections.unmodifiableList(l);
 		return smaller_adjacent;
 	}
+	
+	public Player getOwner() { return owner; }
+	public void setOwner(Player owner) { this.owner = owner; }
+	public int getArmy() { return army; }
+	public void setArmy(int army) {
+		assert army>=0 : "something wired happend: army in a state can't be negative";
+		this.army = army;
+	}
+
 }
