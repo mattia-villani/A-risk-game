@@ -10,7 +10,7 @@ public class NeutralPlayer extends Player {
 	}
 	
 	public NeutralPlayer(String name){
-		super(name, Color.DARK_GRAY);
+		super(name, Color.GRAY);
 	}
 
 }

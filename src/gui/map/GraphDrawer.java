@@ -1,14 +1,19 @@
 package gui.map;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.RadialGradientPaint;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
 import core.entities.State;
 import core.entities.World;
+
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public class GraphDrawer {
@@ -28,6 +33,9 @@ public class GraphDrawer {
 	static final boolean paint_black_the_army = true;
 	static final boolean show_state_view_bounds = false;
 	
+	final static BasicStroke stroke = new BasicStroke(3);
+	
+	/* not working yet */
 	static double alpha_archs = 1.0;
 	
 	static BufferedImage graph;
@@ -113,9 +121,14 @@ public class GraphDrawer {
 				}
 			}
 			
-			for (State s:world.getStates()){
-				g.setColor( s.getContinet().getColor() );
+			for ( State s : world.getStates() ){
+				
+				g.setColor( s.getOwner().getColor() );				
 				g.fillOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
+				
+				g.setStroke(stroke);
+				g.setColor( s.getContinet().getColor() );				
+				g.drawOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
 				drawStateValues(g,s);
 			}
 
