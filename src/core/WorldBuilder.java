@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,12 +23,15 @@ public class WorldBuilder {
 				ArrayList <Continent> continents = new ArrayList<>();
 				ArrayList <List<State>> continent_ownership = new ArrayList<>();
 				
+				final Color[] colors = { Color.YELLOW, Color.BLUE, Color.GREEN, Color.PINK, Color.ORANGE, Color.CYAN };
+				
 				for ( int i=0; i<Constants.NUM_CONTINENTS; i++ )
 					continents.add( new Continent(i){
 						@Override
 						protected void init(int i){
 							this.name = Constants.CONTINENT_NAMES[i];
 							this.index = i;
+							this.color = colors[i];
 							this.value = Constants.CONTINENT_VALUES[i];
 							this.states = new ArrayList<State>();
 							continent_ownership.add( this.states );
