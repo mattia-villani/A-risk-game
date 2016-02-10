@@ -23,6 +23,7 @@ public class GUI implements ActionListener {
 		uiFrame.getContentPane().setLayout(null);
 		uiFrame.setResizable(false);
 		
+		//
 		// Placeholder for the map 
 		/*
 		JLabel Map = new JLabel();
