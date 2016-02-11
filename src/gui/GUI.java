@@ -10,8 +10,8 @@ import gui.map.MapRenderer;
 
 public class GUI implements ActionListener {
 	private JFrame uiFrame;
-	private JTextArea textLog;
-	private JTextField textInput;
+	public static JTextArea textLog;
+	public static JTextField textInput;
 	private JButton submitButton;
 	
 
