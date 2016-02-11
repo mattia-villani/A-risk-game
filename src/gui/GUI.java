@@ -66,6 +66,6 @@ public class GUI implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		// Button actions
-		System.out.println("hr");
+		
 	};	
 }
