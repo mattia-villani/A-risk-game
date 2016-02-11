@@ -5,6 +5,7 @@ package core.entities;
 import java.util.*;
 
 import core.Constants;
+import gui.map.MapRenderer;
 
 abstract public class World {
 	/**
@@ -66,9 +67,9 @@ abstract public class World {
 	}
 	
 	/**
-	 * Setter : set invalidated to true
+	 * Setter : set invalidated to true & call invalidate of MapRenderer
 	 */
-	public void invalidate(){ invalidated=true; }
+	public void invalidate(){ invalidated=true; MapRenderer.Invalidate(); }
 	/**
 	 * Getter
 	 * @return true iff invalidated is true
