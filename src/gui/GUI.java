@@ -145,6 +145,10 @@ public class GUI implements ActionListener{
 		textLog.setText("");
 	}
 	
+	public void resetInput(){
+		textInput.setText("");
+	}
+	
 
 	// Window close dialog
 	private class closure extends WindowAdapter {
