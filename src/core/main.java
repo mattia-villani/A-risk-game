@@ -48,6 +48,10 @@ public class main {
     // create players
     player1 = new Player(player1Name, Color.blue);
     player2 = new Player(player2Name, Color.red);
+    neut1 = new Player("neutral 1", Color.BLACK);
+    neut2 = new Player("neutral 2", Color.green);
+    neut3 = new Player("neutral 3", Color.darkGray);
+    neut4 = new Player("neutral 4", Color.ORANGE);
     
     world = WorldBuilder.Build();
     createGame();
