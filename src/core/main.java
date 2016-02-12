@@ -56,27 +56,13 @@ public class main {
 		window.setLog(player2Name + " will be red. Lets begin!"); 
 		window.resetInput();
 
-		// create players
-		player1 = new Player(player1Name, Color.blue);
-		players.add(player1);
-		player2 = new Player(player2Name, Color.red);
-		players.add(player2);
-		neut1 = new Player("neutral 1", Color.BLACK);
-		players.add(neut1);
-		neut2 = new Player("neutral 2", Color.green);
-		players.add(neut2);
-		neut3 = new Player("neutral 3", Color.darkGray);
-		players.add(neut3);
-		neut4 = new Player("neutral 4", Color.ORANGE);
-		players.add(neut4);
-
-		world = WorldBuilder.Build();
-		//createPlayers();
-		createGame();
-
+		//create players, then world, then give states armies
 		
-		//world.getState(0).setOwner(owner);
-		System.out.println(world.getState(1).getOwner());
+		createPlayers();
+		world = WorldBuilder.Build();		
+		createGame();	
+		
+		//now add correct numbers and colors to the map
 		world.invalidate();
 		
 
@@ -87,6 +73,18 @@ public class main {
 	 */
 	public static void createPlayers(){
 		
+				player1 = new Player(player1Name, Color.blue);
+				players.add(player1);
+				player2 = new Player(player2Name, Color.red);
+				players.add(player2);
+				neut1 = new Player("neutral 1", Color.BLACK);
+				players.add(neut1);
+				neut2 = new Player("neutral 2", Color.green);
+				players.add(neut2);
+				neut3 = new Player("neutral 3", Color.darkGray);
+				players.add(neut3);
+				neut4 = new Player("neutral 4", Color.ORANGE);
+				players.add(neut4);
 	}
 	
 	/*
