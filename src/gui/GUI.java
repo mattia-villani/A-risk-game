@@ -33,6 +33,7 @@ public class GUI{
 		uiFrame.getContentPane().setLayout(null);
 		uiFrame.setResizable(false);
 		
+		// left wooden border
 		final BufferedImage leftWood = ImageIO.read(new File("images/left.jpg"));
 		leftLabel= new JLabel(){
 			@Override
@@ -44,6 +45,7 @@ public class GUI{
 		leftLabel.setBounds(0, 0, 50, 700);
 		uiFrame.getContentPane().add(leftLabel);
 
+		// right wooden border
 		final BufferedImage rightWood = ImageIO.read(new File("images/right.jpg"));
 		rightLabel= new JLabel(){
 			@Override
@@ -88,9 +90,10 @@ public class GUI{
 		scrollPane = new JScrollPane(textLog);
 		scrollPane.setBounds(50, 601, 700, 64);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-			
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
 		uiFrame.getContentPane().add(scrollPane);
-			
+
+		// Player list area. WIP, player names to be displayed in their colours.
 		playerList = new JTextArea(1, 1);
 		playerList.setBounds(748, 601, 201, 64);
 		playerList.setEditable(false);
@@ -99,7 +102,7 @@ public class GUI{
 		uiFrame.getContentPane().add(playerList);
 		playerList.setText("Player List" +"\n"+ "*work in progress*");
 		
-		// Input area
+		// Input area, auto focuses.
 		textInput = new JTextField() {
 			public void addNotify() {
 	            super.addNotify();
@@ -125,6 +128,7 @@ public class GUI{
 		uiFrame.setVisible(true);
 	}
 
+	// WIndow close dialog
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			int i = JOptionPane.showOptionDialog(uiFrame,
