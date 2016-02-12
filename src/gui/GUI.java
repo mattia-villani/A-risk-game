@@ -9,9 +9,10 @@ import java.io.File;
 import java.io.IOException;
 
 import core.WorldBuilder;
+import core.main;
 import gui.map.MapRenderer;
 
-public class GUI{
+public class GUI implements ActionListener{
 	private static JFrame uiFrame;
 	private static JLayeredPane layeredPane;
 	private static JComponent worldMap;
@@ -19,11 +20,11 @@ public class GUI{
 	private static JScrollPane scrollPane;
 	private static JLabel leftLabel;
 	private static JLabel rightLabel;
-	public static JTextArea textLog;
+	private static JTextArea textLog;
 	public static JTextArea playerList;
 	public static JTextField textInput;
 	public static JButton submitButton;
-	public static GuiActionListener listener = new GuiActionListener();
+	final static String newline = "\n";
 	
 	public GUI() throws IOException{	
 		uiFrame=new JFrame();
@@ -117,7 +118,7 @@ public class GUI{
 		
 		// Submit button, non focusable, default action for enter key
 		submitButton = new JButton("Submit");
-		submitButton.addActionListener(listener); 
+		submitButton.addActionListener(this); 
 		submitButton.setBounds(748, 665, 201, 35);
 		submitButton.setFocusable(false);
 		uiFrame.getContentPane().add(submitButton);
@@ -127,8 +128,25 @@ public class GUI{
 		uiFrame.addWindowListener(new closure());
 		uiFrame.setVisible(true);
 	}
+	
+	public String getTextLog(){
+		return textLog.getText();
+	}
+	
+	public void setTextLog(String s){
+		textLog.setText(s);
+	}
+	
+	public static void addTextLog(String s){
+		textLog.append(newline+s);
+	}
+	
+	public static void clearTextLog(){
+		textLog.setText("");
+	}
+	
 
-	// WIndow close dialog
+	// Window close dialog
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			int i = JOptionPane.showOptionDialog(uiFrame,
@@ -141,6 +159,13 @@ public class GUI{
 				System.exit(0);
 			}
 		}
+	}
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		main.didPress= true;
+		
 	}
 }
 
