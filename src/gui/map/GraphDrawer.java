@@ -32,7 +32,7 @@ public class GraphDrawer {
 	static final int size_state_view_width = 100; // of the "view" (the rectangle) in which the info are drawn
 	static final int size_state_view_height = 45; // of the "view" (the rectangle) in which the info are drawn
 	static final boolean clip_state_view = false; // flag to choice if to clip outside that boundry
-	static final boolean paint_black_the_name = false; // flag to write in black the name
+	static final boolean paint_black_the_name = true; // flag to write in black the name
 	static final boolean paint_black_the_army = true; // flag to write in black the army
 	static final boolean show_state_view_bounds = false; // to show the rectangle of the view around a country
 	
@@ -120,6 +120,7 @@ public class GraphDrawer {
 		boolean world_invalidate = world.invalidated();
 		world.reset_invalidate();
 		
+		graph = null;
 		// situation for which the stored image is dropped 
 		if ( world_invalidate // asked by some class
 				|| graph == null  // not stored yet
