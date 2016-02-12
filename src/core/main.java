@@ -2,6 +2,7 @@ package core;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import core.entities.Player;
 import gui.GUI;
@@ -13,12 +14,9 @@ public class main {
 	public static Player player2;
 	public static boolean didPress = false;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		System.out.println("Hello Wold!");
 		GUI window=new GUI();
-		window.createGUI(); //create frame
-		
-		
 	
 		while(!didPress){
 			gui.GUI.textLog.setText("Welcome! What is player 1's name?");
