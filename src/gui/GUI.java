@@ -21,9 +21,9 @@ public class GUI implements ActionListener{
 	private static JLabel leftLabel;
 	private static JLabel rightLabel;
 	private static JTextArea textLog;
-	public static JTextArea playerList;
-	public static JTextField textInput;
-	public static JButton submitButton;
+	private static JTextField textInput;
+	private static JButton submitButton;
+	public static JTextArea playerList; //work in progress
 	final static String newline = "\n";
 	
 	public GUI() throws IOException{	
@@ -129,27 +129,30 @@ public class GUI implements ActionListener{
 		uiFrame.setVisible(true);
 	}
 	
-	public String getTextLog(){
+	public String getLog(){
 		return textLog.getText();
 	}
 	
-	public void setTextLog(String s){
+	public void setLog(String s){
 		textLog.setText(s);
 	}
 	
-	public static void addTextLog(String s){
+	public static void addLog(String s){
 		textLog.append(newline+s);
 	}
 	
-	public static void clearTextLog(){
+	public static void resetLog(){
 		textLog.setText("");
 	}
 	
+	public String getInput(){
+		return textInput.getText();
+	}
+
 	public void resetInput(){
 		textInput.setText("");
 	}
-	
-
+		
 	// Window close dialog
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
@@ -164,7 +167,6 @@ public class GUI implements ActionListener{
 			}
 		}
 	}
-
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
