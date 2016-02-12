@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import core.entities.Player;
 import core.entities.World;
@@ -18,6 +19,7 @@ public class main {
   public static Player neut2;
   public static Player neut3;
   public static Player neut4;
+  public static ArrayList <Player> players;
   
   public static boolean didPress = false;
   public static World world;
@@ -47,16 +49,22 @@ public class main {
     
     // create players
     player1 = new Player(player1Name, Color.blue);
+    players.add(player1);
     player2 = new Player(player2Name, Color.red);
+    players.add(player2);
     neut1 = new Player("neutral 1", Color.BLACK);
+    players.add(neut1);
     neut2 = new Player("neutral 2", Color.green);
+    players.add(neut2);
     neut3 = new Player("neutral 3", Color.darkGray);
+    players.add(neut3);
     neut4 = new Player("neutral 4", Color.ORANGE);
+    players.add(neut4);
     
     world = WorldBuilder.Build();
     createGame();
     
-    //world.invalidate();
+   
     
     world.reset_invalidate();
     
