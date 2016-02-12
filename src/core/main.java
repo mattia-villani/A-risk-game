@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import core.entities.Player;
 import core.entities.World;
 import gui.GUI;
+import gui.map.MapRenderer;
 
 public class main {
 	private static String player1Name;
@@ -19,7 +20,7 @@ public class main {
 	private static Player neut2;
 	private static Player neut3;
 	private static Player neut4;
-	private static ArrayList <Player> players;
+	private static ArrayList <Player> players = new ArrayList<Player>();
 
 	public static ArrayList<Player> getPlayers() {
 		return players;
@@ -38,38 +39,24 @@ public class main {
 
 	public static void main(String[] args) throws IOException {
 
-		GUI window=new GUI();
-		//window.createGUI(); //create frame
+		GUI window=new GUI();//create frame
+		 
 
 		while(!didPress){
 			window.setLog("Welcome! What is player 1's name?");
 		}
 		didPress = false;
-		String player1Name = window.getInput();
+		 player1Name = window.getInput();
 		window.resetInput();
 		while(!didPress){
 			window.setLog(player1Name + " will be blue. What is player two's name?");
 		}
 		didPress = false;
-		String player2Name = window.getInput();
+		player2Name = window.getInput();
 		window.setLog(player2Name + " will be red. Lets begin!"); 
 		window.resetInput();
 
 		// create players
-		createPlayers();
-
-		world = WorldBuilder.Build();
-
-		createGame();
-
-
-
-		world.reset_invalidate();
-
-
-
-	}
-	public static void createPlayers(){
 		player1 = new Player(player1Name, Color.blue);
 		players.add(player1);
 		player2 = new Player(player2Name, Color.red);
@@ -82,7 +69,29 @@ public class main {
 		players.add(neut3);
 		neut4 = new Player("neutral 4", Color.ORANGE);
 		players.add(neut4);
+
+		world = WorldBuilder.Build();
+		//createPlayers();
+		createGame();
+
+		
+		//world.getState(0).setOwner(owner);
+		System.out.println(world.getState(1).getOwner());
+		world.invalidate();
+		
+
 	}
+	
+	/*
+	 *  Create players from what they inputed, then hardcode neutral players
+	 */
+	public static void createPlayers(){
+		
+	}
+	
+	/*
+	 *	ration out states, not randomly 
+	 */
 	public static void createGame(){
 
 
