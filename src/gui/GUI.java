@@ -1,16 +1,24 @@
 package gui;
+/**
+ * @author Andrew Kilbride
+ */
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.html.HTMLEditorKit;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import core.WorldBuilder;
 import core.main;
 import gui.map.MapRenderer;
+import core.entities.Player;
+import core.entities.World;
 
 public class GUI implements ActionListener{
 	private static JFrame uiFrame;
@@ -23,18 +31,19 @@ public class GUI implements ActionListener{
 	private static JTextArea textLog;
 	private static JTextField textInput;
 	private static JButton submitButton;
-	public static JTextArea playerList; //work in progress
+	private static JEditorPane playerListLeft;
+	private static JEditorPane playerListRight;
 	final static String newline = "\n";
 	
 	public GUI() throws IOException{	
 		uiFrame=new JFrame();
 		uiFrame.setBounds(0, 0, 1005,728);
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
-		uiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		uiFrame.getContentPane().setLayout(null);
 		uiFrame.setResizable(false);
 		
-		// left wooden border
+		
+		// Left wooden border
 		final BufferedImage leftWood = ImageIO.read(new File("images/left.jpg"));
 		leftLabel= new JLabel(){
 			@Override
@@ -46,7 +55,7 @@ public class GUI implements ActionListener{
 		leftLabel.setBounds(0, 0, 50, 700);
 		uiFrame.getContentPane().add(leftLabel);
 
-		// right wooden border
+		// Right wooden border
 		final BufferedImage rightWood = ImageIO.read(new File("images/right.jpg"));
 		rightLabel= new JLabel(){
 			@Override
@@ -73,19 +82,20 @@ public class GUI implements ActionListener{
 		worldMap = new MapRenderer(WorldBuilder.Build());
 		worldMap.setBounds(50, 0, 1000, 600);
 		
-		// Combination of Background and Node maps, alignments still off
+		// Combination of Background and Node maps
 		layeredPane = new JLayeredPane();
         layeredPane.setBounds(0, 0, 1000, 600);
         layeredPane.add(map, 1);
         layeredPane.add(worldMap, 0);
         uiFrame.getContentPane().add(layeredPane);
 
+        
 		// Text log area
 		textLog = new JTextArea(1, 1);
 		textLog.setEditable(false);
 		textLog.setLineWrap(true);
 		textLog.setWrapStyleWord(true);
-		textLog.setBackground(new Color(255, 241, 187));
+		textLog.setBackground(new Color(244, 239, 202));
 		textLog.setMargin(new Insets(5,5,5,5));
 		
 		scrollPane = new JScrollPane(textLog);
@@ -94,27 +104,45 @@ public class GUI implements ActionListener{
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
 		uiFrame.getContentPane().add(scrollPane);
 
-		// Player list area. WIP, player names to be displayed in their colours.
-		playerList = new JTextArea(1, 1);
-		playerList.setBounds(748, 601, 201, 64);
-		playerList.setEditable(false);
-		playerList.setBackground(new Color(255, 241, 187));
-		playerList.setMargin(new Insets(5,5,5,5));
-		uiFrame.getContentPane().add(playerList);
-		playerList.setText("Player List" +"\n"+ "*work in progress*");
 		
-		// Input area, auto focuses.
-		textInput = new JTextField() {
-			public void addNotify() {
-	            super.addNotify();
-	            requestFocus();
-	        }
-		};
+		// Player list areas.
+		playerListLeft = new JEditorPane();
+		playerListLeft.setBounds(750, 601, 99, 63);
+		playerListLeft.setEditable(false);
+		playerListLeft.setContentType("text/html");
+		playerListLeft.setBackground(new Color(244, 239, 202));
+		playerListLeft.setMargin(new Insets(0,5,5,5));
+		uiFrame.getContentPane().add(playerListLeft);
+		
+		playerListRight = new JEditorPane();
+		playerListRight.setBounds(849, 601, 100, 63);
+		playerListRight.setEditable(false);
+		playerListRight.setContentType("text/html");
+		playerListRight.setBackground(new Color(244, 239, 202));
+		playerListRight.setMargin(new Insets(0,5,5,5));
+		uiFrame.getContentPane().add(playerListRight);
+		
+		
+		// Input area - Focuses on creation
+		textInput = new JTextField(){
+			public void addNotify(){
+				super.addNotify();
+				requestFocus();
+			}
+		};  
 		textInput.setBounds(50, 665, 700, 35);
-		textInput.setBackground(new Color(255, 241, 187));
+		textInput.setBackground(new Color(244, 239, 202));
 		textInput.setMargin(new Insets(5,5,5,5));
-		textInput.requestFocusInWindow();
+		
+		// Prevents focus being lost when clicking on player list
+		textInput.addFocusListener(new FocusAdapter(){
+			@Override
+			public void focusLost(FocusEvent e){
+				textInput.requestFocus();
+			}
+		});
 		uiFrame.getContentPane().add(textInput);
+		
 		
 		// Submit button, non focusable, default action for enter key
 		submitButton = new JButton("Submit");
@@ -124,11 +152,14 @@ public class GUI implements ActionListener{
 		uiFrame.getContentPane().add(submitButton);
 		uiFrame.getRootPane().setDefaultButton(submitButton);
 		
+		
 		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		uiFrame.addWindowListener(new closure());
 		uiFrame.setVisible(true);
+		
 	}
 	
+	// Text log methods. Get, set, add and reset.
 	public String getLog(){
 		return textLog.getText();
 	}
@@ -145,6 +176,7 @@ public class GUI implements ActionListener{
 		textLog.setText("");
 	}
 	
+	// Input field methods - get and reset
 	public String getInput(){
 		return textInput.getText();
 	}
@@ -152,7 +184,60 @@ public class GUI implements ActionListener{
 	public void resetInput(){
 		textInput.setText("");
 	}
+	
+	// Displays the player list
+	public void displayPlayerList(){
+		ArrayList <Player> players = new ArrayList<Player>();
+		String[] names=new String[6];
+		String[] colors=new String[6];
+		players = main.getPlayers();
 		
+		String color="";
+		String html="";
+		String html2="";
+		
+		// Populates names array for use in in html strings
+		for (int i=0; i<6; i++){
+			if (players.get(i).getName().length() > 12){
+				names[i]=players.get(i).getName().substring(0, 12)+"..";
+			}
+			else{
+				names[i]=players.get(i).getName();
+			}
+			
+			// Populates colors array for use in html strings. Converts RGB value into hex for HTML
+			color=Integer.toString(players.get(i).getColor().getRGB() & 0x00ffffff, 16);
+			while(color.length() < 6){
+				color = "0" + color;
+			}
+			colors[i]=color;
+	    }	
+		
+		/*
+		 * Html strings to feed to the playerLists. At the moment causes the name to not appear if the name contains < or >
+		 * as the < and > are interpreted as html code. N.B list split over 2 editorPanes, rather than a single one,
+		 * to prevent unusual cell contents pushing the other column out of alignment.
+		 */
+		html="<html><table width=90 border=0 cellpadding=0 cellspacing=1><tr>"
+				+"<td><font color="+colors[0]+">"+names[0]+"</td>"
+				+"</tr><tr>"
+				+"<td><font color="+colors[2]+">"+names[2]+"</td>"
+				+"</tr><tr>"
+				+"<td><font color="+colors[4]+">"+names[4]+"</td>"
+				+"</tr></table></html>";
+		
+		html2="<html><table width=90 border=0 cellpadding=0 cellspacing=1><tr>"
+				+"<td><font color="+colors[1]+">"+names[1]+"</td>"
+				+"</tr><tr>"
+				+"<td><font color="+colors[3]+">"+names[3]+"</td>"
+				+"</tr><tr>"
+				+"<td><font color="+colors[5]+">"+names[5]+"</td>"
+				+"</tr></table></html>";
+				
+		playerListLeft.setText(html);
+		playerListRight.setText(html2);
+	}
+	
 	// Window close dialog
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
@@ -168,10 +253,10 @@ public class GUI implements ActionListener{
 		}
 	}
 
+	// Submit button action
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		main.didPress= true;
-		
 	}
 }
 
