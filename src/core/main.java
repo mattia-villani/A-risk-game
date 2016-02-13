@@ -46,7 +46,8 @@ public class main {
 
 	public static void main(String[] args) throws IOException {
 
-		GUI window=new GUI();//create frame
+		world = WorldBuilder.Build();		
+		GUI window=new GUI(world);//create frame
 
 		while(!didPress){
 			window.setLog("Welcome! What is player 1's name?");
@@ -65,12 +66,10 @@ public class main {
 		//create players, then world, then give states armies
 
 		createPlayers();
-		world = WorldBuilder.Build();		
 		assignArmies();	
 
 		//now add correct numbers and colors to the map
-		world.invalidate();
-
+		MapRenderer.Invalidate();
 
 	}
 
@@ -102,27 +101,27 @@ public class main {
 		int statesOwned = 0;
 		for (int i = 0; i < world.getStates().size(); i++){
 			
-			if(i < statesOwned + Constants.INIT_COUNTRIES_PLAYER){
-				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
+			if(i </* statesOwned + */Constants.INIT_COUNTRIES_PLAYER){
+				statesOwned += Constants.INIT_COUNTRIES_PLAYER; // <- ERROR HERE : this keeps increasing statesOwnerd of INIT_COUNTRIES_PLAYER each cicle so this if is never false
 				world.getState(i).setOwner(player1);        
 			}
-			else if(i < statesOwned + Constants.INIT_COUNTRIES_PLAYER){
+			else if(i < /*statesOwned + */2*Constants.INIT_COUNTRIES_PLAYER){ // <- FIX
 				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
 				world.getState(i).setOwner(player2);        
 			}
-			else if(i < statesOwned + Constants.INIT_COUNTRIES_NEUTRAL){
+			else if(i < /*statesOwned + */Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut1);        
 			}
-			else if(i < statesOwned + Constants.INIT_COUNTRIES_NEUTRAL){
+			else if(i < /*statesOwned + */2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut2);        
 			}
-			else if(i < statesOwned + Constants.INIT_COUNTRIES_NEUTRAL){
+			else if(i < /*statesOwned + */3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut3);        
 			}
-			else if(i < statesOwned + Constants.INIT_COUNTRIES_NEUTRAL){
+			else if(i < /*statesOwned + */4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut4);        
 			}

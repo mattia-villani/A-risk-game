@@ -20,6 +20,8 @@ public class GraphDrawer {
 	/**
 	 * Class that actually cares about drawing the graph. It saves it in a bitmap and redraw for efficiency
 	 */
+	static final boolean verbose = false; // print lot of debugs messages
+	
 	static final float margin = 0.9f; // margin in the size after which the store image is dropped
 	static final int circle_ray = 12; // size of the circle of a country
 	static final int thickness = 9; // size of the archs 
@@ -36,7 +38,9 @@ public class GraphDrawer {
 	static final boolean paint_black_the_army = true; // flag to write in black the army
 	static final boolean show_state_view_bounds = false; // to show the rectangle of the view around a country
 	
-	final static BasicStroke stroke = new BasicStroke(3); // to draw the oval around the circle of the state 
+	final static BasicStroke stroke = new BasicStroke(2); // to draw the oval around the circle of the state 
+	
+	static boolean world_invalidate = false; // flag to say if the world was invalidated
 	
 	/* not working yet */
 	static double alpha_archs = 1.0;
@@ -116,24 +120,30 @@ public class GraphDrawer {
 	 * @param height of the view
 	 */
 	static public void drawGraph( Graphics2D comp_g, World world, int width, int height ){
+		if ( verbose ) System.out.println("Drawing graph");
 		// check if it is asked to invalidate the previus stored image 
-		boolean world_invalidate = world.invalidated();
-		world.reset_invalidate();
 		
-		graph = null;
+		if ( verbose & world_invalidate ) System.out.println("World was invalidated");
+		if ( verbose & ! world_invalidate ) System.out.println("World wasn't invalidated");
+		
 		// situation for which the stored image is dropped 
 		if ( world_invalidate // asked by some class
 				|| graph == null  // not stored yet
-				|| width>graph.getWidth()*(1.0f-margin)  // dimentions have changed too much so the scaling would be ugly
-				|| height>graph.getHeight()*(1.0f-margin) 
+				|| width>graph.getWidth()*(1.0+1.0f-margin)  // dimentions have changed too much so the scaling would be ugly
+				|| height>graph.getHeight()*(1.0+1.0f-margin) 
 				|| width<graph.getWidth()*margin 
 				|| height<graph.getHeight()*margin ){
+
+			world_invalidate = false; // reset of the invalidate 
 			
 			// if the stored image has the right dimention, then it is just initialized instead that allocated
-			if ( graph!=null && width==graph.getWidth() && height==graph.getHeight() )
+			if ( graph!=null && width==graph.getWidth() && height==graph.getHeight() ){
 				graph.flush();
-			else // otherwise simple allocates one
+				if ( verbose ) System.out.println("graph was good, flushed");
+			} else {// otherwise simple allocates one
 				graph = new BufferedImage ( width, height, BufferedImage.TYPE_INT_ARGB );
+				if ( verbose ) System.out.println("graph wasn't good, instantiated");
+			}
 			// from now on, the drawing is on the image
 			Graphics2D g = (Graphics2D) graph.getGraphics();
 			// the drawing will suit propertly the dimension of the image
@@ -183,6 +193,7 @@ public class GraphDrawer {
 			// after that it drows the nodes on the archs
 			for ( State s : world.getStates() ){
 				// for each state, the internal color is of the player
+				if ( verbose ) System.out.println(s.getName()+" is owned by "+s.getOwner()+" which has color "+s.getOwner().getColor() );
 				g.setColor( s.getOwner().getColor() );				
 				g.fillOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
 				
@@ -195,13 +206,29 @@ public class GraphDrawer {
 				drawStateValues(g,s);
 			}
 
+			if ( verbose ){
+				System.out.print("Ownerships: ");
+				for(State s: world.getStates())
+					System.out.print(s.getName()+" belongs to "+s.getOwner().getName()+", " );
+				System.out.println("");
+			}
+
 			// force to free the memory
 			g.dispose();
 		}
+		
 		
 		// it draws only if the comp_g is valid and it draws in the bitmap.
 		if ( comp_g != null )
 			comp_g.drawImage(graph, 0, 0, World.VIRTUAL_WIDTH, World.VIRTUAL_HEIGHT, null );
 	}
+
+	/**
+	 * call the invalidate method on the instance of this class stored in this_class attribute
+	 */
+	public static void Invalidate(){
+		world_invalidate = true;
+	}	
+
 	
 }

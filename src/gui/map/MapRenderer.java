@@ -22,6 +22,8 @@ public class MapRenderer extends JComponent {
 	/** copy of this reference in order to always be possible to call invalidate */
 	static private MapRenderer this_class ;
 
+	static final boolean verbose = true; // print lot of debugs messages
+	
 	/** world displayed */
 	private World world;
 	/** Matrix that rapresent the scaling and translation transofrmations to do on the content of the map */
@@ -132,7 +134,14 @@ public class MapRenderer extends JComponent {
 	 * call the invalidate method on the instance of this class stored in this_class attribute
 	 */
 	public static void Invalidate(){
-		if ( this_class != null ) this_class.invalidate();
-	}
+		if ( this_class != null ){ 
+			// this will tell graphDrawer to drop his graph
+			GraphDrawer.Invalidate(); 
+			this_class.revalidate();
+			this_class.repaint();
+			if ( verbose )System.out.println("MapRenderer was asked to invalidate: done.");
+		} else if ( verbose )System.out.println("MapRenderer was asked to invalidate: failled.");
+	}	
+
 }
 

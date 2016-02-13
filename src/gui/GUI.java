@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import core.WorldBuilder;
 import core.main;
+import core.entities.World;
 import gui.map.MapRenderer;
 
 public class GUI implements ActionListener{
@@ -26,7 +27,7 @@ public class GUI implements ActionListener{
 	public static JTextArea playerList; //work in progress
 	final static String newline = "\n";
 	
-	public GUI() throws IOException{	
+	public GUI(World world) throws IOException{	
 		uiFrame=new JFrame();
 		uiFrame.setBounds(0, 0, 1005,728);
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
@@ -70,7 +71,7 @@ public class GUI implements ActionListener{
 		map.setBounds(50, 0, 900, 600);
 	    
 		// Node Map
-		worldMap = new MapRenderer(WorldBuilder.Build());
+		worldMap = new MapRenderer(world);
 		worldMap.setBounds(50, 0, 1000, 600);
 		
 		// Combination of Background and Node maps, alignments still off

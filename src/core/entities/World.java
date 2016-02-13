@@ -12,11 +12,13 @@ abstract public class World {
 	 * ABSTRACT : read core.WorldBuilder.java header to read why.
 	 * 
 	 * This class represent the whole world. It contains all the informations that describe it.
-	 * This class is unmodificable (but invalidate attribute) since there is no reason it should change during the game.
+	 * This class is unmodificable since there is no reason it should change during the game.
 	 * It offers the possibility to memorized (used for rendering purpose) if there have been changes in the world (like for example states's ownership)
 	 * WORNING : for the getters, if they are not stored lie unmodifiables, then they may be expose the internal rapresentation of the world, since the values returned are not copies
 	 */	
 
+	final static private boolean verbose = true;
+	
 	/** VIRTUAL_WIDTH/HEIGHT are the size of the rendered world. This is the referiment for the coords of the states */
 	final public static int VIRTUAL_WIDTH = Constants.FRAME_WIDTH;
 	final public static int VIRTUAL_HEIGHT = Constants.FRAME_HEIGHT;
@@ -66,17 +68,4 @@ abstract public class World {
 		return states.get(index);
 	}
 	
-	/**
-	 * Setter : set invalidated to true & call invalidate of MapRenderer
-	 */
-	public void invalidate(){ invalidated=true; MapRenderer.Invalidate(); }
-	/**
-	 * Getter
-	 * @return true iff invalidated is true
-	 */
-	public boolean invalidated(){ return invalidated; }
-	/**
-	 * Setter : set invalidated to false
-	 */
-	public void reset_invalidate(){ invalidated = false; }
 }
