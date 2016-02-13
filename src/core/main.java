@@ -21,6 +21,16 @@ public class main {
 	private static Player neut3;
 	private static Player neut4;
 	private static ArrayList <Player> players = new ArrayList<Player>();
+	public static boolean didPress = false;
+	private static World world;
+
+	public static World getWorld() {
+		return world;
+	}
+
+	public static void setWorld(World world) {
+		main.world = world;
+	}
 
 	public static ArrayList<Player> getPlayers() {
 		return players;
@@ -30,23 +40,19 @@ public class main {
 		main.players = players;
 	}
 
-	public static boolean didPress = false;
-	public static World world;
+	
 
-	/*
-	 * main method, set up board and then create frame
-	 */
+	
 
 	public static void main(String[] args) throws IOException {
 
 		GUI window=new GUI();//create frame
-		 
 
 		while(!didPress){
 			window.setLog("Welcome! What is player 1's name?");
 		}
 		didPress = false;
-		 player1Name = window.getInput();
+		player1Name = window.getInput();
 		window.resetInput();
 		while(!didPress){
 			window.setLog(player1Name + " will be blue. What is player two's name?");
@@ -56,7 +62,23 @@ public class main {
 		window.setLog(player2Name + " will be red. Lets begin!"); 
 		window.resetInput();
 
-		// create players
+		//create players, then world, then give states armies
+
+		createPlayers();
+		world = WorldBuilder.Build();		
+		assignArmies();	
+
+		//now add correct numbers and colors to the map
+		world.invalidate();
+
+
+	}
+
+	/**
+	 *  Create players from what they inputed, then hardcode neutral players
+	 */
+	public static void createPlayers(){
+
 		player1 = new Player(player1Name, Color.blue);
 		players.add(player1);
 		player2 = new Player(player2Name, Color.red);
@@ -69,35 +91,17 @@ public class main {
 		players.add(neut3);
 		neut4 = new Player("neutral 4", Color.ORANGE);
 		players.add(neut4);
-
-		world = WorldBuilder.Build();
-		//createPlayers();
-		createGame();
-
-		
-		//world.getState(0).setOwner(owner);
-		System.out.println(world.getState(1).getOwner());
-		world.invalidate();
-		
-
 	}
-	
-	/*
-	 *  Create players from what they inputed, then hardcode neutral players
+
+	/**
+	 *	ration out states, give each player 9 and each neutral 6
 	 */
-	public static void createPlayers(){
-		
-	}
-	
-	/*
-	 *	ration out states, not randomly 
-	 */
-	public static void createGame(){
+	public static void assignArmies(){
 
 
 		int statesOwned = 0;
 		for (int i = 0; i < world.getStates().size(); i++){
-			//give each player 9, and each neutral 6
+			
 			if(i < statesOwned + Constants.INIT_COUNTRIES_PLAYER){
 				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
 				world.getState(i).setOwner(player1);        

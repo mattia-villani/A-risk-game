@@ -20,7 +20,7 @@ abstract public class World {
 	/** VIRTUAL_WIDTH/HEIGHT are the size of the rendered world. This is the referiment for the coords of the states */
 	final public static int VIRTUAL_WIDTH = Constants.FRAME_WIDTH;
 	final public static int VIRTUAL_HEIGHT = Constants.FRAME_HEIGHT;
-
+	
 	/** WORNING: for the lists the positions MUST be the same of the indexs of the object listed. */
 	/** list of states in the world... */
 	protected List<State> states;

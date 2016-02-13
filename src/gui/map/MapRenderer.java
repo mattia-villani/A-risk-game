@@ -18,10 +18,10 @@ public class MapRenderer extends JComponent {
 	/**
 	 * JComponent that cares about rendering the map.
 	 */
-	
+
 	/** copy of this reference in order to always be possible to call invalidate */
 	static private MapRenderer this_class ;
-	
+
 	/** world displayed */
 	private World world;
 	/** Matrix that rapresent the scaling and translation transofrmations to do on the content of the map */
@@ -30,7 +30,7 @@ public class MapRenderer extends JComponent {
 	private AffineTransform inverted_matrix;
 	/** real size on the screen of the area drawn */
 	private double displayed_width, displayed_height;
-	
+
 	/** added just to soppres wornings */
 	private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,7 @@ public class MapRenderer extends JComponent {
 			public void componentShown(ComponentEvent e) {}			
 		});
 	}
-		
+
 	/**
 	 * Set the matrix and inverted_matrix with the proper transformation refered to the provided dimensions
 	 * @param width of the component
@@ -92,19 +92,19 @@ public class MapRenderer extends JComponent {
 		// offsets to put the rectangle in the middle of the component
 		double x_offset = (width - displayed_width)/2.0;
 		double y_offset = (height - displayed_height)/2.0;
-		
+
 		// apply the needed transformations to the matrixs
 		matrix.translate(x_offset, y_offset);
 		matrix.scale(ratio, ratio);
 		// revers
 		inverted_matrix.scale(1/ratio, 1/ratio);
 		inverted_matrix.translate( -x_offset, -y_offset);
-		
+
 		// it asks the system to redraw
 		this.revalidate();
 		this.repaint();
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g) {
 		// call the super paintComponent(g)
@@ -112,22 +112,22 @@ public class MapRenderer extends JComponent {
 		// if the matrixs are still null, then they are initialized and stored for efficiency
 		if (matrix == null || inverted_matrix == null )
 			initMatrixs( this.getWidth(), this.getHeight() );	
-		
+
 		// working on the 2D class of the graphics, it applay the matrix transformation
 		Graphics2D g2 = (Graphics2D) g;
 		g2.transform( matrix );
-		
+
 		// asks GraphDrawer to draw the world in the graphic g2 with the evaluated sizes
 		GraphDrawer.drawGraph( g2, world, (int)displayed_width, (int)displayed_height );
-		
+
 		// draw a rectangle in the area the world will be drawn in
 		Rectangle box = new Rectangle(0,0,World.VIRTUAL_WIDTH-1,World.VIRTUAL_HEIGHT-1);
 		g2.draw(box);
-		
+
 		// "pop" the transformation to the previous one
 		g2.transform( inverted_matrix );
 	}
-	
+
 	/**
 	 * call the invalidate method on the instance of this class stored in this_class attribute
 	 */
