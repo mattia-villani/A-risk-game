@@ -7,19 +7,16 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.text.html.HTMLEditorKit;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import core.WorldBuilder;
 import core.main;
 import core.entities.World;
 import gui.map.MapRenderer;
 import core.entities.Player;
-import core.entities.World;
 
 public class GUI implements ActionListener{
 	private static JFrame uiFrame;
