@@ -83,11 +83,11 @@ public class main {
 		players.add(player1);
 		player2 = new Player(player2Name, Color.red);
 		players.add(player2);
-		neut1 = new Player("neutral 1", Color.BLACK);
+		neut1 = new Player("neutral 1", Color.magenta);
 		players.add(neut1);
 		neut2 = new Player("neutral 2", Color.green);
 		players.add(neut2);
-		neut3 = new Player("neutral 3", Color.darkGray);
+		neut3 = new Player("neutral 3", Color.gray);
 		players.add(neut3);
 		neut4 = new Player("neutral 4", Color.ORANGE);
 		players.add(neut4);
