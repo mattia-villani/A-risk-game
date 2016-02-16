@@ -184,11 +184,9 @@ public class GUI implements ActionListener{
 	}
 	
 	// Displays the player list
-	public void displayPlayerList(){
-		ArrayList <Player> players = new ArrayList<Player>();
+	public void displayPlayerList(ArrayList<Player> players){
 		String[] names=new String[6];
 		String[] colors=new String[6];
-		players = main.getPlayers();
 		
 		String color="";
 		String html="";

@@ -66,6 +66,7 @@ public class main {
 		//create players, then world, then give states armies
 
 		createPlayers();
+		window.displayPlayerList(players);
 		assignArmies();	
 
 		//now add correct numbers and colors to the map
