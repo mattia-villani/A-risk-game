@@ -252,7 +252,7 @@ public class GUI implements ActionListener{
 	// Submit button action
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		main.didPress= true;
+		main.pressed();
 	}
 }
 

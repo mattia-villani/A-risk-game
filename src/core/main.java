@@ -21,7 +21,7 @@ public class main {
 	private static Player neut3;
 	private static Player neut4;
 	private static ArrayList <Player> players = new ArrayList<Player>();
-	public static boolean didPress = false;
+	private static boolean didPress = false;
 	private static World world;
 
 	public static World getWorld() {
@@ -39,7 +39,12 @@ public class main {
 	public static void setPlayers(ArrayList<Player> players) {
 		main.players = players;
 	}
-
+	
+	public static void pressed() {
+		
+		didPress = true;
+		
+	}
 	
 
 	
@@ -49,12 +54,16 @@ public class main {
 		world = WorldBuilder.Build();		
 		GUI window=new GUI(world);//create frame
 
+		
+		if (didPress = true) didPress = false;
 		while(!didPress){
 			window.setLog("Welcome! What is player 1's name?");
 		}
 		didPress = false;
 		player1Name = window.getInput();
 		window.resetInput();
+		
+		if (didPress = true) didPress = false;
 		while(!didPress){
 			window.setLog(player1Name + " will be blue. What is player two's name?");
 		}
@@ -102,31 +111,33 @@ public class main {
 		int statesOwned = 0;
 		for (int i = 0; i < world.getStates().size(); i++){
 			
-			if(i </* statesOwned + */Constants.INIT_COUNTRIES_PLAYER){
-				statesOwned += Constants.INIT_COUNTRIES_PLAYER; // <- ERROR HERE : this keeps increasing statesOwnerd of INIT_COUNTRIES_PLAYER each cicle so this if is never false
+			if(i < Constants.INIT_COUNTRIES_PLAYER){
+				statesOwned += Constants.INIT_COUNTRIES_PLAYER; 
 				world.getState(i).setOwner(player1);        
 			}
-			else if(i < /*statesOwned + */2*Constants.INIT_COUNTRIES_PLAYER){ // <- FIX
+			else if(i < 2*Constants.INIT_COUNTRIES_PLAYER){ 
 				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
 				world.getState(i).setOwner(player2);        
 			}
-			else if(i < /*statesOwned + */Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
+			else if(i < Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut1);        
 			}
-			else if(i < /*statesOwned + */2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
+			else if(i < 2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut2);        
 			}
-			else if(i < /*statesOwned + */3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
+			else if(i < 3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut3);        
 			}
-			else if(i < /*statesOwned + */4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ // <- FIX
+			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(i).setOwner(neut4);        
 			}
 			world.getState(i).setArmy(1);
 		}
 	}
+
+	
 }
