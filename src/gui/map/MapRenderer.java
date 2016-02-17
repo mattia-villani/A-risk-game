@@ -22,7 +22,7 @@ public class MapRenderer extends JComponent {
 	/** copy of this reference in order to always be possible to call invalidate */
 	static private MapRenderer this_class ;
 
-	static final boolean verbose = true; // print lot of debugs messages
+	static final boolean verbose = false; // print lot of debugs messages
 	
 	/** world displayed */
 	private World world;
