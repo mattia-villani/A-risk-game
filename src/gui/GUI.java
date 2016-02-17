@@ -42,7 +42,7 @@ public class GUI implements ActionListener{
 		
 		
 		// Left wooden border
-		final BufferedImage leftWood = ImageIO.read(new File("images/left.jpg"));
+		final BufferedImage leftWood = ImageIO.read(getClass().getResourceAsStream("/images/left.jpg"));
 		leftLabel= new JLabel(){
 			@Override
 			public void paint(Graphics g){
@@ -54,7 +54,7 @@ public class GUI implements ActionListener{
 		uiFrame.getContentPane().add(leftLabel);
 
 		// Right wooden border
-		final BufferedImage rightWood = ImageIO.read(new File("images/right.jpg"));
+		final BufferedImage rightWood = ImageIO.read(getClass().getResourceAsStream("/images/right.jpg"));
 		rightLabel= new JLabel(){
 			@Override
 			public void paint(Graphics g){
@@ -65,8 +65,9 @@ public class GUI implements ActionListener{
 		rightLabel.setBounds(950, 0, 50, 700);
 		uiFrame.getContentPane().add(rightLabel);
 		
+
 		// Background Map
-		final BufferedImage bkimage = ImageIO.read(new File("images/map.jpg"));
+		final BufferedImage bkimage = ImageIO.read(getClass().getResourceAsStream("/images/map.jpg"));
 		map = new JLabel(){
 			@Override
 			public void paint(Graphics g){
