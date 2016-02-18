@@ -143,6 +143,15 @@ public class main {
 			world.getState(i).setArmy(1);
 		}
 	}
+	
+	public static int diceRoll(){
+		double rand = Math.random();
+		int returnVal = 1 + (int)(rand * 6);
+		return returnVal;
+		
+		
+		
+	}
 
 	
 }

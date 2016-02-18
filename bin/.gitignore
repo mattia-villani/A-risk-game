@@ -1,13 +1,8 @@
+/.DS_Store
 /.classpath
 /.project
 /README.md
-/Main.class
-/main.class
-/Constants.class
-/tests/
-/gui/
-/map/
 /core/
+/gui/
 /images/
-/main$1.class
-/main$2.class
+/tests/
