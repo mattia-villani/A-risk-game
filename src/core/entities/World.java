@@ -5,6 +5,7 @@ package core.entities;
 import java.util.*;
 
 import core.Constants;
+import core.main;
 import gui.map.MapRenderer;
 
 abstract public class World {
@@ -28,6 +29,8 @@ abstract public class World {
 	protected List<State> states;
 	/** list of continents in the world... */
 	protected List<Continent> continents;
+	/** list of players in the world ... */
+	private static ArrayList <Player> players = new ArrayList<Player>();
 	
 	/** flag that says if something changed in the world ( this will be used by the renderer )*/
 	private boolean invalidated = true;
@@ -67,5 +70,14 @@ abstract public class World {
 	public State getState( int index ){
 		return states.get(index);
 	}
+	
+	public static ArrayList<Player> getPlayers() {
+		return players;
+	}
+
+	public static void setPlayers(ArrayList<Player> players) {
+		World.players = players;
+	}
+
 	
 }

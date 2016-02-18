@@ -19,6 +19,8 @@ public class Player {
 	 */
 	private Color color;
 	
+	private int numArmies;
+	
 	/**
 	 * Constructor
 	 * @param name of the player
@@ -27,6 +29,15 @@ public class Player {
 	public Player(String name, Color color){
 		this.name=name;
 		this.color=color;
+		this.numArmies = 0;
+	}
+
+	public int getNumArmies() {
+		return numArmies;
+	}
+
+	public void setNumArmies(int numArmies) {
+		this.numArmies = numArmies;
 	}
 
 	/**

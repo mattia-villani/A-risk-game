@@ -25,7 +25,6 @@ public class main {
 	private static Player neut2;
 	private static Player neut3;
 	private static Player neut4;
-	private static ArrayList <Player> players = new ArrayList<Player>();
 	private static boolean didPress = false;
 	private static World world;
 
@@ -37,13 +36,7 @@ public class main {
 		main.world = world;
 	}
 
-	public static ArrayList<Player> getPlayers() {
-		return players;
-	}
-
-	public static void setPlayers(ArrayList<Player> players) {
-		main.players = players;
-	}
+	
 	
 	public static void pressed() {
 		
@@ -80,7 +73,8 @@ public class main {
 		//create players, then world, then give states armies
 
 		createPlayers();
-		window.displayPlayerList(players);
+		window.displayPlayerList(World.getPlayers());
+		assignStates();
 		assignArmies();	
 
 		//now add correct numbers and colors to the map
@@ -92,25 +86,25 @@ public class main {
 	 *  Create players from what they inputed, then hardcode neutral players
 	 */
 	public static void createPlayers(){
-
+		
 		player1 = new Player(player1Name, Color.blue);
-		players.add(player1);
+		World.getPlayers().add(player1);
 		player2 = new Player(player2Name, Color.red);
-		players.add(player2);
+		World.getPlayers().add(player2);
 		neut1 = new Player("neutral 1", Color.magenta);
-		players.add(neut1);
+		World.getPlayers().add(neut1);
 		neut2 = new Player("neutral 2", Color.green);
-		players.add(neut2);
+		World.getPlayers().add(neut2);
 		neut3 = new Player("neutral 3", Color.gray);
-		players.add(neut3);
+		World.getPlayers().add(neut3);
 		neut4 = new Player("neutral 4", Color.ORANGE);
-		players.add(neut4);
+		World.getPlayers().add(neut4);
 	}
 
 	/**
 	 *	ration out states, give each player 9 and each neutral 6
 	 */
-	public static void assignArmies(){
+	public static void assignStates(){
 
 
 		int statesOwned = 0;
@@ -141,6 +135,19 @@ public class main {
 				world.getState(i).setOwner(neut4);        
 			}
 			world.getState(i).setArmy(1);
+		}
+	}
+	
+	public static void assignArmies(){
+		ArrayList<Player> players = World.getPlayers();
+		for(int i = 0; i < players.size(); ++i){
+			if (i < players.size() - Constants.NUM_NEUTRALS){
+				players.get(i).setNumArmies(Constants.INIT_UNITS_PLAYER);
+			}
+			else{
+				players.get(i).setNumArmies(Constants.INIT_UNITS_NEUTRAL);
+			}
+			System.out.println(players.get(i).getName() + " " + players.get(i).getNumArmies());
 		}
 	}
 	
