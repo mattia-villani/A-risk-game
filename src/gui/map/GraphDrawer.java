@@ -72,7 +72,7 @@ public class GraphDrawer {
 		// evaluates the size of the text
 		Rectangle2D size = g.getFontMetrics().getStringBounds(s.getArmy()+"",g);
 		// set the color
-		g.setColor(paint_black_the_army?Color.BLACK:s.getContinet().getColor());
+		g.setColor(paint_black_the_army?Color.WHITE:s.getContinet().getColor());
 		// draws the text making it appear centerly in the rect ( fixing it with the values provided )
 		g.drawString(s.getArmy()+"", 
 				(int)( (size_state_view_width-size.getWidth())/2 + x_text_army_fixer ), 
