@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import core.entities.Player;
+import core.entities.TerritoryCard;
+import core.entities.TerritoryDeck;
 import core.entities.World;
 import gui.GUI;
 import gui.map.MapRenderer;
@@ -59,8 +61,8 @@ public class main {
 
 		createPlayers();
 		window.displayPlayerList(World.getPlayers());
-		assignStates();
-		assignArmies();	
+		assignArmies();
+		assignStates();	
 
 		rollTheDiceToStart();
 
@@ -95,7 +97,7 @@ public class main {
 
 
 	/**
-	 *  Create players from the names each player inputed, then hardcode neutral players
+	 *  Create players from the names each player input, then hardcode neutral players
 	 */
 	public static void createPlayers(){
 
@@ -103,51 +105,67 @@ public class main {
 		World.getPlayers().add(player1);
 		player2 = new Player(player2Name, Color.red);
 		World.getPlayers().add(player2);
-		neut1 = new Player("neutral 1", Color.magenta);
+		neut1 = new Player("Neutral 1", Color.magenta);
 		World.getPlayers().add(neut1);
-		neut2 = new Player("neutral 2", Color.green);
+		neut2 = new Player("Neutral 2", Color.green);
 		World.getPlayers().add(neut2);
-		neut3 = new Player("neutral 3", Color.gray);
+		neut3 = new Player("Neutral 3", Color.gray);
 		World.getPlayers().add(neut3);
-		neut4 = new Player("neutral 4", Color.BLACK);
+		neut4 = new Player("Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
 	}
 
 	/**
-	 *	ration out states, give each player 9 and each neutral 6
+	 *	Ration out states, give each player 9 and each neutral 6, decided by territory cards. 
 	 */
 	public static void assignStates(){
-
-
+		
+		TerritoryDeck Deck = new TerritoryDeck();
+		
 		int statesOwned = 0;
-		for (int i = 0; i < world.getStates().size(); i++){
+		for (int i=0; i<world.getStates().size(); i++){
 
+			TerritoryCard temp=Deck.drawTerritoryCard();
+			
 			if(i < Constants.INIT_COUNTRIES_PLAYER){
 				statesOwned += Constants.INIT_COUNTRIES_PLAYER; 
-				world.getState(i).setOwner(player1);        
+				world.getState(temp.getIndex()).setOwner(player1);        
 			}
 			else if(i < 2*Constants.INIT_COUNTRIES_PLAYER){ 
 				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
-				world.getState(i).setOwner(player2);        
+				world.getState(temp.getIndex()).setOwner(player2);        
 			}
 			else if(i < Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
-				world.getState(i).setOwner(neut1);        
+				world.getState(temp.getIndex()).setOwner(neut1);        
 			}
 			else if(i < 2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
-				world.getState(i).setOwner(neut2);        
+				world.getState(temp.getIndex()).setOwner(neut2);        
 			}
 			else if(i < 3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
-				world.getState(i).setOwner(neut3);        
+				world.getState(temp.getIndex()).setOwner(neut3);        
 			}
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
-				world.getState(i).setOwner(neut4);        
+				world.getState(temp.getIndex()).setOwner(neut4);        
 			}
-			world.getState(i).setArmy(1);
+			world.getState(temp.getIndex()).setArmy(1);
+			Player tempPlayer=world.getState(temp.getIndex()).getOwner();
+			tempPlayer.setNumArmies(tempPlayer.getNumArmies()-1);
+		
+			/** Testing assignment on each pass through loop		 		
+			System.out.println("Country " + i + ": "+ world.getState(temp.getIndex()).getName() + ". Assigend to: " + tempPlayer.getName() + ". Armies remaining: " + tempPlayer.getNumArmies());	
+			**/
 		}
+		
+		/** Testing final player list & army size after assignment is finished
+		ArrayList<Player> players = World.getPlayers();
+		for(int x = 0; x < players.size(); ++x){
+			System.out.println(players.get(x).getName() + " " + players.get(x).getNumArmies());	
+		}
+		**/
 	}
 
 	public static void assignArmies(){
