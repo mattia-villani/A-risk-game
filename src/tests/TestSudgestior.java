@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import oracle.Oracle;
-import oracle.Oracle.Result;
+import oracle.Result;
 import oracle.Tree;
 
 public class TestSudgestior {
