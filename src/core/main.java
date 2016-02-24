@@ -76,23 +76,12 @@ public class main {
 	 */
 
 	public static void getNames() {
-
-		if (didPress = true) didPress = false;
-		while(!didPress){
-			window.setLog("Welcome! What is player 1's name?");
-		}
-		didPress = false;
-		player1Name = window.getInput();
-		window.resetInput();
-
-		if (didPress = true) didPress = false;
-		while(!didPress){
-			window.setLog(player1Name + " will be blue. What is player two's name?");
-		}
-		didPress = false;
-		player2Name = window.getInput();
-		window.setLog(player2Name + " will be red. Lets begin!"); 
-		window.resetInput();
+		window.setLog("Welcome! What is player 1's name?");
+		player1Name = window.getCommand();	
+		window.setLog(player1Name + " will be blue.\n\n What is player 2's name?");
+		player2Name = window.getCommand();
+		window.setLog(player2Name + " will be red."); 
+		return;
 	}
 
 
@@ -117,55 +106,55 @@ public class main {
 
 	/**
 	 *	Ration out states, give each player 9 and each neutral 6, decided by territory cards. 
-	 */
+	 **/
+	
 	public static void assignStates(){
 		
 		TerritoryDeck Deck = new TerritoryDeck();
 		
-		int statesOwned = 0;
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		window.setLog("It's time to draw territory cards. Press enter when ready.");
+		window.getCommand();
+		
 		for (int i=0; i<world.getStates().size(); i++){
 
 			TerritoryCard temp=Deck.drawTerritoryCard();
 			
-			if(i < Constants.INIT_COUNTRIES_PLAYER){
-				statesOwned += Constants.INIT_COUNTRIES_PLAYER; 
-				world.getState(temp.getIndex()).setOwner(player1);        
+			if(i < Constants.INIT_COUNTRIES_PLAYER){ 
+				world.getState(temp.getIndex()).setOwner(player1);
 			}
 			else if(i < 2*Constants.INIT_COUNTRIES_PLAYER){ 
-				statesOwned += Constants.INIT_COUNTRIES_PLAYER;
-				world.getState(temp.getIndex()).setOwner(player2);        
+				world.getState(temp.getIndex()).setOwner(player2); 
 			}
 			else if(i < Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(temp.getIndex()).setOwner(neut1);        
 			}
 			else if(i < 2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(temp.getIndex()).setOwner(neut2);        
 			}
 			else if(i < 3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(temp.getIndex()).setOwner(neut3);        
 			}
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				statesOwned += Constants.INIT_COUNTRIES_NEUTRAL;
 				world.getState(temp.getIndex()).setOwner(neut4);        
 			}
 			world.getState(temp.getIndex()).setArmy(1);
-			Player tempPlayer=world.getState(temp.getIndex()).getOwner();
-			tempPlayer.setNumArmies(tempPlayer.getNumArmies()-1);
-		
-			/** Testing assignment on each pass through loop		 		
-			System.out.println("Country " + i + ": "+ world.getState(temp.getIndex()).getName() + ". Assigend to: " + tempPlayer.getName() + ". Armies remaining: " + tempPlayer.getNumArmies());	
-			**/
+			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
+			
+			window.setLog(world.getState(temp.getIndex()).getOwner().getName() + " has drawn: "+world.getState(temp.getIndex()).getName());
+			
+			try {
+				Thread.sleep(550);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} 
+			MapRenderer.Invalidate();
 		}
-		
-		/** Testing final player list & army size after assignment is finished
-		ArrayList<Player> players = World.getPlayers();
-		for(int x = 0; x < players.size(); ++x){
-			System.out.println(players.get(x).getName() + " " + players.get(x).getNumArmies());	
-		}
-		**/
 	}
 
 	public static void assignArmies(){
