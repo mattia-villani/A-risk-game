@@ -11,16 +11,16 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import core.main;
 import core.entities.World;
 import gui.map.MapRenderer;
 import core.entities.Player;
 
-public class GUI implements ActionListener{
+public class GUI{
 	private static JFrame uiFrame;
 	private static JLayeredPane layeredPane;
 	private static JComponent worldMap;
@@ -33,6 +33,7 @@ public class GUI implements ActionListener{
 	private static JButton submitButton;
 	private static JEditorPane playerListLeft;
 	private static JEditorPane playerListRight;
+	private ActionButton bob;
 	final static String newline = "\n";
 	
 	public GUI(World world) throws IOException{	
@@ -46,6 +47,8 @@ public class GUI implements ActionListener{
 		// Left wooden border
 		final BufferedImage leftWood = ImageIO.read(getClass().getResourceAsStream("/images/left.jpg"));
 		leftLabel= new JLabel(){
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void paint(Graphics g){
 				super.paint(g);
@@ -58,6 +61,8 @@ public class GUI implements ActionListener{
 		// Right wooden border
 		final BufferedImage rightWood = ImageIO.read(getClass().getResourceAsStream("/images/right.jpg"));
 		rightLabel= new JLabel(){
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void paint(Graphics g){
 				super.paint(g);
@@ -71,6 +76,8 @@ public class GUI implements ActionListener{
 		// Background Map
 		final BufferedImage bkimage = ImageIO.read(getClass().getResourceAsStream("/images/map.jpg"));
 		map = new JLabel(){
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void paint(Graphics g){
 				super.paint(g);
@@ -126,6 +133,7 @@ public class GUI implements ActionListener{
 		
 		// Input area - Focuses on creation
 		textInput = new JTextField(){
+			private static final long serialVersionUID = 1L;
 			public void addNotify(){
 				super.addNotify();
 				requestFocus();
@@ -146,8 +154,9 @@ public class GUI implements ActionListener{
 		
 		
 		// Submit button, non focusable, default action for enter key
+		bob = new ActionButton();
 		submitButton = new JButton("Submit");
-		submitButton.addActionListener(this); 
+		submitButton.addActionListener(bob); 
 		submitButton.setBounds(748, 665, 201, 35);
 		submitButton.setFocusable(false);
 		uiFrame.getContentPane().add(submitButton);
@@ -251,11 +260,42 @@ public class GUI implements ActionListener{
 			}
 		}
 	}
+	
+	public String getCommand () {
+		return bob.getCommand();
+	}
 
 	// Submit button action
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		main.pressed();
+	class ActionButton implements ActionListener{
+		
+		private LinkedList<String> commandBuffer = new LinkedList<String>();
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			synchronized (commandBuffer) {
+				commandBuffer.add(textInput.getText());
+				textInput.setText("");
+				commandBuffer.notify();
+			}
+			return;
+		}  
+		           
+		public String getCommand() {
+			String command;
+			
+			synchronized (commandBuffer) {
+				while (commandBuffer.isEmpty()) {
+					try {
+						commandBuffer.wait();
+					} 
+					catch (InterruptedException e) {
+							e.printStackTrace();
+					}
+				}
+				command = commandBuffer.pop();
+			}		
+			return command;
+		}
 	}
 }
 
