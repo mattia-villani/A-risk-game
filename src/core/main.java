@@ -173,7 +173,12 @@ public class main {
 	public static void rollTheDiceToStart(){
 		int player1Roll = diceRollNumber();
 		int player2Roll = diceRollNumber();
-
+		window.setLog("Press enter to Roll, player1!");
+		window.getCommand();
+		//perform animation
+		window.setLog("Press enter to Roll, player2!");
+		window.getCommand();
+		//perform animation
 		if (player1Roll > player2Roll){
 			window.setLog("Player1 will go first");
 			turn = 0;
