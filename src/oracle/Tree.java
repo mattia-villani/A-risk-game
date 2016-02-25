@@ -14,76 +14,79 @@ import javax.xml.stream.events.Characters;
 
 public class Tree {
 	
-	private boolean finalNode;
-	private Map<Character, Tree> childs;
+	int count = 0;
+	boolean finalNode = false;
+	Character nodeLabel ;
+	private Map<Character, Tree> childs = new HashMap<>();
 	
-	private Tree(){
-		finalNode = true;
-		childs = new HashMap<>();
+	public Tree ( char head, String tail ){
+		assert tail != null;
+		nodeLabel = head;
+		if ( ! tail.equals("") )
+			add(tail);
 	}
-	public Tree( Iterator<Character> iterator ){
-		this();
-		add(iterator);
-	}
-	public Tree( String string ){
-		this();
-		add(string);
-	}
+	
 	public Tree( Collection<String> input ){
-		this();
+		boolean insertedAtLeastOne = false;
 		for ( String string : input )
-			add( string );
+			if ( string != null ){
+				add( string );
+				insertedAtLeastOne = true;
+			}
+		assert insertedAtLeastOne : "The collection was invalid or empty";
+	}
+	
+	public void setAsFinal(){
+		finalNode = true;
 	}
 	
 	public void add( String string ){
-		List<Character> list = new LinkedList<>();
-		for ( int i = 0 ; i<string.length(); i++ )
-			list.add( string.charAt(i) );
-		add( list.iterator() ) ;
-	}
-	
-	public void add ( Iterator<Character> iterator ){
-		if ( iterator.hasNext() == false ) finalNode = (childs.size()==0);
-		else{
-			finalNode = false;
-			Character character = iterator.next();
-			if ( childs.containsKey(character) ) childs.get(character).add(iterator);
-			else childs.put(character, new Tree(iterator) );
+		assert (string!=null && !string.equals("")) : "Why is string null or empty??";
+		char head = string.charAt(0);
+		String tail = string.substring(1);
+		Tree tree = null;
+		count ++;
+		if ( childs.containsKey(head) ) tree = childs.get(head);
+		else {
+			tree = new Tree(head, tail);
+			childs.put(head, tree);
 		}
+		if ( tail.equals("") ) tree.setAsFinal();
 	}
 	
-	private String tailIfUnique(){
-		String string = null ;
-		if ( finalNode )
-			string = "";
-		else
-			if ( childs.size()==1 ) {
-				Character character = childs.keySet().iterator().next();
-				String tail = childs.get(character).tailIfUnique();
-				if ( tail != null )
-					string = character + tail;
+	public Tree evalue( String string ){
+		assert string != null : "string should be not null";
+		assert !string.equals("") || finalNode : "string shouldn't be empty";
+		Tree result = null;
+		if ( string.equals("") && this.finalNode ) result = this;
+		else{
+			char head = string.charAt(0);
+			String tail = string.substring(1);
+			if ( childs.containsKey(head) == false ) { /* not into */ }
+			else {
+				Tree tree = childs.get(head);
+				result = tree.evalue(tail);
 			}
-		return string;
-	}
-	
-	public Result evalue( Iterator<Character> iterator ){
-		Result result = null;
-		if ( iterator.hasNext() == false ){
-			String tail = tailIfUnique();
-			result = new Result(
-					true, // if i am arrived so far, then the head is present
-					this.finalNode, // if it is true, then, both the tree and the iterator finished together
-					tail != null,
-					tail
-				);
-		}else{
-			Character character = iterator.next();
-			if ( childs.containsKey(character) == false )
-				result = new Result.EmptyResult();
-			else 
-				result = childs.get(character).evalue(iterator);
 		}
 		return result;
 	}
+	public boolean isFinal(){
+		return finalNode;
+	}
+	public boolean isUniquePath(){
+		return count == 0;
+	}
+	public Character getChar(){
+		return nodeLabel;
+	}
+	
+	public String getUniquePath(){
+		if ( ! isUniquePath() ) throw new RuntimeException();
+		char key = childs.keySet().iterator().next();
+		Tree tree = childs.get(key);
+		if ( tree.isFinal() ) return tree.getChar().toString();
+		else return tree.getChar()+tree.getUniquePath();
+	}
+	
 }
 

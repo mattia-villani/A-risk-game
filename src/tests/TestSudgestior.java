@@ -9,6 +9,14 @@ import oracle.Result;
 import oracle.Tree;
 
 public class TestSudgestior {
+	
+	public static void yes(int i){
+		System.out.println("test "+(i++)+" ok");
+	}
+	
+	public static void no(int i){
+		System.out.println("test "+(i++)+" fail");
+	}
 
 	public static void main(String[] args) {
 		
@@ -20,22 +28,28 @@ public class TestSudgestior {
 		for ( String s : dictionary )
 			words.add(s);
 		
-		Tree tree = new Tree( words );
+		Tree tree;
 		
-		Oracle oracle = new Oracle( tree );
-		
-		Result [][] results = new Result[][]{
-			new Result[]{ oracle.evalue("abc"), new Result(true,true,true,"")  },
-			new Result[]{ oracle.evalue("ab"),  new Result(true,false,false,"")  },
-			new Result[]{ oracle.evalue("ERR"), new Result(false,false,false,null)  },
-			new Result[]{ oracle.evalue("da"), new Result(true,false,true,"f")  },
-			new Result[]{ oracle.evalue("d"), new Result(true,false,true,"sas")  }			
-		};
-		
-		int i=0;
-		for ( Result[] pair : results )
-			if ( pair[1].equals(pair[0]) ) System.out.println("test "+(i++)+" ok");
-			else System.out.println("test "+(i++)+" fail");
+		Oracle oracle = new Oracle( new Tree( words ) );
+				
+		try{
+			tree = oracle.evalue("abc");
+			if ( tree!=null && tree.isUniquePath() && "".equals(tree.getUniquePath()) ) yes(1);
+			else no(1);
+		}catch(Exception e){ no(1); };
+
+		try{
+			tree = oracle.evalue("ab");
+			if ( tree!=null && !tree.isUniquePath() ) yes(2);
+			else no(2);
+		}catch(Exception e){ no(2); };
+
+		try{
+			tree = oracle.evalue("errore");
+			if ( tree==null ) yes(3);
+			else no(3);
+		}catch(Exception e){ no(3); };
+
 
 	}
 

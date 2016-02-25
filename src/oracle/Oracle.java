@@ -11,11 +11,8 @@ public class Oracle {
 		this.tree = tree;
 	}
 	
-	public Result evalue( String string ){ 
-		List<Character> list = new LinkedList<>();
-		for (int i=0;i<string.length(); i++)
-			list.add( string.charAt(i) );
-		return tree.evalue( list.iterator() ); 
+	public Tree evalue( String string ){ 
+		return tree.evalue( string ); 
 	}
 	
 }
