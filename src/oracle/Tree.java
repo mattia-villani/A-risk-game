@@ -35,6 +35,12 @@ public class Tree {
 		add(tail);
 	}
 	
+	public Tree( String[] input ){
+		for (String string : input)
+			if ( string != null )
+				add(string);
+	}
+	
 	public Tree( Collection<String> input ){
 		boolean insertedAtLeastOne = false;
 		for ( String string : input )
@@ -54,7 +60,10 @@ public class Tree {
 		String tail = string.substring(1);
 		Tree tree = null;
 		if ( childs.containsKey(head) ){ 
-			if ( ! tail.equals("") ) childs.get(head).add( tail );
+			if ( ! tail.equals("") ) {
+				if ( childs.get(head) == null ) childs.put(head, new Tree() );
+				childs.get(head).add( tail );
+			}
 		} else {
 			tree = tail.equals("") ? null : new Tree(tail);
 			childs.put(head, tree);

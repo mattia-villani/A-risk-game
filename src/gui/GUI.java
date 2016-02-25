@@ -132,7 +132,7 @@ public class GUI{
 		
 		
 		// Input area - Focuses on creation
-		textInput = new JTextField(){
+		textInput = new OracledTextField(){
 			private static final long serialVersionUID = 1L;
 			public void addNotify(){
 				super.addNotify();
