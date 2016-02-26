@@ -53,6 +53,9 @@ abstract public class State {
 	 */
 	abstract protected void init(int i);
 
+
+	public int[] getAdjacent(){ return adjacent; }
+
 	/**
 	 * Getter.
 	 * @return the x attribute

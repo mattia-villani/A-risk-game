@@ -20,7 +20,7 @@ public class OracledTextField extends JTextField {
 
 	private final static boolean verbose = true;
 	
-	private boolean oracleEnabled = true;
+	private boolean oracleEnabled = false;
 	private boolean errorColor = false;
 	private String lastValid = "";
 	private String prediction;
@@ -35,13 +35,7 @@ public class OracledTextField extends JTextField {
 	}
 	
 	public OracledTextField(){
-		super();
-		this.enableOracle( new Tree( new String[]{
-				"prova",
-				"provaNumeroDue",
-				"cosa sta succedendo"
-		} ) );
-		
+		super();		
 		this.getDocument().addDocumentListener(new DocumentListener(){
 			
 			public boolean callRefresh(DocumentEvent arg0){
@@ -151,7 +145,10 @@ public class OracledTextField extends JTextField {
 				prediction = result.getUniquePath();
 				return true;
 			}else prediction = null;
-		} catch(Tree.NotUniqueException e){ return true; }
+		} catch(Tree.NotUniqueException e){ 
+			prediction = null; 
+			return true; 
+		}
 		return false;
 	}
 	

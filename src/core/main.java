@@ -62,6 +62,8 @@ public class main {
 		assignStates();	
 
 		rollTheDiceToStart();
+		
+		window.enableOracle( world, player1 );
 
 		//now add correct numbers and colors to the map
 		MapRenderer.Invalidate();

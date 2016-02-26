@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import core.main;
 import core.entities.World;
 import gui.map.MapRenderer;
+import oracle.Oracle;
 import core.entities.Player;
 
 public class GUI{
@@ -170,6 +171,10 @@ public class GUI{
 		uiFrame.addWindowListener(new closure());
 		uiFrame.setVisible(true);
 		
+	}
+	
+	public void enableOracle( World world, Player player ){
+		this.textInput.enableOracle(Oracle.GenerateOracleTree(world, player));
 	}
 	
 	// Text log methods. Get, set, add and reset.

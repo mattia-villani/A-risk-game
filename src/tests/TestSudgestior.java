@@ -34,7 +34,7 @@ public class TestSudgestior {
 		
 		Tree tree;
 		
-		Oracle oracle = new Oracle( root );
+		Tree oracle = root;
 				
 		try{
 			tree = oracle.evalue("abc");
