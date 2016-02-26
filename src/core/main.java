@@ -203,6 +203,7 @@ public class main {
 	}
 
 	public static boolean setReinforcements (String stateName, int player){
+		boolean returnVal = false;
 		for (State state : world.getStates()){
 			if (stateName.equals(state.getName())){
 				if(player <  2){
@@ -211,9 +212,10 @@ public class main {
 				else{
 					state.setArmy(state.getArmy() + 1);
 				}
-				return true;
+				returnVal =  true;
 			}
 		}
-		return false;
+		MapRenderer.Invalidate();
+		return returnVal;
 	}
 }
