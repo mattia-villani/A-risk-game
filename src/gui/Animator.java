@@ -1,9 +1,12 @@
 package gui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.SwingUtilities;
 
 public class Animator {
 		
@@ -43,7 +46,7 @@ public class Animator {
 			originalDuration = duration;
 			this.postHandler = new Runnable(){
 				@Override 
-				public void run(){ post(); }
+				public void run(){ FromZeroToOneIntervalHandler.this.run(1.0f); post(); }
 			};
 		}
 		@Override
@@ -103,7 +106,13 @@ public class Animator {
 						list.removeAll(toIgnore);
 					}
 					for ( Runnable runnable : postHandlers )
-						runnable.run();
+						try {
+							SwingUtilities.invokeAndWait( runnable );
+						} catch (InvocationTargetException e1) {
+							e1.printStackTrace();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
 					try {
 						Thread.sleep(timeToWait);
 					} catch (InterruptedException e) {e.printStackTrace();}

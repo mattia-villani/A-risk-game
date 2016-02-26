@@ -22,7 +22,7 @@ import oracle.Oracle;
 import core.entities.Player;
 
 public class GUI{
-	private static JFrame uiFrame;
+	private static FancyFullFrameAnimation uiFrame;
 	private static JLayeredPane layeredPane;
 	private static JComponent worldMap;
 	private static JLabel map;
@@ -171,6 +171,7 @@ public class GUI{
 		uiFrame.addWindowListener(new closure());
 		uiFrame.setVisible(true);
 		
+		uiFrame.startAnimation();
 	}
 	
 	public void enableOracle( World world, Player player ){
