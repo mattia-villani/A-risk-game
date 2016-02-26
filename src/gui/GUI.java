@@ -171,7 +171,10 @@ public class GUI{
 		uiFrame.addWindowListener(new closure());
 		uiFrame.setVisible(true);
 		
-		uiFrame.startAnimation();
+		uiFrame.startAnimation(new Rolling(uiFrame,new int[][]{ 
+				new int[] { 3 , 4 },
+				new int[] { 5, 2, 1 }
+		}));
 	}
 	
 	public void enableOracle( World world, Player player ){
