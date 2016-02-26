@@ -41,7 +41,7 @@ public class GUI{
 	public GUI(World world) throws IOException{	
 		animator = new Animator();
 		
-		uiFrame=new JFrame();
+		uiFrame=new FancyFullFrameAnimation();
 		uiFrame.setBounds(0, 0, 1005,728);
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
 		uiFrame.getContentPane().setLayout(null);

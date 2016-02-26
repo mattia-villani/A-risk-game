@@ -28,8 +28,9 @@ public class Oracle extends Tree{
 		
 		String prefix = "attack ";
 		for ( State state : world.getStates() )
-			for ( int index : state.getAdjacent() )
-				legalStrings.add( prefix + world.getState(index).getName() );
+			if ( state.getOwner() == player )
+				for ( int index : state.getAdjacent() )
+					legalStrings.add( prefix + world.getState(index).getName() );
 		
 		return new Oracle(legalStrings);
 	}

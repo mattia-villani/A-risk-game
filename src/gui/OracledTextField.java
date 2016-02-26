@@ -74,7 +74,7 @@ public class OracledTextField extends JTextField {
 								refresh(lastValid);
 						    }
 						});
-						Animator.add(new Animator.Handler(250,1){
+						Animator.add(new Animator.Handler(250,0,1){
 
 							@Override
 							public void run() {
