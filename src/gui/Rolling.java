@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -17,8 +18,29 @@ public class Rolling extends View {
 	public final static int littleViewHeight = 120;
 	public final static int littleViewWidth = 120;
 	public final static int duration = 2000;
+	private final static boolean verbose = true;
 	
-	private Image dice;
+	static private Image[] diceFrames;
+	static private final int N = 72;
+	static private int[] positions = new int[]{
+		37, // 1
+		46, // 2
+		19, // 3
+		55, // 4
+		64, // 5
+		0,  // 6
+	};
+	
+	static void loadImages (Class clazz) {
+		if ( diceFrames != null ) return;
+		diceFrames = new Image[N];
+		for ( int i=0; i<N; i++ )
+			try {
+				diceFrames[i] = ImageIO.read(clazz.getResourceAsStream("/images/dice_frame/frame_"+i+"_delay-0.1s.gif"));
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }		
+	}
 	
 	private int width, height;
 	int [][] numbers ;
@@ -34,13 +56,7 @@ public class Rolling extends View {
 		assert lenght != 0 : "sub arrays empty";
 		width = lenght*littleViewWidth+(lenght+1)*marginWidth;
 		
-		try {
-	        Toolkit tk = Toolkit.getDefaultToolkit();
-	        dice = tk.createImage("dice.gif");
-	        tk.prepareImage(dice, littleViewWidth, littleViewHeight, null);
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+		loadImages(this.getClass());
 	}
 
 	@Override
@@ -53,10 +69,11 @@ public class Rolling extends View {
 		return height;
 	}
 
-	public void drawNumber( Graphics2D g2d, int n, float point ){
+	public void drawNumber( Graphics2D g2d, int i, int j, float point ){
+		if ( verbose ) System.out.println("Drawing number "+numbers[i][j]+" at time "+point);
+				
 		// http://www.animatedimages.org/img-animated-dice-image-0064-120764.htm 
-		// http://stackoverflow.com/questions/20924230/java-draw-a-gif
-		g2d.drawImage((Image) dice,  0, 0, littleViewWidth, littleViewHeight, null);
+		g2d.drawImage( diceFrames[ (int)(point*1562) % N] ,  0, 0, littleViewWidth, littleViewHeight, null);
 	}
 	
 	@Override
@@ -64,15 +81,19 @@ public class Rolling extends View {
 		g2d.setColor(FancyFullFrameAnimation.alphaColor(Color.blue.darker(),useThisAlpha*0.5f));
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		int y = marginHeight;
+		int i=0;
 		for ( int[] subs: numbers ){
 			int x = (width - (marginWidth+subs.length*(littleViewWidth+marginWidth)))/2 + marginWidth;
+			int j=0;
 			for ( int number : subs ){
 				g2d.translate(x, y);
-				drawNumber(g2d, number, getAnimationPoint() );
+				drawNumber(g2d, i, j , getAnimationPoint() );
 				g2d.translate(-x, -y);
 				x += marginWidth+littleViewWidth;
+				j++;
 			}
 			y += marginHeight+littleViewHeight;
+			i++;
 		}
 	}
 
