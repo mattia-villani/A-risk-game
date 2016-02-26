@@ -11,10 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import core.entities.Player;
-import core.entities.TerritoryCard;
-import core.entities.TerritoryDeck;
-import core.entities.World;
+import core.entities.*;
 import gui.GUI;
 import gui.map.MapRenderer;
 
@@ -188,8 +185,8 @@ public class main {
 			turn = 1;
 		}
 		else{
-			window.setLog("tie! we'll roll again!");
-			
+			window.setLog("tie! we'll roll again! Press enter when ready");
+			window.getCommand();
 			rollTheDiceToStart();
 		}
 
@@ -203,5 +200,18 @@ public class main {
 
 	}
 
-
+	public static boolean setReinforcements (String stateName, int player){
+		for (State state : world.getStates()){
+			if (stateName.equals(state.getName())){
+				if(player <  2){
+					state.setArmy(state.getArmy() + 3);
+				}
+				else{
+					state.setArmy(state.getArmy() + 1);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }
