@@ -29,14 +29,17 @@ public class GUI{
 	private static JLabel leftLabel;
 	private static JLabel rightLabel;
 	private static JTextArea textLog;
-	private static JTextField textInput;
+	private static OracledTextField textInput;
 	private static JButton submitButton;
 	private static JEditorPane playerListLeft;
 	private static JEditorPane playerListRight;
 	private ActionButton bob;
+	private Animator animator;
 	final static String newline = "\n";
 	
 	public GUI(World world) throws IOException{	
+		animator = new Animator();
+		
 		uiFrame=new JFrame();
 		uiFrame.setBounds(0, 0, 1005,728);
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
@@ -188,7 +191,7 @@ public class GUI{
 	
 	// Input field methods - get and reset
 	public String getInput(){
-		return textInput.getText();
+		return textInput.getExtendedText();
 	}
 
 	public void resetInput(){

@@ -1,6 +1,9 @@
 package oracle;
 
 public class Result{
+	/** DEPRECADED */
+	
+	
 	boolean contained; // e.g. "wor" is contained in {"hello", "world", "word"}
 	boolean exactlyContained; // e.g. in the previus example "wor" is not exactlyContained but "world" is
 	boolean unique; // e.g. in the previus example "wor" is unique, but "w" is not

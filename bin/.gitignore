@@ -1,9 +1,3 @@
-/.DS_Store
-/.classpath
-/.project
-/README.md
-/core/
-/gui/
-/images/
-/tests/
 /oracle/
+/tests/
+/gui/

@@ -10,6 +10,8 @@ public class Tree {
 	static final private boolean verboseAdd = false;
 	static final private boolean verboseEvalue = false;
 	
+	private boolean finalNode = false;
+	
 	@SuppressWarnings("serial")
 	public class NotUniqueException extends RuntimeException{};
 	@SuppressWarnings("serial")
@@ -31,8 +33,9 @@ public class Tree {
 	private Tree(){}
 	
 	public Tree ( String tail ){
-		assert tail != null && !tail.equals("") ;
-		add(tail);
+		assert tail != null ;
+		if ( tail.equals("") ) finalNode=true;
+		else add(tail);
 	}
 	
 	public Tree( String[] input ){
@@ -58,19 +61,19 @@ public class Tree {
 		assert (string!=null && !string.equals("")) : "Why is string null or empty??";
 		char head = string.charAt(0);
 		String tail = string.substring(1);
-		Tree tree = null;
 		if ( childs.containsKey(head) ){ 
+			if ( childs.get(head) == null ) childs.put(head, new Tree() );
 			if ( ! tail.equals("") ) {
-				if ( childs.get(head) == null ) childs.put(head, new Tree() );
 				childs.get(head).add( tail );
-			}
-		} else {
-			tree = tail.equals("") ? null : new Tree(tail);
-			childs.put(head, tree);
-		}
+			}else childs.get(head).setFinal();
+		} else 
+			childs.put(head, new Tree(tail));
 		
 		if ( verboseAdd ) System.out.println("tree.add("+string+").post "+this);
 	}
+	
+	public void setFinal(){ finalNode = true; }
+	public boolean isFinal(){ return finalNode; }
 	
 	public Tree evalue( String string ){
 		if ( verboseEvalue ) System.out.println("tree.evalue("+string+").pre "+this);
@@ -97,8 +100,8 @@ public class Tree {
 	public String getUniquePath() throws NotUniqueException, EmptyException{
 		int childsNum = childs.size();
 		
-		if ( childsNum == 0 ) throw new EmptyException();
-		if ( childsNum != 1 ) throw new NotUniqueException();
+		if ( childsNum == 0 ) return "";
+		if ( childsNum != 1 || finalNode ) throw new NotUniqueException();
 		
 		char key = childs.keySet().iterator().next();
 		Tree tree = childs.get(key);
@@ -110,7 +113,7 @@ public class Tree {
 	
 	@Override 
 	public String toString(){
-		String result = "tree{ ";
+		String result = finalNode ? "finalTree{ " : "tree{ ";
 		for ( char key : childs.keySet() )
 			result += key+":"+childs.get(key)+" ";
 		result+="}";

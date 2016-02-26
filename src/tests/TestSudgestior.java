@@ -21,7 +21,7 @@ public class TestSudgestior {
 	public static void main(String[] args) {
 		
 		String[] dictionary = new String[]{
-			"abc", "abd", "hello world", "abef", "abeg", "daf", "asd", "dsas"	
+			"abc", "abd", "hello world", "abef", "abeg", "daf", "asd", "dsas", "hello"	
 		};
 		
 		Set<String> words = new HashSet<>();
@@ -61,6 +61,14 @@ public class TestSudgestior {
 			if ( result.equals("world") ) yes(4);
 			else no(4);
 		}catch(Exception e){ no(4); e.printStackTrace();};
+
+		try{
+			tree = oracle.evalue("hello");
+			if( ! tree.isFinal() ) no(5);
+			else tree.getUniquePath();
+			no(5);
+		}catch(Tree.NotUniqueException e){ yes(5); }
+		catch(Exception e){ no(5); e.printStackTrace();};
 
 
 	}

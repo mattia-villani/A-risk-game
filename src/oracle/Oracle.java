@@ -4,7 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Oracle {
-
+	/** DEPRECADED */
+	
 	private Tree tree ;
 	
 	public Oracle ( Tree tree ){

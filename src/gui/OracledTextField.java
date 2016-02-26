@@ -4,13 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -23,6 +22,7 @@ public class OracledTextField extends JTextField {
 	
 	private boolean oracleEnabled = true;
 	private boolean errorColor = false;
+	private String lastValid = "";
 	private String prediction;
 	private Tree tree;
 	private int fix_x = 4;
@@ -44,15 +44,19 @@ public class OracledTextField extends JTextField {
 		
 		this.getDocument().addDocumentListener(new DocumentListener(){
 			
-			public void callRefresh(DocumentEvent arg0){
+			public boolean callRefresh(DocumentEvent arg0){
 				String text;
 				try {
 					text = arg0.getDocument().getText(0, arg0.getDocument().getLength());
 					if ( verbose ) System.out.println("Update text:" +text );
-					refresh( text );
+					if ( refresh( text ) ){ 
+						lastValid = text;
+						return true;
+					}
 				} catch (BadLocationException e) {
 					e.printStackTrace();
 				}
+				return false;
 			}
 
 			@Override
@@ -63,6 +67,33 @@ public class OracledTextField extends JTextField {
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				callRefresh(arg0);
+				if ( ! oracleEnabled ) return ;
+				Tree result;
+				try {
+					result = tree.evalue( arg0.getDocument().getText(0, arg0.getDocument().getLength()) );
+					if ( result == null ){
+						errorColor=true;
+						SwingUtilities.invokeLater(new Runnable(){
+							@Override
+						    public void run(){
+								setText( lastValid );
+								refresh(lastValid);
+						    }
+						});
+						Animator.add(new Animator.Handler(250,1){
+
+							@Override
+							public void run() {
+								errorColor=false;
+								OracledTextField.this.repaint();
+							}
+							
+						});
+					}else callRefresh(arg0);
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+
 			}
 
 			@Override
@@ -79,51 +110,55 @@ public class OracledTextField extends JTextField {
 				if ( oracleEnabled == false ) return;
 				if ( ( arg0.getKeyCode() == KeyEvent.VK_TAB 
 						|| arg0.getKeyCode() == KeyEvent.VK_ENTER )
-					 && prediction.equals("") == false ){
-						System.out.println("Tab pressed");
+					 && prediction != null ){
+						System.out.println("Tab or enter pressed");
 						OracledTextField.this.setText( OracledTextField.this.getText()+ prediction);
 						arg0.consume();
 					}
-				else if ( arg0.getKeyCode() != KeyEvent.VK_BACK_SPACE){
-					Tree result = tree.evalue( getText()+arg0.getKeyChar() );
-					if ( result == null ){
-						arg0.consume();
-						setText( getText() );
-						errorColor=true;
-					}
-				}
 			}
 
 			@Override
 			public void keyReleased(KeyEvent arg0) {}
 
 			@Override
-			public void keyTyped(KeyEvent arg0) {}
+			public void keyTyped(KeyEvent arg0) {
+				
+				
+			}
 			
 		});
 				
 	}
 	
-	public void refresh( String text ){
-		if ( oracleEnabled == false ) return;
+	public String getExtendedText () {
+		assert !oracleEnabled || prediction != null ;
+		return ( oracleEnabled ? getText()+prediction : "" );
+	}
+	
+	public boolean refresh( String text ){
+		if ( oracleEnabled == false ) return false;
 		assert tree != null : "tree should be defined at this point";
+		
+		if ( text.equals("") ){ 
+			prediction = null;
+			return true;
+		}
 		
 		Tree result;
 		result = tree.evalue(text);
 		try{
 			if ( result != null ){ 
 				prediction = result.getUniquePath();
-				errorColor = false;
+				return true;
 			}else prediction = null;
-		} catch(Tree.NotUniqueException e){}
-
+		} catch(Tree.NotUniqueException e){ return true; }
+		return false;
 	}
 	
 	public void enableOracle( Tree tree ){
 		assert this.getText().equals("") : "this option should be used in a different moment";
 		
 		oracleEnabled = true;
-		errorColor = false;
 		if ( tree != null ) this.tree = tree;
 	}
 	public void disableOracle(){
