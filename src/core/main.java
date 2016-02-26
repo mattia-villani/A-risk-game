@@ -188,8 +188,8 @@ public class main {
 			turn = 1;
 		}
 		else{
-			window.setLog("tie! we'll roll again!");
-			
+			window.setLog("tie! we'll roll again! Press enter when ready");
+			window.getCommand();
 			rollTheDiceToStart();
 		}
 
