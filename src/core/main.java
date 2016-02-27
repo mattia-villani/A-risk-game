@@ -26,7 +26,7 @@ public class main {
 	private static Player neut4;
 	private static boolean didPress = false;
 	private static World world;
-	private static int turn = -1;
+	private static int turn = -2;
 	private static GUI window;
 
 
