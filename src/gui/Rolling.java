@@ -32,7 +32,7 @@ public class Rolling extends View {
 		0,  // 6
 	};
 	
-	static void loadImages (Class clazz) {
+	public static void loadImages (Class clazz) {
 		if ( diceFrames != null ) return;
 		diceFrames = new Image[N];
 		for ( int i=0; i<N; i++ )
