@@ -28,7 +28,7 @@ public class GraphDrawer {
 	static final float margin = 0.9f; // margin in the size after which the store image is dropped
 	static final int circle_ray = 12; // size of the circle of a country
 	static final int thickness = 2; // size of the archs 
-	static final int font_size_name = 12; // size of the font that is used to show the name of the coutry
+	static final int font_size_name = 13; // size of the font that is used to show the name of the coutry
 	static final int font_type_name = Font.BOLD;// type of the font that is used to show the name of the coutry
 	static final int font_size_army = 13;// size of the font that is used to show the numerosity of the army
 	static final int font_type_army = Font.PLAIN;// type of the font that is used to show the numerosity of the army
