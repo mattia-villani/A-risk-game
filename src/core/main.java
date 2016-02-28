@@ -10,10 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import core.entities.*;
 import gui.GUI;
-import gui.map.MapRenderer;
+
 
 public class main {
 	private static String player1Name;
@@ -29,7 +28,6 @@ public class main {
 	private static int turn = -2;
 	private static GUI window;
 
-
 	public static World getWorld() {
 		return world;
 	}
@@ -38,24 +36,16 @@ public class main {
 		main.world = world;
 	}
 
-
-
 	public static void pressed() {
-
 		didPress = true;
-
 	}
-
-
-
 
 	public static void main(String[] args) throws IOException {
 		world = WorldBuilder.Build();		
-		window=new GUI(world);//create frame
+		window = new GUI(world);//create frame
 
 		getNames();
 		//create players, then world, then give states armies
-
 		createPlayers();
 		window.displayPlayerList(World.getPlayers());
 		assignArmies();
@@ -66,7 +56,7 @@ public class main {
 		window.enableOracle( world, player1 );
 
 		//now add correct numbers and colors to the map
-		MapRenderer.Invalidate();
+		window.refreshMap();
 
 	}
 
@@ -75,11 +65,11 @@ public class main {
 	 */
 
 	public static void getNames() {
-		window.setLog("Welcome! What is player 1's name?");
+		window.setText("Welcome! What is player 1's name?");
 		player1Name = window.getCommand();	
-		window.setLog(player1Name + " will be blue.\n\n What is player 2's name?");
+		window.setText(player1Name + " will be blue.\n\nWhat is player 2's name?");
 		player2Name = window.getCommand();
-		window.setLog(player2Name + " will be red."); 
+		window.setText(player2Name + " will be red."); 
 		return;
 	}
 
@@ -89,13 +79,13 @@ public class main {
 	 */
 	public static void createPlayers(){
 
-		player1 = new Player(player1Name, Color.blue);
+		player1 = new Player(player1Name, new Color(0, 0, 180));
 		World.getPlayers().add(player1);
-		player2 = new Player(player2Name, Color.red);
+		player2 = new Player(player2Name, new Color(210, 0, 0));
 		World.getPlayers().add(player2);
 		neut1 = new Player("Neutral 1", Color.magenta);
 		World.getPlayers().add(neut1);
-		neut2 = new Player("Neutral 2", Color.green);
+		neut2 = new Player("Neutral 2", new Color(0, 140, 0));
 		World.getPlayers().add(neut2);
 		neut3 = new Player("Neutral 3", Color.gray);
 		World.getPlayers().add(neut3);
@@ -112,18 +102,21 @@ public class main {
 		TerritoryDeck Deck = new TerritoryDeck();
 		
 		try {
-			Thread.sleep(500);
+			Thread.sleep(800);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
-		window.setLog("It's time to draw territory cards. Press enter when ready.");
+		window.setText("It's time to draw territory cards. Press enter when ready.");
 		window.getCommand();
+		window.resetText();
 		
-		for (int i=0; i<world.getStates().size(); i++){
+		Player tempPlayer=null;
+
+		for (int i=0; i<world.getStates().size(); i++) {
 
 			TerritoryCard temp=Deck.drawTerritoryCard();
-			
+
 			if(i < Constants.INIT_COUNTRIES_PLAYER){ 
 				world.getState(temp.getIndex()).setOwner(player1);
 			}
@@ -131,28 +124,43 @@ public class main {
 				world.getState(temp.getIndex()).setOwner(player2); 
 			}
 			else if(i < Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				world.getState(temp.getIndex()).setOwner(neut1);        
+				world.getState(temp.getIndex()).setOwner(neut1);
 			}
 			else if(i < 2*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				world.getState(temp.getIndex()).setOwner(neut2);        
+				world.getState(temp.getIndex()).setOwner(neut2);
 			}
 			else if(i < 3*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				world.getState(temp.getIndex()).setOwner(neut3);        
+				world.getState(temp.getIndex()).setOwner(neut3);
 			}
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
-				world.getState(temp.getIndex()).setOwner(neut4);        
+				world.getState(temp.getIndex()).setOwner(neut4);
 			}
 			world.getState(temp.getIndex()).setArmy(1);
 			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
+
+			if (world.getState(temp.getIndex()).getOwner() != tempPlayer ) {
+				if (tempPlayer == null) {
+					window.addText(world.getState(temp.getIndex()).getOwner().getName());
+				}
+				else {
+					window.addTextln(world.getState(temp.getIndex()).getOwner().getName());
+				}
+				
+				window.addText(" has drawn: "+world.getState(temp.getIndex()).getName());				
+				tempPlayer = world.getState(temp.getIndex()).getOwner();
+			}
+			else {
+				window.addText(", "+world.getState(temp.getIndex()).getName());
+			}
 			
-			window.setLog(world.getState(temp.getIndex()).getOwner().getName() + " has drawn: "+world.getState(temp.getIndex()).getName());
+			window.refreshMap();
 			
 			try {
-				Thread.sleep(550);
+				Thread.sleep(400);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} 
-			MapRenderer.Invalidate();
+
 		}
 	}
 
@@ -172,22 +180,22 @@ public class main {
 	public static void rollTheDiceToStart(){
 		int player1Roll = diceRollNumber();
 		int player2Roll = diceRollNumber();
-		window.setLog("Press enter to Roll, player1!");
+		window.setText("Press enter to Roll, player1!");
 		window.getCommand();
 		//perform animation
-		window.setLog("Press enter to Roll, player2!");
+		window.setText("Press enter to Roll, player2!");
 		window.getCommand();
 		//perform animation
 		if (player1Roll > player2Roll){
-			window.setLog("Player1 will go first");
+			window.setText("Player1 will go first");
 			turn = 0;
 		}
 		else if(player2Roll > player1Roll){
-			window.setLog("Player2 will go first");
+			window.setText("Player2 will go first");
 			turn = 1;
 		}
 		else{
-			window.setLog("tie! we'll roll again! Press enter when ready");
+			window.setText("tie! we'll roll again! Press enter when ready");
 			window.getCommand();
 			rollTheDiceToStart();
 		}
@@ -215,7 +223,7 @@ public class main {
 				returnVal =  true;
 			}
 		}
-		MapRenderer.Invalidate();
+		window.refreshMap();
 		return returnVal;
 	}
 }

@@ -5,260 +5,223 @@
 
 package gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import core.main;
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+
+import core.entities.Player;
 import core.entities.World;
 import gui.map.MapRenderer;
 import oracle.Oracle;
-import core.entities.Player;
 
-public class GUI{
+public class GUI {
 	private static FancyFullFrameAnimation uiFrame;
-	private static JLayeredPane layeredPane;
-	private static JComponent worldMap;
-	private static JLabel map;
-	private static JScrollPane scrollPane;
-	private static JLabel leftLabel;
-	private static JLabel rightLabel;
-	private static JTextArea textLog;
-	private static OracledTextField textInput;
-	private static JButton submitButton;
-	private static JEditorPane playerListLeft;
-	private static JEditorPane playerListRight;
-	private ActionButton bob;
+	private static OracledTextField inputArea;
+	private static MapPanel mapPanel;
+	private static RightBorder rightBorder;
+	private static LeftBorder leftBorder;
+	private static TextArea textArea;
+	private static PlayerList playerList;
+	private static MapRenderer worldMap;
 	private Animator animator;
 	final static String newline = "\n";
-	
-	public GUI(World world) throws IOException{	
-		animator = new Animator();
-		
+	private LinkedList<String> commandBuffer = new LinkedList<String>();
+
+	public GUI (World world) throws IOException {
+		animator = new Animator();	
 		uiFrame=new FancyFullFrameAnimation();
-		uiFrame.setBounds(0, 0, 1005,728);
+		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 700));
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
-		uiFrame.getContentPane().setLayout(null);
 		uiFrame.setResizable(false);
-		
-		
-		// Left wooden border
-		final BufferedImage leftWood = ImageIO.read(getClass().getResourceAsStream("/images/left.jpg"));
-		leftLabel= new JLabel(){
-			private static final long serialVersionUID = 1L;
+		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		uiFrame.addWindowListener(new closure());
 
-			@Override
-			public void paint(Graphics g){
-				super.paint(g);
-				g.drawImage(leftWood,0,0,50,700,null);
-			}
-		};
-		leftLabel.setBounds(0, 0, 50, 700);
-		uiFrame.getContentPane().add(leftLabel);
+		uiFrame.getContentPane().setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+		gbc.insets = new Insets(0,0,0,0);
 
-		// Right wooden border
-		final BufferedImage rightWood = ImageIO.read(getClass().getResourceAsStream("/images/right.jpg"));
-		rightLabel= new JLabel(){
-			private static final long serialVersionUID = 1L;
+		leftBorder = new LeftBorder();
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 3;
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.VERTICAL;
+		uiFrame.getContentPane().add(leftBorder, gbc);
 
-			@Override
-			public void paint(Graphics g){
-				super.paint(g);
-				g.drawImage(rightWood,0,0,50,700,null);
-			}
-		};
-		rightLabel.setBounds(950, 0, 50, 700);
-		uiFrame.getContentPane().add(rightLabel);
-		
+		rightBorder = new RightBorder();
+		gbc.gridx = 4;
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 3;
+		gbc.weightx = 4;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		uiFrame.getContentPane().add(rightBorder, gbc);
 
-		// Background Map
-		final BufferedImage bkimage = ImageIO.read(getClass().getResourceAsStream("/images/map.jpg"));
-		map = new JLabel(){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void paint(Graphics g){
-				super.paint(g);
-				g.drawImage(bkimage,0,0,900,600,null);
-			}
-		};
-		map.setBounds(50, 0, 900, 600);
-	    
-		// Node Map
+		mapPanel = new MapPanel();
 		worldMap = new MapRenderer(world);
-		worldMap.setBounds(50, 0, 1000, 600);
-		
-		// Combination of Background and Node maps
-		layeredPane = new JLayeredPane();
-        layeredPane.setBounds(0, 0, 1000, 600);
-        layeredPane.add(map, 1);
-        layeredPane.add(worldMap, 0);
-        uiFrame.getContentPane().add(layeredPane);
+		JLayeredPane layeredPane = new JLayeredPane();
+		layeredPane.setPreferredSize(new Dimension(900, 600));
+		mapPanel.setBounds(0, 0, 900, 600);
+		worldMap.setBounds(-1, 0, 1000, 600);
+		layeredPane.add(mapPanel,1);
+		layeredPane.add(worldMap,0);
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		gbc.gridheight = 1;
+		gbc.weightx = 2;
+		gbc.weighty = 1;
+		gbc.fill = GridBagConstraints.BOTH;
+		uiFrame.getContentPane().add(layeredPane, gbc);
 
-        
-		// Text log area
-		textLog = new JTextArea(1, 1);
-		textLog.setEditable(false);
-		textLog.setLineWrap(true);
-		textLog.setWrapStyleWord(true);
-		textLog.setBackground(new Color(244, 239, 202));
-		textLog.setMargin(new Insets(5,5,5,5));
-		
-		scrollPane = new JScrollPane(textLog);
-		scrollPane.setBounds(50, 601, 700, 64);
+		textArea = new TextArea();
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setPreferredSize(new Dimension(650, 64));
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);	
-		uiFrame.getContentPane().add(scrollPane);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		gbc.gridx = 2;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 2;
+		gbc.weighty = 2;
+		gbc.fill = GridBagConstraints.BOTH;
+		uiFrame.getContentPane().add(scrollPane, gbc);
 
-		
-		// Player list areas.
-		playerListLeft = new JEditorPane();
-		playerListLeft.setBounds(750, 601, 99, 63);
-		playerListLeft.setEditable(false);
-		playerListLeft.setContentType("text/html");
-		playerListLeft.setBackground(new Color(244, 239, 202));
-		playerListLeft.setMargin(new Insets(0,5,5,5));
-		uiFrame.getContentPane().add(playerListLeft);
-		
-		playerListRight = new JEditorPane();
-		playerListRight.setBounds(849, 601, 100, 63);
-		playerListRight.setEditable(false);
-		playerListRight.setContentType("text/html");
-		playerListRight.setBackground(new Color(244, 239, 202));
-		playerListRight.setMargin(new Insets(0,5,5,5));
-		uiFrame.getContentPane().add(playerListRight);
-		
-		
-		// Input area - Focuses on creation
-		textInput = new OracledTextField(){
+		inputArea = new OracledTextField() {
 			private static final long serialVersionUID = 1L;
-			public void addNotify(){
+			public void addNotify() {
 				super.addNotify();
 				requestFocus();
 			}
-		};  
-		textInput.setBounds(50, 665, 700, 35);
-		textInput.setBackground(new Color(244, 239, 202));
-		textInput.setMargin(new Insets(5,5,5,5));
-		
-		// Prevents focus being lost when clicking on player list
-		textInput.addFocusListener(new FocusAdapter(){
+		};
+		inputArea.addFocusListener(new FocusAdapter() {
 			@Override
-			public void focusLost(FocusEvent e){
-				textInput.requestFocus();
+			public void focusLost(FocusEvent e) {
+				inputArea.requestFocusInWindow();
 			}
 		});
-		uiFrame.getContentPane().add(textInput);
-		
-		
-		// Submit button, non focusable, default action for enter key
-		bob = new ActionButton();
-		submitButton = new JButton("Submit");
-		submitButton.addActionListener(bob); 
-		submitButton.setBounds(748, 665, 201, 35);
-		submitButton.setFocusable(false);
-		uiFrame.getContentPane().add(submitButton);
-		uiFrame.getRootPane().setDefaultButton(submitButton);
-		
-		
-		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		uiFrame.addWindowListener(new closure());
+		inputArea.addActionListener(new InputAction());
+		inputArea.setBackground(new Color(244, 239, 202));
+		inputArea.setMargin(new Insets(5,5,5,5));
+		gbc.gridx = 2;
+		gbc.gridy = 3;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 1;
+		gbc.weightx = 2;
+		gbc.weighty = 3;
+		gbc.fill = GridBagConstraints.BOTH;
+		uiFrame.getContentPane().add(inputArea, gbc);
+
+		playerList = new PlayerList();
+		playerList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+		gbc.gridx = 3;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;
+		gbc.gridheight = 2;
+		gbc.weightx = 3;
+		gbc.weighty = 3;
+		gbc.fill = GridBagConstraints.BOTH;
+		uiFrame.getContentPane().add(playerList, gbc);
+
+		uiFrame.pack();
 		uiFrame.setVisible(true);
-		
 		uiFrame.startAnimation(new Rolling(uiFrame,new int[][]{ 
-				new int[] { 3 , 4 },
-				new int[] { 5, 2, 1 }
+			new int[] { 3 , 4 },
+			new int[] { 5, 2, 1 }
 		}));
+		return;
 	}
 	
-	public void enableOracle( World world, Player player ){
-		this.textInput.enableOracle(Oracle.GenerateOracleTree(world, player));
-	}
-	
-	// Text log methods. Get, set, add and reset.
-	public String getLog(){
-		return textLog.getText();
-	}
-	
-	public void setLog(String s){
-		textLog.setText(s);
-	}
-	
-	public static void addLog(String s){
-		textLog.append(newline+s);
-	}
-	
-	public static void resetLog(){
-		textLog.setText("");
-	}
-	
-	// Input field methods - get and reset
-	public String getInput(){
-		return textInput.getExtendedText();
+	public void enableOracle(World world, Player player){
+		this.inputArea.enableOracle(Oracle.GenerateOracleTree(world, player));
 	}
 
-	public void resetInput(){
-		textInput.setText("");
+	 public String getText() {
+		return textArea.getText();
+	}
+
+	public void setText(String s) {
+		textArea.setText(s);
+		return;
+	}
+
+	public void addText(String s) {
+		textArea.append(s);
+		return;
+	}
+
+	public void addTextln(String s) {
+		textArea.append(newline+s);
+		return;
 	}
 	
-	// Displays the player list
-	public void displayPlayerList(ArrayList<Player> players){
-		String[] names=new String[6];
-		String[] colors=new String[6];
-		
-		String color="";
-		String html="";
-		String html2="";
-		
-		// Populates names array for use in in html strings
-		for (int i=0; i<6; i++){
-			if (players.get(i).getName().length() > 12){
-				names[i]=players.get(i).getName().substring(0, 12)+"..";
-			}
-			else{
-				names[i]=players.get(i).getName();
-			}
-			
-			// Populates colors array for use in html strings. Converts RGB value into hex for HTML
-			color=Integer.toString(players.get(i).getColor().getRGB() & 0x00ffffff, 16);
-			while(color.length() < 6){
-				color = "0" + color;
-			}
-			colors[i]=color;
-	    }	
-		
-		/*
-		 * Html strings to feed to the playerLists. At the moment causes the name to not appear if the name contains < or >
-		 * as the < and > are interpreted as html code. N.B list split over 2 editorPanes, rather than a single one,
-		 * to prevent unusual cell contents pushing the other column out of alignment.
-		 */
-		html="<html><table width=90 border=0 cellpadding=0 cellspacing=1><tr>"
-				+"<td><font color="+colors[0]+">"+names[0]+"</td>"
-				+"</tr><tr>"
-				+"<td><font color="+colors[2]+">"+names[2]+"</td>"
-				+"</tr><tr>"
-				+"<td><font color="+colors[4]+">"+names[4]+"</td>"
-				+"</tr></table></html>";
-		
-		html2="<html><table width=90 border=0 cellpadding=0 cellspacing=1><tr>"
-				+"<td><font color="+colors[1]+">"+names[1]+"</td>"
-				+"</tr><tr>"
-				+"<td><font color="+colors[3]+">"+names[3]+"</td>"
-				+"</tr><tr>"
-				+"<td><font color="+colors[5]+">"+names[5]+"</td>"
-				+"</tr></table></html>";
-				
-		playerListLeft.setText(html);
-		playerListRight.setText(html2);
+	public void resetText() {
+		textArea.setText("");
+		return;
 	}
-	
-	// Window close dialog
+
+	public void refreshMap() {
+		MapRenderer.Invalidate();
+		return;
+	}
+
+	public void displayPlayerList(ArrayList<Player> players) {
+		Graphics g = playerList.getGraphics();
+		playerList.drawList(g, players);
+		return;
+	}
+
+	private class InputAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			synchronized (commandBuffer) {
+				commandBuffer.add(inputArea.getText());
+				inputArea.setText("");
+				commandBuffer.notify();
+			}
+			return;
+		}
+	}
+
+	public String getCommand() {
+		String command;
+
+		synchronized (commandBuffer) {
+			while (commandBuffer.isEmpty()) {
+				try {
+					commandBuffer.wait();
+				}
+				catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			command = commandBuffer.pop();
+		}
+		return command;
+	}
+
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			int i = JOptionPane.showOptionDialog(uiFrame,
@@ -272,43 +235,4 @@ public class GUI{
 			}
 		}
 	}
-	
-	public String getCommand () {
-		return bob.getCommand();
-	}
-
-	// Submit button action
-	class ActionButton implements ActionListener{
-		
-		private LinkedList<String> commandBuffer = new LinkedList<String>();
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			synchronized (commandBuffer) {
-				commandBuffer.add(textInput.getText());
-				textInput.setText("");
-				commandBuffer.notify();
-			}
-			return;
-		}  
-		           
-		public String getCommand() {
-			String command;
-			
-			synchronized (commandBuffer) {
-				while (commandBuffer.isEmpty()) {
-					try {
-						commandBuffer.wait();
-					} 
-					catch (InterruptedException e) {
-							e.printStackTrace();
-					}
-				}
-				command = commandBuffer.pop();
-			}		
-			return command;
-		}
-	}
 }
-
-
