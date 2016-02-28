@@ -26,7 +26,7 @@ public class GraphDrawer {
 	
 	static final float margin = 0.9f; // margin in the size after which the store image is dropped
 	static final int circle_ray = 12; // size of the circle of a country
-	static final int thickness = 9; // size of the archs 
+	static final int thickness = 2; // size of the archs 
 	static final int font_size_name = 12; // size of the font that is used to show the name of the coutry
 	static final int font_type_name = Font.BOLD;// type of the font that is used to show the name of the coutry
 	static final int font_size_army = 13;// size of the font that is used to show the numerosity of the army
@@ -149,6 +149,7 @@ public class GraphDrawer {
 			Graphics2D g = (Graphics2D) graph.getGraphics();
 			// the drawing will suit propertly the dimension of the image
 			g.scale( ((double)width)/(double)World.VIRTUAL_WIDTH, ((double)height)/(double)World.VIRTUAL_HEIGHT);
+			g.setStroke(new BasicStroke(thickness));
 			
 			for (State s:world.getStates()){
 				// for each state in the world
