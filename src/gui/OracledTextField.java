@@ -19,7 +19,7 @@ import oracle.Tree;
 
 public class OracledTextField extends JTextField {
 
-	private final static boolean verbose = true;
+	private final static boolean verbose = false;
 	
 	private boolean oracleEnabled = false;
 	private boolean errorColor = false;
@@ -107,7 +107,6 @@ public class OracledTextField extends JTextField {
 				if ( ( arg0.getKeyCode() == KeyEvent.VK_TAB 
 						|| arg0.getKeyCode() == KeyEvent.VK_ENTER )
 					 && prediction != null ){
-						System.out.println("Tab or enter pressed");
 						OracledTextField.this.setText( OracledTextField.this.getText()+ prediction);
 						if ( arg0.getKeyCode() != KeyEvent.VK_ENTER )
 							arg0.consume();

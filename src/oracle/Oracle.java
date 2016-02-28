@@ -31,7 +31,7 @@ public class Oracle extends Tree{
 		return super.evalue(string.toLowerCase());
 	}
 	
-	static public Tree GenerateOracleTree(World world, Player player){
+	static public Tree GenerateOracleTreeForAttacking(World world, Player player){
 		List<String> legalStrings = new ArrayList<String>();
 				
 		boolean first = true;
@@ -47,5 +47,20 @@ public class Oracle extends Tree{
 		inst +=">\"";
 		return new Oracle(legalStrings, inst );
 	}
-	
+
+	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player){
+		List<String> legalStrings = new ArrayList<String>();
+				
+		boolean first = true;
+		String prefix = "";
+		String inst = "type \""+prefix+"<";
+		for ( State state : world.getStates() ){
+			inst+=(first?"":"|")+state.getName();
+			first = false;
+			legalStrings.add( prefix + state.getName() );
+		}
+		inst +=">\"";
+		return new Oracle(legalStrings, inst );
+	}
+
 }
