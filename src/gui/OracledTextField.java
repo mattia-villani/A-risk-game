@@ -107,7 +107,8 @@ public class OracledTextField extends JTextField {
 					 && prediction != null ){
 						System.out.println("Tab or enter pressed");
 						OracledTextField.this.setText( OracledTextField.this.getText()+ prediction);
-						arg0.consume();
+						if ( arg0.getKeyCode() != KeyEvent.VK_ENTER )
+							arg0.consume();
 					}
 			}
 

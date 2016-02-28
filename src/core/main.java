@@ -54,7 +54,7 @@ public class main {
 
 		rollTheDiceToStart();
 		
-		window.enableOracle( world, player1 );
+		window.enableOracle( world, turn==0 ? player1 : player2 );
 
 		//now add correct numbers and colors to the map
 		window.refreshMap();
@@ -183,10 +183,10 @@ public class main {
 		int player2Roll;
 		window.setText("Press enter to Roll, player1!");
 		window.getCommand();
-		player1Roll = diceRollNumber();
+		player1Roll = diceRollNumber( player1 );
 		window.setText("Press enter to Roll, player2!");
 		window.getCommand();
-		player2Roll = diceRollNumber();
+		player2Roll = diceRollNumber( player2 );
 		if (player1Roll > player2Roll){
 			window.setText("Player1 will go first");
 			turn = 0;
@@ -204,12 +204,14 @@ public class main {
 
 	}
 
-	public static int diceRollNumber(){
+	public static int diceRollNumber(Player player){
 		double rand = Math.random();
 		int returnVal = 1 + (int)(rand * 6);
 		window.getUiFrame().startAnimation(new Rolling(window.getUiFrame(),new int[][]{ 
-			new int[] { returnVal }
-		}));
+				new int[] { returnVal }
+			}, new Player[]{
+				player
+			}));
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {

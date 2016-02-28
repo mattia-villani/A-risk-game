@@ -184,8 +184,7 @@ public class GUI {
 	}
 
 	public void displayPlayerList(ArrayList<Player> players) {
-		Graphics g = playerList.getGraphics();
-		playerList.drawList(g, players);
+		playerList.requestToDrawList(players);
 		return;
 	}
 

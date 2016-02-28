@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
@@ -147,6 +148,8 @@ public class GraphDrawer {
 			}
 			// from now on, the drawing is on the image
 			Graphics2D g = (Graphics2D) graph.getGraphics();
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			// the drawing will suit propertly the dimension of the image
 			g.scale( ((double)width)/(double)World.VIRTUAL_WIDTH, ((double)height)/(double)World.VIRTUAL_HEIGHT);
 			g.setStroke(new BasicStroke(thickness));

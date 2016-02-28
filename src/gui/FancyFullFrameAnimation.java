@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -45,7 +46,7 @@ public class FancyFullFrameAnimation extends JFrame {
 	private View view;
 	private float backAlpha;
 	private BufferedImage copyOfTheBack;
-	private int transitionTime = 500;
+	private int transitionTime = 350;
 	
 	public FancyFullFrameAnimation(){
 		super();
@@ -71,6 +72,9 @@ public class FancyFullFrameAnimation extends JFrame {
 		}
 	}
 	public void paint(Graphics g){
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
 		if ( animating == false ){
 			super.paint(g);
 			return;
@@ -79,6 +83,8 @@ public class FancyFullFrameAnimation extends JFrame {
 			copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
 		super.paint( copyOfTheBack.getGraphics() );
 		Graphics2D g2d = (Graphics2D) copyOfTheBack.getGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2d.setColor(Color.black);
 		g2d.drawRect(0, 0, 2000, 2000);
 		g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));

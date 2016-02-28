@@ -17,6 +17,8 @@ import java.util.Map;
 public class PlayerList extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	
+	private ArrayList<Player> players;
 
 	@Override
 	public void paint(Graphics g) {
@@ -40,6 +42,8 @@ public class PlayerList extends JPanel {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2.drawString(text, x, 20);
+		if ( players != null ) 
+			drawList( g2 );
 		return;
 	}
 
@@ -48,8 +52,13 @@ public class PlayerList extends JPanel {
 		setBackground(new Color(244, 239, 202));
 		return;
 	}
+	
+	public void requestToDrawList ( ArrayList<Player> players ){
+		this.players = players;
+		this.repaint();
+	}
 
-	public void drawList(Graphics g, ArrayList<Player> players) {
+	public void drawList(Graphics g) {
 
 		Graphics2D g2 = (Graphics2D)g;
 

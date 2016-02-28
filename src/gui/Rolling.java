@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import core.entities.Player;
 import gui.FancyFullFrameAnimation.View;
 
 public class Rolling extends View {
@@ -44,15 +45,20 @@ public class Rolling extends View {
 	
 	private int width, height;
 	int [][] numbers ;
+	Color[] colors;
 	
-	public Rolling(FancyFullFrameAnimation fancyFullFrameAnimation, int[][] numbers) {
+	public Rolling(FancyFullFrameAnimation fancyFullFrameAnimation, int[][] numbers, Player[] players) {
 		fancyFullFrameAnimation.super(duration);
 		assert numbers != null : "i need data to show";
+		assert players==null || players.length==numbers.length: "there should be colors for every set";
 		this.numbers = numbers;
+		this.colors = new Color[numbers.length];
 		height = numbers.length*littleViewHeight+(numbers.length+1)*marginHeight;
 		int lenght = 0;
-		for ( int[] sub : numbers )
-			lenght = Math.max(lenght, sub.length );
+		for ( int i=0; i<numbers.length; i++ ){
+			lenght = Math.max(lenght, numbers[i].length );
+			this.colors[i] = players!=null ? players[i].getColor() : Color.DARK_GRAY.darker();
+		}
 		assert lenght != 0 : "sub arrays empty";
 		width = lenght*littleViewWidth+(lenght+1)*marginWidth;
 		
@@ -83,8 +89,18 @@ public class Rolling extends View {
 	
 	@Override
 	public void paint(Graphics2D g2d, float useThisAlpha) {
-		g2d.setColor(FancyFullFrameAnimation.alphaColor(Color.blue.darker(),useThisAlpha*0.5f));
-		g2d.fillRect(0, 0, getWidth(), getHeight());
+		int base_h = (marginHeight+1)/2;
+		float alpha = 0.4f;
+		for ( int i=0;i<colors.length;i++){
+			int h = littleViewHeight + marginHeight;
+			g2d.setColor(FancyFullFrameAnimation.alphaColor(colors[i],useThisAlpha*alpha));
+			g2d.fillRect(0, base_h + i*h, getWidth(), h);
+		}
+		g2d.setColor(FancyFullFrameAnimation.alphaColor(colors[0],useThisAlpha*alpha));
+		g2d.fillRect(0, 0 , getWidth(), base_h);
+		g2d.setColor(FancyFullFrameAnimation.alphaColor(colors[colors.length-1],useThisAlpha*alpha));
+		g2d.fillRect(0, getHeight()-base_h , getWidth(), base_h);
+
 		int y = marginHeight;
 		for ( int[] subs: numbers ){
 			int x = (width - (marginWidth+subs.length*(littleViewWidth+marginWidth)))/2 + marginWidth;
