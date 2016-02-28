@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import core.entities.*;
 import gui.GUI;
 import gui.Rolling;
+import gui.map.MapRenderer;
 
 
 public class main {
@@ -160,6 +161,7 @@ public class main {
 			window.refreshMap();
 			
 			try {
+				MapRenderer.Invalidate();
 				Thread.sleep(400);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

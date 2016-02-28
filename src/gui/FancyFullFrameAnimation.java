@@ -12,6 +12,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
@@ -47,6 +48,11 @@ public class FancyFullFrameAnimation extends JFrame {
 	private float backAlpha;
 	private BufferedImage copyOfTheBack;
 	private int transitionTime = 350;
+	private JTextField inputToDisable ;
+	
+	public void setInputToDisable(JTextField inputTextField){
+		inputToDisable = inputTextField;
+	}
 	
 	public FancyFullFrameAnimation(){
 		super();
@@ -81,19 +87,19 @@ public class FancyFullFrameAnimation extends JFrame {
 		}
 		if ( copyOfTheBack == null ) 
 			copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
+		else 
+			copyOfTheBack.flush();
 		super.paint( copyOfTheBack.getGraphics() );
 		Graphics2D g2d = (Graphics2D) copyOfTheBack.getGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.setColor(Color.black);
-		g2d.drawRect(0, 0, 2000, 2000);
+/*		g2d.setColor(Color.black);
+		g2d.drawRect(0, 0, 2000, 2000);*/
 		g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));
 		g2d.fillRect(0, 0, getWidth()+1, getHeight()+1);
-		
+				
 		float powered = backAlpha*backAlpha*backAlpha*backAlpha;
-		g2d.setStroke(new BasicStroke(4));
+/*		g2d.setStroke(new BasicStroke(4));
 		g2d.setColor(alphaColor(Color.black, powered));
-		g2d.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);
+		g2d.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);*/
 		
 		float w = powered*(float)view.getWidth();
 		float h = powered*(float)view.getHeight();
@@ -118,13 +124,14 @@ public class FancyFullFrameAnimation extends JFrame {
 	
 	
 	public void startAnimation(View view){
-		if ( verbose ) System.out.println("FullFrame starting animation");
+		if ( verbose ) System.out.println("FullFrame starting animation");		
 		
-		this.setEnabled(false);
+		if ( inputToDisable != null )
+			inputToDisable.setEnabled(false);
+		
 		animating = true;
 		assert view != null : "the view should be something to be displaied";
 		this.view = view;
-		copyOfTheBack = null;
 
 		Animator.add( new Animator.FromZeroToOneIntervalHandler(0,transitionTime) {
 			@Override
@@ -156,12 +163,12 @@ public class FancyFullFrameAnimation extends JFrame {
 			public void pre() {}
 			@Override
 			public void post() {
-				FancyFullFrameAnimation.this.setEnabled(true);
 				animating = false;
 				FancyFullFrameAnimation.this.view = null;
-				copyOfTheBack = null;
 				FancyFullFrameAnimation.this.repaint();
 				FancyFullFrameAnimation.this.invalidate();
+				if ( inputToDisable != null )
+					inputToDisable.setEnabled(true);
 				if ( verbose ) System.out.println("FullFrame animation ended");
 			}
 		});

@@ -42,15 +42,8 @@ public class GraphDrawer {
 	static final boolean show_state_view_bounds = false; // to show the rectangle of the view around a country
 	final static BasicStroke stroke = new BasicStroke(2); // to draw the oval around the circle of the state 
 	
-	static boolean world_invalidate = false; // flag to say if the world was invalidated
-	
 	/* not working yet */
 	static double alpha_archs = 1.0;
-	
-	/**
-	 * since lot of the paint may be done over the same map, it is store to more efficiently redraw that
-	 */
-	static BufferedImage graph;
 	
 	/**
 	 * Draws the states information assuming it is in coords 0,0
@@ -120,119 +113,82 @@ public class GraphDrawer {
 	 * @param width of the view
 	 * @param height of the view
 	 */
-	static public void drawGraph( Graphics2D comp_g, World world, int width, int height ){
+	static public void drawGraph( Graphics2D g, World world, int width, int height ){
 		if ( verbose ) System.out.println("Drawing graph");
 		// check if it is asked to invalidate the previus stored image 
-		
-		if ( verbose & world_invalidate ) System.out.println("World was invalidated");
-		if ( verbose & ! world_invalidate ) System.out.println("World wasn't invalidated");
-		
-		// situation for which the stored image is dropped 
-		if ( world_invalidate // asked by some class
-				|| graph == null  // not stored yet
-				|| width>graph.getWidth()*(1.0+1.0f-margin)  // dimentions have changed too much so the scaling would be ugly
-				|| height>graph.getHeight()*(1.0+1.0f-margin) 
-				|| width<graph.getWidth()*margin 
-				|| height<graph.getHeight()*margin ){
 
-			world_invalidate = false; // reset of the invalidate 
-			
-			// if the stored image has the right dimention, then it is just initialized instead that allocated
-			if ( graph!=null && width==graph.getWidth() && height==graph.getHeight() ){
-				graph.flush();
-				if ( verbose ) System.out.println("graph was good, flushed");
-			} else {// otherwise simple allocates one
-				graph = new BufferedImage ( width, height, BufferedImage.TYPE_INT_ARGB );
-				if ( verbose ) System.out.println("graph wasn't good, instantiated");
-			}
-			// from now on, the drawing is on the image
-			Graphics2D g = (Graphics2D) graph.getGraphics();
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			// the drawing will suit propertly the dimension of the image
-			g.scale( ((double)width)/(double)World.VIRTUAL_WIDTH, ((double)height)/(double)World.VIRTUAL_HEIGHT);
-			g.setStroke(new BasicStroke(thickness));
-			
-			for (State s:world.getStates()){
-				// for each state in the world
-				// the color used is the one of the continet
-				g.setColor( s.getContinet().getColor() );
-				// it first draws the arch ( a subset in order not to draw all of them twice )
-				for (State adj:s.getSmallerAdjacent(world)){
-					// aliases for the (x0,y0) -> (x1,y1) of the arch
-					int a=s.getX(), b=s.getY();
-					int c=adj.getX(), d=adj.getY();
-					// if the arch has not the both sides in the same continent, then a special drawn is done
-					if ( s.getContinet() != adj.getContinet() ){
-						// two situations are possible: or the arch connect them directly or it has to go in the other side of the map
-						if ( Math.abs(a-c) > World.VIRTUAL_WIDTH/2 ){
-							// if this happen, the the arch should exit from one side and appear in the other.
-							// WORNING!!! this fix works only with the traditional map
-							// evaluate the sign ( if the first node is right or left )
-							int sign = (int)Math.signum(a-c);
-							// created two new points which are out of window
-							int A = a-sign*World.VIRTUAL_WIDTH;
-							int C = c+sign*World.VIRTUAL_WIDTH;
-							// and other two which are a limitation of the previus one to the border of the window
-							int fixed_a = A<0? 0: (A>World.VIRTUAL_WIDTH?World.VIRTUAL_WIDTH:A);
-							int fixed_c = C<0? 0: (C>World.VIRTUAL_WIDTH?World.VIRTUAL_WIDTH:C);
-							// draws two lines going out of the mapwith the gradient limitated to the border
-							g.setPaint(new GradientPaint(a,b, s.getContinet().getColor(), fixed_c, d, adj.getContinet().getColor()));
-							g.drawLine( a, b, C, d );																	
-							g.setPaint(new GradientPaint(fixed_a,b, s.getContinet().getColor(), c, d, adj.getContinet().getColor()));
-							g.drawLine( A, b, c, d );																	
-						}else{
-							// otherwise it the states are close, so just a fancy gradiented line is drawn
-							g.setPaint(new GradientPaint(a,b, s.getContinet().getColor(), c, d, adj.getContinet().getColor()));
-							g.drawLine( a, b, c, d );
-						}
-						// set back the color to the one of the continent
-						g.setColor( s.getContinet().getColor() );							
-					}else
-						// both country are in the same continent, so it just draws the line (the color is the one of the continent)
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		// the drawing will suit propertly the dimension of the image
+		g.scale( ((double)width)/(double)World.VIRTUAL_WIDTH, ((double)height)/(double)World.VIRTUAL_HEIGHT);
+		g.setStroke(new BasicStroke(thickness));
+		
+		for (State s:world.getStates()){
+			// for each state in the world
+			// the color used is the one of the continet
+			g.setColor( s.getContinet().getColor() );
+			// it first draws the arch ( a subset in order not to draw all of them twice )
+			for (State adj:s.getSmallerAdjacent(world)){
+				// aliases for the (x0,y0) -> (x1,y1) of the arch
+				int a=s.getX(), b=s.getY();
+				int c=adj.getX(), d=adj.getY();
+				// if the arch has not the both sides in the same continent, then a special drawn is done
+				if ( s.getContinet() != adj.getContinet() ){
+					// two situations are possible: or the arch connect them directly or it has to go in the other side of the map
+					if ( Math.abs(a-c) > World.VIRTUAL_WIDTH/2 ){
+						// if this happen, the the arch should exit from one side and appear in the other.
+						// WORNING!!! this fix works only with the traditional map
+						// evaluate the sign ( if the first node is right or left )
+						int sign = (int)Math.signum(a-c);
+						// created two new points which are out of window
+						int A = a-sign*World.VIRTUAL_WIDTH;
+						int C = c+sign*World.VIRTUAL_WIDTH;
+						// and other two which are a limitation of the previus one to the border of the window
+						int fixed_a = A<0? 0: (A>World.VIRTUAL_WIDTH?World.VIRTUAL_WIDTH:A);
+						int fixed_c = C<0? 0: (C>World.VIRTUAL_WIDTH?World.VIRTUAL_WIDTH:C);
+						// draws two lines going out of the mapwith the gradient limitated to the border
+						g.setPaint(new GradientPaint(a,b, s.getContinet().getColor(), fixed_c, d, adj.getContinet().getColor()));
+						g.drawLine( a, b, C, d );																	
+						g.setPaint(new GradientPaint(fixed_a,b, s.getContinet().getColor(), c, d, adj.getContinet().getColor()));
+						g.drawLine( A, b, c, d );																	
+					}else{
+						// otherwise it the states are close, so just a fancy gradiented line is drawn
+						g.setPaint(new GradientPaint(a,b, s.getContinet().getColor(), c, d, adj.getContinet().getColor()));
 						g.drawLine( a, b, c, d );
-				}
+					}
+					// set back the color to the one of the continent
+					g.setColor( s.getContinet().getColor() );							
+				}else
+					// both country are in the same continent, so it just draws the line (the color is the one of the continent)
+					g.drawLine( a, b, c, d );
 			}
-			
-			// after that it drows the nodes on the archs
-			for ( State s : world.getStates() ){
-				// for each state, the internal color is of the player
-				if ( verbose ) System.out.println(s.getName()+" is owned by "+s.getOwner()+" which has color "+s.getOwner().getColor() );
-				g.setColor( s.getOwner().getColor() );				
-				g.fillOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
-				
-				// and surrond it with the conntinent color
-				g.setStroke(stroke);
-				g.setColor( s.getContinet().getColor() );				
-				g.drawOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
-				
-				// then it draws the view of the state (like name ecc..)
-				drawStateValues(g,s);
-			}
-
-			if ( verbose ){
-				System.out.print("Ownerships: ");
-				for(State s: world.getStates())
-					System.out.print(s.getName()+" belongs to "+s.getOwner().getName()+", " );
-				System.out.println("");
-			}
-
-			// force to free the memory
-			g.dispose();
 		}
 		
-		
-		// it draws only if the comp_g is valid and it draws in the bitmap.
-		if ( comp_g != null )
-			comp_g.drawImage(graph, 0, 0, World.VIRTUAL_WIDTH, World.VIRTUAL_HEIGHT, null );
+		// after that it drows the nodes on the archs
+		for ( State s : world.getStates() ){
+			// for each state, the internal color is of the player
+			if ( verbose ) System.out.println(s.getName()+" is owned by "+s.getOwner()+" which has color "+s.getOwner().getColor() );
+			g.setColor( s.getOwner().getColor() );				
+			g.fillOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
+			
+			// and surrond it with the conntinent color
+			g.setStroke(stroke);
+			g.setColor( s.getContinet().getColor() );				
+			g.drawOval(s.getX()-circle_ray, s.getY()-circle_ray, 2*circle_ray, 2*circle_ray);
+			
+			// then it draws the view of the state (like name ecc..)
+			drawStateValues(g,s);
+		}
+		if ( verbose ){
+		System.out.print("Ownerships: ");
+		for(State s: world.getStates())
+			System.out.print(s.getName()+" belongs to "+s.getOwner().getName()+", " );
+			System.out.println("");
+		}
+			// force to free the memory
+		g.dispose();
 	}
 
-	/**
-	 * call the invalidate method on the instance of this class stored in this_class attribute
-	 */
-	public static void Invalidate(){
-		world_invalidate = true;
-	}	
 
 	
 }

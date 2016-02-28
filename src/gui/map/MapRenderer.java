@@ -137,8 +137,6 @@ public class MapRenderer extends JComponent {
 	 */
 	public static void Invalidate(){
 		if ( this_class != null ){ 
-			// this will tell graphDrawer to drop his graph
-			GraphDrawer.Invalidate(); 
 			this_class.revalidate();
 			this_class.repaint();
 			if ( verbose )System.out.println("MapRenderer was asked to invalidate: done.");

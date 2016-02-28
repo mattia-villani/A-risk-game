@@ -125,6 +125,7 @@ public class GUI {
 		inputArea.addActionListener(new InputAction());
 		inputArea.setBackground(new Color(244, 239, 202));
 		inputArea.setMargin(new Insets(5,5,5,5));
+		uiFrame.setInputToDisable(inputArea);
 		gbc.gridx = 2;
 		gbc.gridy = 3;
 		gbc.gridwidth = 1;

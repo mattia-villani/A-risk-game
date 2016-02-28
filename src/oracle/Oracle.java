@@ -53,7 +53,7 @@ public class Oracle extends Tree{
 				
 		boolean first = true;
 		String prefix = "";
-		String inst = "type \""+prefix+"<";
+		String inst = "enter the name of the country to reinforce \""+prefix+"<";
 		for ( State state : world.getStates() ){
 			inst+=(first?"":"|")+state.getName();
 			first = false;
