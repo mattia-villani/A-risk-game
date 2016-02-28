@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import core.entities.*;
 import gui.GUI;
+import gui.Rolling;
 
 
 public class main {
@@ -43,7 +44,7 @@ public class main {
 	public static void main(String[] args) throws IOException {
 		world = WorldBuilder.Build();		
 		window = new GUI(world);//create frame
-
+		
 		getNames();
 		//create players, then world, then give states armies
 		createPlayers();
@@ -178,14 +179,14 @@ public class main {
 	}
 
 	public static void rollTheDiceToStart(){
-		int player1Roll = diceRollNumber();
-		int player2Roll = diceRollNumber();
+		int player1Roll;
+		int player2Roll;
 		window.setText("Press enter to Roll, player1!");
 		window.getCommand();
-		//perform animation
+		player1Roll = diceRollNumber();
 		window.setText("Press enter to Roll, player2!");
 		window.getCommand();
-		//perform animation
+		player2Roll = diceRollNumber();
 		if (player1Roll > player2Roll){
 			window.setText("Player1 will go first");
 			turn = 0;
@@ -206,6 +207,14 @@ public class main {
 	public static int diceRollNumber(){
 		double rand = Math.random();
 		int returnVal = 1 + (int)(rand * 6);
+		window.getUiFrame().startAnimation(new Rolling(window.getUiFrame(),new int[][]{ 
+			new int[] { returnVal }
+		}));
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return returnVal;
 
 	}

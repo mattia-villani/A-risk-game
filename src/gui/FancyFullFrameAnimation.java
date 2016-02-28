@@ -45,6 +45,7 @@ public class FancyFullFrameAnimation extends JFrame {
 	private View view;
 	private float backAlpha;
 	private BufferedImage copyOfTheBack;
+	private int transitionTime = 500;
 	
 	public FancyFullFrameAnimation(){
 		super();
@@ -119,7 +120,7 @@ public class FancyFullFrameAnimation extends JFrame {
 		this.view = view;
 		copyOfTheBack = null;
 
-		Animator.add( new Animator.FromZeroToOneIntervalHandler(0,1000) {
+		Animator.add( new Animator.FromZeroToOneIntervalHandler(0,transitionTime) {
 			@Override
 			public void run(float point) {
 				if ( verbose ) System.out.println("FullFrame updatting animation : "+point);
@@ -133,13 +134,12 @@ public class FancyFullFrameAnimation extends JFrame {
 			@Override
 			public void post() { Animator.add(view); }
 		});
-		
 	}
 	
 	public void endAnimation(){
 		if ( verbose ) System.out.println("FullFrame ending animation");
 		
-		Animator.add( new Animator.FromZeroToOneIntervalHandler(0,1000) {
+		Animator.add( new Animator.FromZeroToOneIntervalHandler(0,transitionTime) {
 			@Override
 			public void run(float point) {
 				if ( verbose ) System.out.println("FullFrame updatting animation : "+point);

@@ -147,10 +147,6 @@ public class GUI {
 
 		uiFrame.pack();
 		uiFrame.setVisible(true);
-		uiFrame.startAnimation(new Rolling(uiFrame,new int[][]{ 
-			new int[] { 3 , 4 },
-			new int[] { 5, 2, 1 }
-		}));
 		return;
 	}
 	
@@ -203,6 +199,10 @@ public class GUI {
 			}
 			return;
 		}
+	}
+	
+	public FancyFullFrameAnimation getUiFrame() {
+		return uiFrame;
 	}
 
 	public String getCommand() {

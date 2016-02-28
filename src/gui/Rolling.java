@@ -15,19 +15,19 @@ import gui.FancyFullFrameAnimation.View;
 public class Rolling extends View {
 	public final static int marginHeight = 30;
 	public final static int marginWidth = 25;
-	public final static int littleViewHeight = 120;
-	public final static int littleViewWidth = 120;
-	public final static int duration = 2000;
-	private final static boolean verbose = true;
+	public final static int littleViewHeight = 80;
+	public final static int littleViewWidth = 80;
+	public final static int duration = 1500;
+	private final static boolean verbose = false;
 	
 	static private Image[] diceFrames;
 	static private final int N = 72;
 	static private int[] positions = new int[]{
-		37, // 1
-		46, // 2
-		19, // 3
-		55, // 4
-		64, // 5
+		36, // 1
+		45, // 2
+		18, // 3
+		54, // 4
+		63, // 5
 		0,  // 6
 	};
 	
@@ -69,11 +69,16 @@ public class Rolling extends View {
 		return height;
 	}
 
-	public void drawNumber( Graphics2D g2d, int i, int j, float point ){
-		if ( verbose ) System.out.println("Drawing number "+numbers[i][j]+" at time "+point);
-				
+	public void drawNumber( Graphics2D g2d, int number, float point ){
+		if ( verbose ) System.out.println("Drawing number "+number+" at time "+point);
+		float topPoint = 0.5f;
+		float fixedPoint = Math.min(topPoint, point);
+		float ratio = fixedPoint / topPoint;
+		ratio = (float) Math.sqrt( Math.sqrt(ratio) );
+		float index = ratio * ( N )  ;
+		index += positions[number-1];
 		// http://www.animatedimages.org/img-animated-dice-image-0064-120764.htm 
-		g2d.drawImage( diceFrames[ (int)(point*1562) % N] ,  0, 0, littleViewWidth, littleViewHeight, null);
+		g2d.drawImage( diceFrames[ (int)(index) % N] ,  0, 0, littleViewWidth, littleViewHeight, null);
 	}
 	
 	@Override
@@ -81,19 +86,15 @@ public class Rolling extends View {
 		g2d.setColor(FancyFullFrameAnimation.alphaColor(Color.blue.darker(),useThisAlpha*0.5f));
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 		int y = marginHeight;
-		int i=0;
 		for ( int[] subs: numbers ){
 			int x = (width - (marginWidth+subs.length*(littleViewWidth+marginWidth)))/2 + marginWidth;
-			int j=0;
 			for ( int number : subs ){
 				g2d.translate(x, y);
-				drawNumber(g2d, i, j , getAnimationPoint() );
+				drawNumber(g2d, number , getAnimationPoint() );
 				g2d.translate(-x, -y);
 				x += marginWidth+littleViewWidth;
-				j++;
 			}
 			y += marginHeight+littleViewHeight;
-			i++;
 		}
 	}
 
