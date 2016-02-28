@@ -11,8 +11,16 @@ import core.entities.World;
 
 public class Oracle extends Tree{
 	
-	public Oracle ( Collection<String> strings ){
+	private String instruction = null;
+	
+	@Override
+	public String getInstruction(){
+		return instruction;
+	}
+	
+	public Oracle ( Collection<String> strings, String instruction ){
 		super(strings);
+		this.instruction = instruction;
 	}
 	
 	public void add( String string ){
@@ -23,16 +31,36 @@ public class Oracle extends Tree{
 		return super.evalue(string.toLowerCase());
 	}
 	
-	static public Tree GenerateOracleTree(World world, Player player){
+	static public Tree GenerateOracleTreeForAttacking(World world, Player player){
 		List<String> legalStrings = new ArrayList<String>();
-		
+				
+		boolean first = true;
 		String prefix = "attack ";
+		String inst = "type \""+prefix+"<";
 		for ( State state : world.getStates() )
 			if ( state.getOwner() == player )
-				for ( int index : state.getAdjacent() )
+				for ( int index : state.getAdjacent() ){
+					inst+=(first?"":"|")+world.getState(index).getName();
+					first = false;
 					legalStrings.add( prefix + world.getState(index).getName() );
-		
-		return new Oracle(legalStrings);
+				}
+		inst +=">\"";
+		return new Oracle(legalStrings, inst );
 	}
-	
+
+	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player){
+		List<String> legalStrings = new ArrayList<String>();
+				
+		boolean first = true;
+		String prefix = "";
+		String inst = "type \""+prefix+"<";
+		for ( State state : world.getStates() ){
+			inst+=(first?"":"|")+state.getName();
+			first = false;
+			legalStrings.add( prefix + state.getName() );
+		}
+		inst +=">\"";
+		return new Oracle(legalStrings, inst );
+	}
+
 }

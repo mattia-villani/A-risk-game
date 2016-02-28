@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
@@ -18,7 +19,7 @@ import oracle.Tree;
 
 public class OracledTextField extends JTextField {
 
-	private final static boolean verbose = true;
+	private final static boolean verbose = false;
 	
 	private boolean oracleEnabled = false;
 	private boolean errorColor = false;
@@ -29,6 +30,7 @@ public class OracledTextField extends JTextField {
 	private int fix_y = -1;
 	private double fix_height = 1.3f;
 		
+	
 	@Override
 	public boolean isManagingFocus(){
 		return true; // so that the tab key is detected
@@ -105,7 +107,6 @@ public class OracledTextField extends JTextField {
 				if ( ( arg0.getKeyCode() == KeyEvent.VK_TAB 
 						|| arg0.getKeyCode() == KeyEvent.VK_ENTER )
 					 && prediction != null ){
-						System.out.println("Tab or enter pressed");
 						OracledTextField.this.setText( OracledTextField.this.getText()+ prediction);
 						if ( arg0.getKeyCode() != KeyEvent.VK_ENTER )
 							arg0.consume();
@@ -166,14 +167,26 @@ public class OracledTextField extends JTextField {
 	
 	@Override
 	public void paintComponent( Graphics g ){		
-		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+		super.paintComponent(g2d);
 		if ( ! oracleEnabled ) return;
 
-		Graphics2D g2d = (Graphics2D) g;
-		
 		g2d.setFont(this.getFont());		
 		Rectangle2D currentSize = g2d.getFontMetrics().getStringBounds(this.getText()+"",g2d);	
-		
+
+		int x = fix_x+(int)(currentSize.getX()+currentSize.getWidth())+this.getMargin().left;
+		int y = fix_y+(int)currentSize.getY()+this.getMargin().top + (int)currentSize.getHeight();
+
+		if (( prediction == null || prediction.equals("") )
+				&& this.getText().equals("")
+				&& tree.getInstruction() != null ){
+			g2d.setColor(Color.GRAY);
+			g2d.drawString(tree.getInstruction(), x+1, y + (int)currentSize.getHeight() );
+		}
+					
 		if ( errorColor ){
 			int X = (int) currentSize.getX() + this.getMargin().left;
 			int Y = (int) currentSize.getY() + (int) currentSize.getHeight() + this.getMargin().top;
@@ -189,10 +202,7 @@ public class OracledTextField extends JTextField {
 		
 		g2d.setFont(this.getFont().deriveFont(Font.BOLD));
 		Rectangle2D toAddSize = g2d.getFontMetrics().getStringBounds(prediction+"",g2d);
-		
-		int x = fix_x+(int)(currentSize.getX()+currentSize.getWidth())+this.getMargin().left;
-		int y = fix_y+(int)currentSize.getY()+this.getMargin().top + (int)currentSize.getHeight();
-		
+				
 		// back light
 		g.setColor(Color.BLUE);
 		g2d.fillRect(

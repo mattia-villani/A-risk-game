@@ -32,7 +32,7 @@ public class Rolling extends View {
 		0,  // 6
 	};
 	
-	static void loadImages (Class clazz) {
+	public static void loadImages (Class clazz) {
 		if ( diceFrames != null ) return;
 		diceFrames = new Image[N];
 		for ( int i=0; i<N; i++ )
@@ -90,7 +90,7 @@ public class Rolling extends View {
 	@Override
 	public void paint(Graphics2D g2d, float useThisAlpha) {
 		int base_h = (marginHeight+1)/2;
-		float alpha = 0.4f;
+		float alpha = 1.0f;
 		for ( int i=0;i<colors.length;i++){
 			int h = littleViewHeight + marginHeight;
 			g2d.setColor(FancyFullFrameAnimation.alphaColor(colors[i],useThisAlpha*alpha));

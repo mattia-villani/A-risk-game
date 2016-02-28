@@ -42,9 +42,12 @@ public class main {
 	}
 
 	public static void main(String[] args) throws IOException {
+		
 		world = WorldBuilder.Build();		
 		window = new GUI(world);//create frame
-		
+
+		Rolling.loadImages( window.getClass() );
+
 		getNames();
 		//create players, then world, then give states armies
 		createPlayers();

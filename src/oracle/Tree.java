@@ -30,6 +30,8 @@ public class Tree {
 	
 	private Map<Character, Tree> childs = new HashMap<>();
 	
+	public String getInstruction(){ return ""; }
+	
 	private Tree(){}
 	
 	public Tree ( String tail ){

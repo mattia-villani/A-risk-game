@@ -151,7 +151,9 @@ public class GUI {
 	}
 	
 	public void enableOracle(World world, Player player){
-		this.inputArea.enableOracle(Oracle.GenerateOracleTree(world, player));
+		// save the tree in this situation to not to regenerate this every time.
+		// one tree for each player
+		this.inputArea.enableOracle(Oracle.GenerateOracleTreeForIncreasingArmy(world, player));
 	}
 
 	 public String getText() {
