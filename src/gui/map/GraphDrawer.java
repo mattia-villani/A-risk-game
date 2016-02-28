@@ -29,7 +29,7 @@ public class GraphDrawer {
 	static final int thickness = 9; // size of the archs 
 	static final int font_size_name = 12; // size of the font that is used to show the name of the coutry
 	static final int font_type_name = Font.PLAIN;// type of the font that is used to show the name of the coutry
-	static final int font_size_army = 15;// size of the font that is used to show the numerosity of the army
+	static final int font_size_army = 14;// size of the font that is used to show the numerosity of the army
 	static final int font_type_army = Font.BOLD;// type of the font that is used to show the numerosity of the army
 	static final int x_text_army_fixer = 1; // fixer to display the number of the army in the center
 	static final int y_text_army_fixer = 4; // fixer to display the number of the army in the center
@@ -59,8 +59,8 @@ public class GraphDrawer {
 	 */
 	static public void stateView(Graphics2D g, State s){
 		
-		// sets the font 
-		g.setFont(new Font(g.getFont().getFontName(), font_type_name, font_size_name));
+		// sets the font.... g.getFont().getFontName() was the problem.
+		g.setFont(new Font(null, font_type_name, font_size_name));
 		// it evaluates the off_x to make it appear in the center
 		int off_x = size_state_view_width - (int)g.getFontMetrics().getStringBounds(s.getName(),g).getWidth();
 		off_x/=2;
@@ -69,8 +69,8 @@ public class GraphDrawer {
 		// draw the name
 		g.drawString(s.getName(), off_x, size_state_view_height);
 
-		// sets the font
-		g.setFont(new Font(g.getFont().getFontName(), font_type_army, font_size_army) );
+		// sets the font 
+		g.setFont(new Font(null, font_type_army, font_size_army) );
 		// evaluates the size of the text
 		Rectangle2D size = g.getFontMetrics().getStringBounds(s.getArmy()+"",g);
 		// set the color
@@ -79,7 +79,6 @@ public class GraphDrawer {
 		g.drawString(s.getArmy()+"", 
 				(int)( (size_state_view_width-size.getWidth())/2 + x_text_army_fixer ), 
 				(int)( size_state_view_height - (size_state_view_height-size.getHeight())/2 ) - y_text_army_fixer);
-		
 	}
 	
 	/**
