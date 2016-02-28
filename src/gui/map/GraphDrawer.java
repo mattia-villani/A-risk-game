@@ -28,9 +28,9 @@ public class GraphDrawer {
 	static final int circle_ray = 12; // size of the circle of a country
 	static final int thickness = 9; // size of the archs 
 	static final int font_size_name = 12; // size of the font that is used to show the name of the coutry
-	static final int font_type_name = Font.PLAIN;// type of the font that is used to show the name of the coutry
-	static final int font_size_army = 14;// size of the font that is used to show the numerosity of the army
-	static final int font_type_army = Font.BOLD;// type of the font that is used to show the numerosity of the army
+	static final int font_type_name = Font.BOLD;// type of the font that is used to show the name of the coutry
+	static final int font_size_army = 13;// size of the font that is used to show the numerosity of the army
+	static final int font_type_army = Font.PLAIN;// type of the font that is used to show the numerosity of the army
 	static final int x_text_army_fixer = 1; // fixer to display the number of the army in the center
 	static final int y_text_army_fixer = 4; // fixer to display the number of the army in the center
 	static final int size_state_view_width = 100; // of the "view" (the rectangle) in which the info are drawn

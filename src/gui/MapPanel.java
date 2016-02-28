@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 public class MapPanel extends JLabel {
 
 	private static final long serialVersionUID = 1L;
-	final BufferedImage bkimage = ImageIO.read(getClass().getResourceAsStream("/images/map.jpg"));
+	final BufferedImage bkimage = ImageIO.read(getClass().getResourceAsStream("/images/mappng.png"));
 
 	@Override
 	public void paint(Graphics g) {
