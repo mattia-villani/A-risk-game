@@ -40,7 +40,6 @@ public class GraphDrawer {
 	static final boolean paint_black_the_name = true; // flag to write in black the name
 	static final boolean paint_black_the_army = true; // flag to write in black the army
 	static final boolean show_state_view_bounds = false; // to show the rectangle of the view around a country
-	
 	final static BasicStroke stroke = new BasicStroke(2); // to draw the oval around the circle of the state 
 	
 	static boolean world_invalidate = false; // flag to say if the world was invalidated
@@ -59,9 +58,8 @@ public class GraphDrawer {
 	 * @param s state to draw about
 	 */
 	static public void stateView(Graphics2D g, State s){
-		
-		// sets the font.... g.getFont().getFontName() was the problem.
-		g.setFont(new Font(null, font_type_name, font_size_name));
+		// sets the font
+		g.setFont(new Font(g.getFont().getFamily(), font_type_name, font_size_name));
 		// it evaluates the off_x to make it appear in the center
 		int off_x = size_state_view_width - (int)g.getFontMetrics().getStringBounds(s.getName(),g).getWidth();
 		off_x/=2;
@@ -71,7 +69,7 @@ public class GraphDrawer {
 		g.drawString(s.getName(), off_x, size_state_view_height);
 
 		// sets the font 
-		g.setFont(new Font(null, font_type_army, font_size_army) );
+		g.setFont(new Font(g.getFont().getFamily(), font_type_army, font_size_army) );
 		// evaluates the size of the text
 		Rectangle2D size = g.getFontMetrics().getStringBounds(s.getArmy()+"",g);
 		// set the color
@@ -81,6 +79,7 @@ public class GraphDrawer {
 				(int)( (size_state_view_width-size.getWidth())/2 + x_text_army_fixer ), 
 				(int)( size_state_view_height - (size_state_view_height-size.getHeight())/2 ) - y_text_army_fixer);
 	}
+	
 	
 	/**
 	 * Set up the graphic g to easly draw the view of the state
