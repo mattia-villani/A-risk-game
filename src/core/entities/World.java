@@ -6,7 +6,6 @@
 package core.entities;
 
 import java.util.*;
-
 import core.Constants;
 
 abstract public class World {

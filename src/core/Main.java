@@ -203,6 +203,12 @@ public class Main {
 			window.getCommand();
 			rollTheDiceToStart();
 		}
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 
 	}
