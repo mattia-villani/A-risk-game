@@ -5,25 +5,13 @@
 
 package gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
-
 import core.entities.Player;
 import core.entities.World;
 import gui.map.MapRenderer;
@@ -154,7 +142,7 @@ public class GUI {
 	public void enableOracle(World world, Player player){
 		// save the tree in this situation to not to regenerate this every time.
 		// one tree for each player
-		this.inputArea.enableOracle(Oracle.GenerateOracleTreeForIncreasingArmy(world, player));
+		inputArea.enableOracle(Oracle.GenerateOracleTreeForIncreasingArmy(world, player));
 	}
 
 	 public String getText() {

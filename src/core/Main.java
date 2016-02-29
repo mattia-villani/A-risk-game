@@ -6,8 +6,6 @@
 package core;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import core.entities.*;
@@ -16,7 +14,7 @@ import gui.Rolling;
 import gui.map.MapRenderer;
 
 
-public class main {
+public class Main {
 	private static String player1Name;
 	private static String player2Name;
 	private static Player player1;
@@ -35,7 +33,7 @@ public class main {
 	}
 
 	public static void setWorld(World world) {
-		main.world = world;
+		Main.world = world;
 	}
 
 	public static void pressed() {

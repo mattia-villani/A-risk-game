@@ -8,8 +8,6 @@ package core.entities;
 import java.util.*;
 
 import core.Constants;
-import core.main;
-import gui.map.MapRenderer;
 
 abstract public class World {
 	/**
