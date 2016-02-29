@@ -11,6 +11,7 @@ import core.Constants;
 import core.WorldBuilder;
 import core.entities.World;
 import gui.MapPanel;
+import gui.MouseInput;
 import gui.map.MapRenderer;
 
 public class MouseTest {	
@@ -30,37 +31,11 @@ public class MouseTest {
 		JLayeredPane layeredPane = new JLayeredPane();
 		layeredPane.setPreferredSize(new Dimension(900, 600));
 		mapPanel.setBounds(0, 0, 900, 600);
-		worldMap.setBounds(-1, 0, 1000, 600);
+		worldMap.setBounds(0, 0, 1000, 600);
 		layeredPane.add(mapPanel,1);
-		layeredPane.add(worldMap,0);
+		layeredPane.add(worldMap,0);	
+		layeredPane.addMouseListener(new MouseInput());
 		frame.add(layeredPane);
-				
-		frame.getContentPane().addMouseListener(new MouseListener() {			
-		    @Override
-			public void mouseClicked(MouseEvent e) {
-			    int x=e.getX();
-			    int y=e.getY();
-			    System.out.println("clicked: "+x+" , "+y);
-			    findState(world, x,y);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {	
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-			}
-		});
-		
 		frame.pack();
 		frame.setVisible(true);
 		

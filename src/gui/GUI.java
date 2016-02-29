@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
+
+import core.Constants;
 import core.entities.Player;
+import core.entities.State;
 import core.entities.World;
 import gui.map.MapRenderer;
 import oracle.Oracle;
@@ -69,9 +72,10 @@ public class GUI {
 		JLayeredPane layeredPane = new JLayeredPane();
 		layeredPane.setPreferredSize(new Dimension(900, 600));
 		mapPanel.setBounds(0, 0, 900, 600);
-		worldMap.setBounds(-1, 0, 1000, 600);
+		worldMap.setBounds(0, 0, 1000, 600);
 		layeredPane.add(mapPanel,1);
 		layeredPane.add(worldMap,0);
+		layeredPane.addMouseListener(new MouseInput());
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.gridwidth = 2;
@@ -137,6 +141,20 @@ public class GUI {
 		uiFrame.pack();
 		uiFrame.setVisible(true);
 		return;
+	}
+	
+	public State findState(World world, int x, int y){
+		int[][] COUNTRY_COORD=Constants.COUNTRY_COORD;
+		
+		for (int i=0; i<42; i++){
+			if ( (x-21<COUNTRY_COORD[i][0] && COUNTRY_COORD[i][0]<x+21) && (y-21<COUNTRY_COORD[i][1] && COUNTRY_COORD[i][1]<y+21) ){
+				//System.out.println("State Found: "+COUNTRY_COORD[i][0]+","+COUNTRY_COORD[i][1]+".");
+				//System.out.println("it's index is: "+i);
+				//System.out.println("it's name is: "+world.getState(i).getName());
+				return world.getState(i);
+			}			
+		}
+		return null;
 	}
 	
 	public void enableOracle(World world, Player player){
