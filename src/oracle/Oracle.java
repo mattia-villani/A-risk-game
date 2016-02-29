@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.glass.ui.Window;
+
 import core.entities.Player;
 import core.entities.State;
 import core.entities.World;
@@ -54,6 +56,7 @@ public class Oracle extends Tree{
 		boolean first = true;
 		String prefix = "";
 		String inst = "enter the name of the country to reinforce \""+prefix+"<";
+		gui.GUI.setLog(inst);
 		for ( State state : world.getStates() ){
 			inst+=(first?"":"|")+state.getName();
 			first = false;
