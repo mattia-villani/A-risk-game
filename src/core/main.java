@@ -186,18 +186,18 @@ public class main {
 	public static void rollTheDiceToStart(){
 		int player1Roll;
 		int player2Roll;
-		window.setText("Press enter to Roll, player1!");
+		window.setText("Press enter to Roll, " + player1Name + "!");
 		window.getCommand();
 		player1Roll = diceRollNumber( player1 );
-		window.setText("Press enter to Roll, player2!");
+		window.setText("Press enter to Roll, " + player2Name + "!");
 		window.getCommand();
 		player2Roll = diceRollNumber( player2 );
 		if (player1Roll > player2Roll){
-			window.setText("Player1 will go first");
+			window.setText(player1Name + " will go first");
 			turn = 0;
 		}
 		else if(player2Roll > player1Roll){
-			window.setText("Player2 will go first");
+			window.setText(player2Name + " will go first");
 			turn = 1;
 		}
 		else{
