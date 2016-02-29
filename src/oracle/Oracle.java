@@ -10,6 +10,7 @@ import com.sun.glass.ui.Window;
 import core.entities.Player;
 import core.entities.State;
 import core.entities.World;
+import gui.TextArea;
 
 public class Oracle extends Tree{
 	
@@ -50,13 +51,13 @@ public class Oracle extends Tree{
 		return new Oracle(legalStrings, inst );
 	}
 
-	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player){
+	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player, TextArea textArea){
 		List<String> legalStrings = new ArrayList<String>();
 				
 		boolean first = true;
 		String prefix = "";
 		String inst = "enter the name of the country to reinforce \""+prefix+"<";
-		gui.GUI.setLog(inst);
+		textArea.setText(player.getName()+", please enter the name of a country to reinfore.\n\n Pressing tab will autocomplete the name of the Country");
 		for ( State state : world.getStates() ){
 			inst+=(first?"":"|")+state.getName();
 			first = false;
