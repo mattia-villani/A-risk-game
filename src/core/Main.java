@@ -57,15 +57,15 @@ public class Main {
 		assignStates();	
 		window.refreshMap();
 		rollTheDiceToStart();
-		chooseReinforments();
-
-
-		//now add correct numbers and colors to the map
-		//window.refreshMap();
+		chooseReinforcements();
 
 	}
 
-	public static void chooseReinforments(){
+	/**
+	 * lets players choose where they should put their reinforcements before the game starts
+	 */
+
+	public static void chooseReinforcements(){
 		boolean player1Turn = false;
 		if (turn == 0) player1Turn = true;
 		Tree[] trees = new Tree[6];
@@ -74,6 +74,14 @@ public class Main {
 		Player[] players = new Player[]{ player1, player2, neut1, neut2, neut3, neut4};
 		for (int i = 0; i < Constants.TUNRS_OF_REINFORCEMENTS; ++i){
 			for (int j = 0; j < Constants.NUM_TOTAL_PLAYERS; j++ ){
+				if (player1Turn){
+					window.setText(player1.getName() + " choose country to place reinforcements for: " + players[turn].getName());
+					window.addText("\n you will only be able to type in a name if it has the correct owner.");
+				}
+				else{
+					window.setText(player2.getName() + " choose country to place reinforcements for: " + players[turn].getName());
+					window.addText("\n you will only be able to type in a name if it has the correct owner.");
+				}
 				if (turn == 0 && player1Turn == false || turn == 1 && player1Turn == true){
 					turn = (turn + 1) % 6;
 				}
@@ -88,6 +96,7 @@ public class Main {
 					turn = (turn + 1) % 6;
 				}
 			}
+			player1Turn = !player1Turn;
 		}
 	}
 
@@ -138,7 +147,7 @@ public class Main {
 		}
 
 		window.setText("It's time to draw territory cards. Press enter when ready.");
-		window.getCommand();
+		String test = window.getCommand();
 		window.resetText();
 
 		Player tempPlayer=null;
@@ -183,15 +192,20 @@ public class Main {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
 
+
+
 			window.refreshMap();
+			if (test.equals("test")){
+			}
+			else{
 
-			try {
-				MapRenderer.Invalidate();
-				Thread.sleep(400);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} 
-
+				try {
+					MapRenderer.Invalidate();
+					Thread.sleep(400);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+			}
 		}
 	}
 
