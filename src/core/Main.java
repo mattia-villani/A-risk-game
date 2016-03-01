@@ -56,6 +56,7 @@ public class Main {
 		window.refreshMap();
 		rollTheDiceToStart();
 		
+		
 		window.enableOracle( world, turn==0 ? player1 : player2 );
 		setReinforcements( window.getCommand() , turn );
 		

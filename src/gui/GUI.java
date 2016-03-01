@@ -36,7 +36,7 @@ public class GUI {
 	public GUI (World world) throws IOException {
 		animator = new Animator();	
 		uiFrame=new FancyFullFrameAnimation();
-		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 700));
+		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 600));
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
 		uiFrame.setResizable(false);
 		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

@@ -58,11 +58,12 @@ public class Oracle extends Tree{
 		String prefix = "";
 		String inst = "enter the name of the country to reinforce \""+prefix+"<";
 		textArea.setText(player.getName()+", please enter the name of a country to reinfore.\n\n Pressing tab will autocomplete the name of the Country");
-		for ( State state : world.getStates() ){
-			inst+=(first?"":"|")+state.getName();
-			first = false;
-			legalStrings.add( prefix + state.getName() );
-		}
+		for ( State state : world.getStates() )
+			if ( player == state.getOwner() ){
+				inst+=(first?"":"|")+state.getName();
+				first = false;
+				legalStrings.add( prefix + state.getName() );
+			}
 		inst +=">\"";
 		return new Oracle(legalStrings, inst );
 	}
