@@ -82,7 +82,9 @@ public class Main {
 					if (trees[turn] == null )
 						trees[turn]=window.enableOracleAndReturnTree( world, player );
 					else window.enableOracle(trees[turn]);
-					setReinforcements( window.getCommand() , turn);
+					String str ;
+					while ( (str = window.getCommand() ).equals("") );
+					setReinforcements( str , turn);
 					turn = (turn + 1) % 6;
 				}
 			}
