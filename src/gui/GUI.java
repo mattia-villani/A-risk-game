@@ -215,7 +215,6 @@ public class GUI {
 
 	public String getCommand() {
 		String command;
-
 		synchronized (commandBuffer) {
 			while (commandBuffer.isEmpty()) {
 				try {
@@ -228,6 +227,11 @@ public class GUI {
 			command = commandBuffer.pop();
 		}
 		return command;
+	}
+	
+	public void clearCommands(){
+		commandBuffer.clear();
+		return;
 	}
 
 	private class closure extends WindowAdapter {
