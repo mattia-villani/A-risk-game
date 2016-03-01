@@ -70,7 +70,7 @@ public class Main {
 		boolean player1Turn = false;
 		if (turn == 0) player1Turn = true;
 		Tree[] trees = new Tree[6];
-
+ 
 
 		Player[] players = new Player[]{ player1, player2, neut1, neut2, neut3, neut4};
 		for (int i = 0; i < Constants.TUNRS_OF_REINFORCEMENTS; ++i){
@@ -94,7 +94,7 @@ public class Main {
 					else window.enableOracle(trees[turn]);
 					String str ;
 					while ( (str = window.getCommand() ).length() < 4){
-						window.addTextln("Mnewake sure input is unambiguous");
+						window.addTextln("Make sure input is unambiguous");
 					};
 					setReinforcements( str , turn);
 					turn = (turn + 1) % 6;
@@ -232,10 +232,10 @@ public class Main {
 		int player2Roll;
 		window.setText("Press enter to Roll, " + player1Name + "!");
 		window.getCommand();
-		player1Roll = diceRollNumber( player1 );
+		player1Roll =  diceRollNumber( player1 );
 		window.setText("Press enter to Roll, " + player2Name + "!");
 		window.getCommand();
-		player2Roll = diceRollNumber( player2 );
+		player2Roll = 6;//diceRollNumber( player2 );
 		if (player1Roll > player2Roll){
 			window.setText(player1Name + " will go first");
 			turn = 0;
@@ -277,7 +277,6 @@ public class Main {
 	}
 
 	public static boolean setReinforcements (String stateName, int player){
-		System.out.println(stateName);
 		boolean returnVal = false;
 		for (State state : world.getStates()){
 			if (stateName.toLowerCase().equals(state.getName().toLowerCase())){
