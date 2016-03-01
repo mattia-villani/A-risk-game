@@ -58,6 +58,7 @@ public class Main {
 		window.refreshMap();
 		rollTheDiceToStart();
 		chooseReinforcements();
+		window.setText("Let's play!");
 
 	}
 
@@ -80,7 +81,7 @@ public class Main {
 				}
 				else{
 					window.setText(player2.getName() + " choose country to place reinforcements for: " + players[turn].getName());
-					window.addText("\n you will only be able to type in a name if it has the correct owner.");
+					window.addText("\nYou will only be able to type in a name if it has the correct owner.");
 				}
 				if (turn == 0 && player1Turn == false || turn == 1 && player1Turn == true){
 					turn = (turn + 1) % 6;
@@ -88,16 +89,20 @@ public class Main {
 				else{
 					Player player = players[turn];
 					if (trees[turn] == null )
+						
 						trees[turn]=window.enableOracleAndReturnTree( world, player );
 					else window.enableOracle(trees[turn]);
 					String str ;
-					while ( (str = window.getCommand() ).equals("") );
+					while ( (str = window.getCommand() ).length() < 4){
+						window.addTextln("Mnewake sure input is unambiguous");
+					};
 					setReinforcements( str , turn);
 					turn = (turn + 1) % 6;
 				}
 			}
 			player1Turn = !player1Turn;
 		}
+		
 	}
 
 	/**
@@ -246,7 +251,7 @@ public class Main {
 		}
 
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

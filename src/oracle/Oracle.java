@@ -57,7 +57,6 @@ public class Oracle extends Tree{
 		boolean first = true;
 		String prefix = "";
 		String inst = "enter the name of the country to reinforce \""+prefix+"<";
-		textArea.setText(player.getName()+", please enter the name of a country to reinfore.\n\n Pressing tab will autocomplete the name of the Country");
 		for ( State state : world.getStates() )
 			if ( player == state.getOwner() ){
 				inst+=(first?"":"|")+state.getName();
