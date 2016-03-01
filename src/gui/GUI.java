@@ -19,6 +19,7 @@ import core.entities.State;
 import core.entities.World;
 import gui.map.MapRenderer;
 import oracle.Oracle;
+import oracle.Tree;
 
 public class GUI {
 	private static FancyFullFrameAnimation uiFrame;
@@ -36,7 +37,7 @@ public class GUI {
 	public GUI (World world) throws IOException {
 		animator = new Animator();	
 		uiFrame=new FancyFullFrameAnimation();
-		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 600));
+		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 700));
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
 		uiFrame.setResizable(false);
 		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -157,10 +158,15 @@ public class GUI {
 		return null;
 	}
 	
-	public void enableOracle(World world, Player player){
+	public Tree enableOracleAndReturnTree(World world, Player player){
 		// save the tree in this situation to not to regenerate this every time.
 		// one tree for each player
-		inputArea.enableOracle(Oracle.GenerateOracleTreeForIncreasingArmy(world, player, textArea));
+		Tree tree = Oracle.GenerateOracleTreeForIncreasingArmy(world, player, textArea);
+		inputArea.enableOracle(tree);
+		return tree;
+	}
+	public void enableOracle(Tree tree){
+		inputArea.enableOracle(tree);
 	}
 
 	 public String getText() {

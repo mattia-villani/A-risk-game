@@ -12,6 +12,7 @@ import core.entities.*;
 import gui.GUI;
 import gui.Rolling;
 import gui.map.MapRenderer;
+import oracle.Tree;
 
 
 public class Main {
@@ -41,9 +42,10 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws IOException {
-		
+
 		world = WorldBuilder.Build();		
 		window = new GUI(world);//create frame
+
 
 		Rolling.loadImages( window.getClass() );
 
@@ -55,15 +57,36 @@ public class Main {
 		assignStates();	
 		window.refreshMap();
 		rollTheDiceToStart();
-		
-		
-		window.enableOracle( world, turn==0 ? player1 : player2 );
-		setReinforcements( window.getCommand() , turn );
-		
+		chooseReinforments();
+
 
 		//now add correct numbers and colors to the map
 		//window.refreshMap();
 
+	}
+
+	public static void chooseReinforments(){
+		boolean player1Turn = false;
+		if (turn == 0) player1Turn = true;
+		Tree[] trees = new Tree[6];
+
+
+		Player[] players = new Player[]{ player1, player2, neut1, neut2, neut3, neut4};
+		for (int i = 0; i < Constants.TUNRS_OF_REINFORCEMENTS; ++i){
+			for (int j = 0; j < Constants.NUM_TOTAL_PLAYERS; j++ ){
+				if (turn == 0 && player1Turn == false || turn == 1 && player1Turn == true){
+					turn = (turn + 1) % 6;
+				}
+				else{
+					Player player = players[turn];
+					if (trees[turn] == null )
+						trees[turn]=window.enableOracleAndReturnTree( world, player );
+					else window.enableOracle(trees[turn]);
+					setReinforcements( window.getCommand() , turn);
+					turn = (turn + 1) % 6;
+				}
+			}
+		}
 	}
 
 	/**
@@ -84,7 +107,6 @@ public class Main {
 	 *  Create players from the names each player input, then hardcode neutral players
 	 */
 	public static void createPlayers(){
-
 		player1 = new Player(player1Name, new Color(0, 0, 180));
 		World.getPlayers().add(player1);
 		player2 = new Player(player2Name, new Color(210, 0, 0));
@@ -102,21 +124,21 @@ public class Main {
 	/**
 	 *	Ration out states, give each player 9 and each neutral 6, decided by territory cards. 
 	 **/
-	
+
 	public static void assignStates(){
-		
+
 		TerritoryDeck Deck = new TerritoryDeck();
-		
+
 		try {
 			Thread.sleep(800);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		window.setText("It's time to draw territory cards. Press enter when ready.");
 		window.getCommand();
 		window.resetText();
-		
+
 		Player tempPlayer=null;
 
 		for (int i=0; i<world.getStates().size(); i++) {
@@ -151,16 +173,16 @@ public class Main {
 				else {
 					window.addTextln(world.getState(temp.getIndex()).getOwner().getName());
 				}
-				
+
 				window.addText(" has drawn: "+world.getState(temp.getIndex()).getName());				
 				tempPlayer = world.getState(temp.getIndex()).getOwner();
 			}
 			else {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
-			
+
 			window.refreshMap();
-			
+
 			try {
 				MapRenderer.Invalidate();
 				Thread.sleep(400);
@@ -206,7 +228,7 @@ public class Main {
 			window.getCommand();
 			rollTheDiceToStart();
 		}
-		
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -220,10 +242,10 @@ public class Main {
 		double rand = Math.random();
 		int returnVal = 1 + (int)(rand * 6);
 		window.getUiFrame().startAnimation(new Rolling(window.getUiFrame(),new int[][]{ 
-				new int[] { returnVal }
-			}, new Player[]{
+			new int[] { returnVal }
+		}, new Player[]{
 				player
-			}));
+		}));
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
