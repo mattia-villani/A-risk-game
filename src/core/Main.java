@@ -53,13 +53,15 @@ public class Main {
 		window.displayPlayerList(World.getPlayers());
 		assignArmies();
 		assignStates();	
-
+		window.refreshMap();
 		rollTheDiceToStart();
 		
 		window.enableOracle( world, turn==0 ? player1 : player2 );
+		setReinforcements( window.getCommand() , turn );
+		
 
 		//now add correct numbers and colors to the map
-		window.refreshMap();
+		//window.refreshMap();
 
 	}
 
@@ -231,9 +233,10 @@ public class Main {
 	}
 
 	public static boolean setReinforcements (String stateName, int player){
+		System.out.println(stateName);
 		boolean returnVal = false;
 		for (State state : world.getStates()){
-			if (stateName.equals(state.getName())){
+			if (stateName.toLowerCase().equals(state.getName().toLowerCase())){
 				if(player <  2){
 					state.setArmy(state.getArmy() + 3);
 				}
