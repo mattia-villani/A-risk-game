@@ -160,6 +160,7 @@ public class OracledTextField extends JTextField {
 		oracleEnabled = true;
 		if ( tree != null ) this.tree = tree;
 	}
+	
 	public void disableOracle(){
 		oracleEnabled = false;
 	}

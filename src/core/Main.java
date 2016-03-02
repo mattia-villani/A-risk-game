@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import core.entities.*;
 import gui.GUI;
 import gui.Rolling;
-import gui.map.MapRenderer;
 import oracle.Tree;
-
 
 public class Main {
 	private static String player1Name;
@@ -24,103 +22,90 @@ public class Main {
 	private static Player neut2;
 	private static Player neut3;
 	private static Player neut4;
-	private static boolean didPress = false;
 	private static World world;
-	private static int turn = -1;
 	private static GUI window;
+	private static boolean player1Start;
 
+	
+	public static void main(String[] args) throws IOException {
+		/*
+		 * Create world and GUI.
+		 */
+		world = WorldBuilder.Build();		
+		window = new GUI(world);
+		Rolling.loadImages( window.getClass() );
+
+		/*
+		 *  Initial game setup.
+		 */
+		getNames();
+		createPlayers();
+		assignArmies();
+		assignStates();
+		rollTheDiceToStart();
+		chooseReinforcements();
+		
+		/*
+		 *  Game setup complete, ready to start turns.
+		 */
+		window.setText("Let's play!");
+	}
+
+	// 	Returns the world.
 	public static World getWorld() {
 		return world;
 	}
 
-	public static void setWorld(World world) {
-		Main.world = world;
-	}
-
-	public static void pressed() {
-		didPress = true;
-	}
-
-	public static void main(String[] args) throws IOException {
-
-		world = WorldBuilder.Build();		
-		window = new GUI(world);//create frame
-
-
-		Rolling.loadImages( window.getClass() );
-
-		getNames();
-		//create players, then world, then give states armies
-		createPlayers();
-		window.displayPlayerList(World.getPlayers());
-		assignArmies();
-		assignStates();	
-		window.refreshMap();
-		rollTheDiceToStart();
-		chooseReinforcements();
-		window.setText("Let's play!");
-
-	}
-
 	/**
-	 * lets players choose where they should put their reinforcements before the game starts
+	 * <p>	Sleeps thread for specified time.
+	 * 		@param miliseconds Amount of time to sleep for in miliseconds
 	 */
-
-	public static void chooseReinforcements(){
-		boolean player1Turn = false;
-		if (turn == 0) player1Turn = true;
-		Tree[] trees = new Tree[6];
- 
-
-		Player[] players = new Player[]{ player1, player2, neut1, neut2, neut3, neut4};
-		for (int i = 0; i < Constants.TURNS_OF_REINFORCEMENTS; ++i){
-			for (int j = 0; j < Constants.NUM_TOTAL_PLAYERS; j++ ){
-				if (player1Turn){
-					window.setText(player1.getName() + " choose country to place reinforcements for: " + players[turn].getName());
-					window.addText("\n you will only be able to type in a name if it has the correct owner.");
-				}
-				else{
-					window.setText(player2.getName() + " choose country to place reinforcements for: " + players[turn].getName());
-					window.addText("\nYou will only be able to type in a name if it has the correct owner.");
-				}
-				if (turn == 0 && player1Turn == false || turn == 1 && player1Turn == true){
-					turn = (turn + 1) % 6;
-				}
-				else{
-					Player player = players[turn];
-					if (trees[turn] == null )
-						
-						trees[turn]=window.enableOracleAndReturnTree( world, player );
-					else window.enableOracle(trees[turn]);
-					String str ;
-					while ( (str = window.getCommand() ).length() < 4){
-						window.addTextln("Make sure input is unambiguous and not blank");
-					};
-					setReinforcements( str , turn);
-					turn = (turn + 1) % 6;
-				}
-			}
-			player1Turn = !player1Turn;
+	public static void sleep(int miliseconds){
+		try {
+			Thread.sleep(miliseconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		
-	}
-
-	/**
-	 * Gets names from text input box, and creates the players
-	 */
-
-	public static void getNames() {
-		window.setText("Welcome! What is player 1's name?");
-		player1Name = window.getCommand();	
-		window.setText(player1Name + " will be blue.\n\nWhat is player 2's name?");
-		player2Name = window.getCommand();
-		window.setText(player2Name + " will be red."); 
 		return;
 	}
-
-
+	
 	/**
-	 *  Create players from the names each player input, then hardcode neutral players
+	 * <p>	Gets the names for the 2 human players.
+	 * <br>	Will only accept non blank names, displays error message if attempted.
+	 */
+	public static void getNames() {
+		window.setText("Welcome to Risk! Please enter a name for player 1.");
+		window.clearCommands();
+		
+		player1Name="";	
+		while (player1Name.length()<1){
+			player1Name = window.getCommand();
+			if (player1Name.length()<1){
+				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't have an empty name. Please pick a name.");
+			}
+			
+		}
+		
+		window.setText(player1Name + " will be blue. Please enter a name for player 2.");
+		
+		player2Name="";
+		while (player2Name.length()<1){
+			player2Name = window.getCommand();
+			if (player2Name.length()<1){
+				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have an empty name. Please pick a name.");
+			}
+		}
+		
+		window.setText(player2Name + " will be red."); 
+		
+		sleep(1000);
+		window.clearCommands();
+		return;
+	}
+	
+	/**
+	 * <p>	Creates the players & Displays the player list.
+	 * <br>	The 4 neutral player names are hardcoded.
 	 */
 	public static void createPlayers(){
 		player1 = new Player(player1Name, new Color(0, 0, 180));
@@ -135,23 +120,39 @@ public class Main {
 		World.getPlayers().add(neut3);
 		neut4 = new Player("Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
+		
+		window.displayPlayerList(World.getPlayers());
+		return;
 	}
 
 	/**
-	 *	Ration out states, give each player 9 and each neutral 6, decided by territory cards. 
-	 **/
-
-	public static void assignStates(){
-
-		TerritoryDeck Deck = new TerritoryDeck();
-
-		try {
-			Thread.sleep(800);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	 * <p>	Assigns the number of armies specified in the constants to each player
+	 */
+	public static void assignArmies(){
+		ArrayList<Player> players = World.getPlayers();
+		for(int i = 0; i < players.size(); ++i){
+			if (i < players.size() - Constants.NUM_NEUTRALS){
+				players.get(i).setNumArmies(Constants.INIT_UNITS_PLAYER);
+			}
+			else{
+				players.get(i).setNumArmies(Constants.INIT_UNITS_NEUTRAL);
+			}
 		}
-
+		return;
+	}
+	
+	/**
+	 * <p>	Assigns all countries to the players.
+	 * <br>	Number of countries assigned determined by constants.
+	 * <p>	Serial country assignment to each player still provides random countries as card deck is randomized upon creation.
+	 */
+	public static void assignStates(){
+		TerritoryDeck Deck = new TerritoryDeck();
+		
+		window.clearCommands();
 		window.setText("It's time to draw territory cards. Press enter when ready.");
+		
+		// If "test" is entered the method will skip the sleep timer on each passthrough of the loop below
 		String test = window.getCommand();
 		window.resetText();
 
@@ -179,9 +180,12 @@ public class Main {
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				world.getState(temp.getIndex()).setOwner(neut4);
 			}
+			
+			// adds army to state, decreases owners army count
 			world.getState(temp.getIndex()).setArmy(1);
 			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
 
+			// determines what text to display to the user
 			if (world.getState(temp.getIndex()).getOwner() != tempPlayer ) {
 				if (tempPlayer == null) {
 					window.addText(world.getState(temp.getIndex()).getOwner().getName());
@@ -196,69 +200,51 @@ public class Main {
 			else {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
-
-
-
 			window.refreshMap();
-			if (test.equals("test")){
-			}
-			else{
-
-				try {
-					MapRenderer.Invalidate();
-					Thread.sleep(400);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} 
-			}
+			if (!test.equals("test")) sleep(400);
 		}
+		
+		sleep(1000);
+		window.clearCommands();
+		return;
 	}
-
-	public static void assignArmies(){
-		ArrayList<Player> players = World.getPlayers();
-		for(int i = 0; i < players.size(); ++i){
-			if (i < players.size() - Constants.NUM_NEUTRALS){
-				players.get(i).setNumArmies(Constants.INIT_UNITS_PLAYER);
-			}
-			else{
-				players.get(i).setNumArmies(Constants.INIT_UNITS_NEUTRAL);
-			}
-			System.out.println(players.get(i).getName() + " " + players.get(i).getNumArmies());
-		}
-	}
-
+	
+	/**
+	 * <p>	Dice rolls to determine which player goes first with placing reinforcements
+	 */
 	public static void rollTheDiceToStart(){
-		int player1Roll;
-		int player2Roll;
-		window.setText("Press enter to Roll, " + player1Name + "!");
+		window.clearCommands();
+		window.setText("Press enter to roll, " + player1.getName() + "!");
 		window.getCommand();
-		player1Roll =  diceRollNumber( player1 );
-		window.setText("Press enter to Roll, " + player2Name + "!");
+		int player1Roll = diceRollNumber( player1 );
+		
+		window.clearCommands();
+		window.setText("Press enter to roll, " + player2.getName() + "!");
 		window.getCommand();
-		player2Roll = 6;//diceRollNumber( player2 );
+		int player2Roll = diceRollNumber( player2 );
+		
 		if (player1Roll > player2Roll){
-			window.setText(player1Name + " will go first");
-			turn = 0;
+			window.setText(player1.getName()+" rolled a "+player1Roll+", which beats "+player2.getName()+"'s "+player2Roll+". So "+player1.getName()+" will go first!");
+			player1Start=true;
+			sleep(5000);
 		}
 		else if(player2Roll > player1Roll){
-			window.setText(player2Name + " will go first");
-			turn = 1;
+			window.setText(player2.getName()+" rolled a "+player2Roll+", which beats "+player1.getName()+"'s "+player1Roll+". So "+player2.getName()+" will go first!");
+			player1Start=false;
+			sleep(5000);
 		}
 		else{
-			window.setText("tie! we'll roll again! Press enter when ready");
+			window.setText("Tie! We'll roll again! Press enter when ready.");
 			window.getCommand();
 			rollTheDiceToStart();
 		}
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-
+		window.clearCommands();
+		return;
 	}
 
+	/**
+	 * <p>	Handles animation of die rolls.
+	 */
 	public static int diceRollNumber(Player player){
 		double rand = Math.random();
 		int returnVal = 1 + (int)(rand * 6);
@@ -267,29 +253,86 @@ public class Main {
 		}, new Player[]{
 				player
 		}));
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		sleep(2000);
 		return returnVal;
-
 	}
+	
+	/**
+	 * <p>	Reinforcement placing during game setup phase.
+	 * <br>	Uses oracle to assist player by predicting country names based upon text entered.
+	 */
+	public static void chooseReinforcements(){
+		
+		window.clearCommands();
+		
+		Player[] players = new Player[]{ player2, neut1, neut2, neut3, neut4};
+		Tree[] trees = new Tree[5];
+		Tree player1Tree=null;
+		Tree player2Tree=null;
+		boolean error=false;
 
-	public static boolean setReinforcements (String stateName, int player){
-		boolean returnVal = false;
+		if (player1Start) players[0]=player1;
+		for (int i = 0; i < Constants.TURNS_OF_REINFORCEMENTS; ++i){
+			for (int j=0; j < Constants.NUM_TOTAL_PLAYERS-1; j++ ){
+				
+				// Display text to the user
+				if (j==0) window.setText(players[0].getName()+" please choose one of your countries to reinforce.");
+				else window.setText(players[0].getName()+" please choose a country to reinforce for: "+players[j].getName()+".");
+
+				window.addText("\nYou will only be able to type in a name if it has the correct owner.");
+				
+				Player player = players[j];
+				
+				// Generate and store oracle trees.
+				if (trees[j] == null) trees[j]=window.enableOracleAndReturnTree( world, player );
+				else window.enableOracle(trees[j]);
+				String str ;
+				while ( (str = window.getCommand() ).length() < 4){
+					if (!error){
+						window.setText(window.getText()+"\nPlease make sure input is unambiguous and not blank.");
+						error=!error;
+					}
+				};	
+				setReinforcements( str , j);
+			}	
+			
+			// Swap position 0 to the other human player. Also swap the two players trees.
+			if(players[0]==player1){
+				players[0]=player2;
+				player1Tree=trees[0];
+				trees[0]=player2Tree;
+			}
+			else{
+				players[0]=player1;
+				player2Tree=trees[0];
+				trees[0]=player1Tree;
+			}
+		}		
+		window.disableOracle();
+		window.clearCommands();
+		return;
+	}		
+
+	/**
+	 * <p>	Sets reinforcements into state.
+	 * <br>	Decrements army size of state owner.
+	 * 		@param stateName The state to reinforce
+	 * 		@param player To determine if player is human or neutral
+	 */
+	public static void setReinforcements (String stateName, int player){
 		for (State state : world.getStates()){
 			if (stateName.toLowerCase().equals(state.getName().toLowerCase())){
-				if(player <  2){
+				if(player == 0){
 					state.setArmy(state.getArmy() + 3);
+					state.getOwner().setNumArmies(state.getOwner().getNumArmies()-3);
 				}
 				else{
 					state.setArmy(state.getArmy() + 1);
+					state.getOwner().setNumArmies(state.getOwner().getNumArmies()-1);
 				}
-				returnVal =  true;
 			}
 		}
 		window.refreshMap();
-		return returnVal;
+		return;
 	}
 }

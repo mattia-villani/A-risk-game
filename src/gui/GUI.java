@@ -34,6 +34,12 @@ public class GUI {
 	final static String newline = "\n";
 	private LinkedList<String> commandBuffer = new LinkedList<String>();
 
+	/**
+	 * 	<p>The visual interface for the game.
+	 * 
+	 * 	@param world.
+	 * 	@throws IOException exception handled due to images used.
+	 */
 	public GUI (World world) throws IOException {
 		animator = new Animator();	
 		uiFrame=new FancyFullFrameAnimation();
@@ -43,11 +49,13 @@ public class GUI {
 		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		uiFrame.addWindowListener(new closure());
 
+		// Grid Bag Layout
 		uiFrame.getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 		gbc.insets = new Insets(0,0,0,0);
 
+		// Left wooden image
 		leftBorder = new LeftBorder();
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -58,6 +66,7 @@ public class GUI {
 		gbc.fill = GridBagConstraints.VERTICAL;
 		uiFrame.getContentPane().add(leftBorder, gbc);
 
+		// Right wooden image
 		rightBorder = new RightBorder();
 		gbc.gridx = 4;
 		gbc.gridy = 1;
@@ -68,6 +77,7 @@ public class GUI {
 		gbc.fill = GridBagConstraints.BOTH;
 		uiFrame.getContentPane().add(rightBorder, gbc);
 
+		// Central map image and world graph overlay
 		mapPanel = new MapPanel();
 		worldMap = new MapRenderer(world);
 		JLayeredPane layeredPane = new JLayeredPane();
@@ -86,6 +96,7 @@ public class GUI {
 		gbc.fill = GridBagConstraints.BOTH;
 		uiFrame.getContentPane().add(layeredPane, gbc);
 
+		// Display area
 		textArea = new TextArea();
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setPreferredSize(new Dimension(650, 64));
@@ -102,6 +113,7 @@ public class GUI {
 		gbc.fill = GridBagConstraints.BOTH;
 		uiFrame.getContentPane().add(scrollPane, gbc);
 
+		// User input area
 		inputArea = new OracledTextField() {
 			private static final long serialVersionUID = 1L;
 			public void addNotify() {
@@ -128,6 +140,7 @@ public class GUI {
 		gbc.fill = GridBagConstraints.BOTH;
 		uiFrame.getContentPane().add(inputArea, gbc);
 
+		// Player list display
 		playerList = new PlayerList();
 		playerList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
 		gbc.gridx = 3;
@@ -144,65 +157,125 @@ public class GUI {
 		return;
 	}
 	
+	/**
+	 * <p>	Method for finding a state clicked by mouse input (currently unused).
+	 * 		@param world The game world.
+	 * 		@param x The X coordinate of the mouse click.
+	 * 		@param y The Y coordinate of the mouse click.
+	 * 		@return The state clicked on or null.
+	 */
 	public State findState(World world, int x, int y){
 		int[][] COUNTRY_COORD=Constants.COUNTRY_COORD;
 		
 		for (int i=0; i<42; i++){
 			if ( (x-21<COUNTRY_COORD[i][0] && COUNTRY_COORD[i][0]<x+21) && (y-21<COUNTRY_COORD[i][1] && COUNTRY_COORD[i][1]<y+21) ){
-				//System.out.println("State Found: "+COUNTRY_COORD[i][0]+","+COUNTRY_COORD[i][1]+".");
-				//System.out.println("it's index is: "+i);
-				//System.out.println("it's name is: "+world.getState(i).getName());
 				return world.getState(i);
 			}			
 		}
 		return null;
 	}
 	
+	/**
+	 * <p>	Generates oracle tree and returns tree for storage.
+	 * <br>	Enables oracle text detection.
+	 * 		@param world The game world.
+	 * 		@param player Player to generate tree for.
+	 * 		@return Oracle tree.
+	 */
 	public Tree enableOracleAndReturnTree(World world, Player player){
-		// save the tree in this situation to not to regenerate this every time.
-		// one tree for each player
-		Tree tree = Oracle.GenerateOracleTreeForIncreasingArmy(world, player, textArea);
+		Tree tree = Oracle.GenerateOracleTreeForIncreasingArmy(world, player);
 		inputArea.enableOracle(tree);
 		return tree;
 	}
+	
+	/**
+	 * <p>	Enables oracle text detection.
+	 * 		@param tree Tree to be used for text detection.
+	 */
 	public void enableOracle(Tree tree){
 		inputArea.enableOracle(tree);
 	}
+	
+	/**
+	 * <p>	Disables oracle text detection.
+	 */
+	public void disableOracle(){
+		inputArea.disableOracle();
+	}
 
-	 public String getText() {
+	/**
+	 * <p>	Gets the contents of the text display.
+	 * 		@return	A string composed of the contents of the text display.
+	 */
+
+	public String getText() {
 		return textArea.getText();
 	}
 
-	public void setText(String s) {
-		textArea.setText(s);
+	/**
+	 * <p>	Sets the text display.
+	 * @param string The string to set the display to.
+	 */
+	public void setText(String string) {
+		textArea.setText(string);
 		return;
 	}
 
-	public void addText(String s) {
-		textArea.append(s);
+	/**
+	 * <p>	Adds to the text display.
+	 * @param string The string to add.
+	 */
+	public void addText(String string) {
+		textArea.append(string);
 		return;
 	}
 
-	public void addTextln(String s) {
-		textArea.append(newline+s);
+	/**
+	 * <p>	Adds to the text display on a new line.
+	 * @param string The string to add.
+	 */
+	public void addTextln(String string) {
+		textArea.append(newline+string);
 		return;
 	}
 	
+	/**
+	 * <p>	Clears the text display.
+	 */
 	public void resetText() {
 		textArea.setText("");
 		return;
 	}
+	
+	/**
+	 * <p>	Gets the GUI frame to display animation.
+	 * 		@return Frame in use.
+	 */
+	public FancyFullFrameAnimation getUiFrame() {
+		return uiFrame;
+	}
 
+	/**
+	 * <p>	Refreshes the world map.
+	 */
 	public void refreshMap() {
 		MapRenderer.Invalidate();
 		return;
 	}
 
+	/**
+	 * <p>	Displays the player list.
+	 * 		@param players ArrayList of players to be displayed.
+	 */
 	public void displayPlayerList(ArrayList<Player> players) {
 		playerList.requestToDrawList(players);
 		return;
 	}
 
+	/**
+	 * <p>	Private class for the action listener.
+	 * <br>	Notifies when the commandBuffer has been added to.
+	 */
 	private class InputAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -215,10 +288,20 @@ public class GUI {
 		}
 	}
 	
-	public FancyFullFrameAnimation getUiFrame() {
-		return uiFrame;
+	/**
+	 * <p>	Clears the command buffer
+	 * <p>	Used to prevent additional unwanted commands being input by the user and then retrieved by getCommand()
+	 * <br>	For example hitting the enter key when sleep has been called.
+	 */
+	public void clearCommands(){
+		commandBuffer.clear();
+		return;
 	}
-
+	
+	/**
+	 * <p>	Gets commands entered by the user. Synced to the command buffer.
+	 * 		@return the latest command added to the buffer.
+	 */
 	public String getCommand() {
 		String command;
 		synchronized (commandBuffer) {
@@ -235,11 +318,9 @@ public class GUI {
 		return command;
 	}
 	
-	public void clearCommands(){
-		commandBuffer.clear();
-		return;
-	}
-
+	/**
+	 * <p>	Private class to handle window closure
+	 */
 	private class closure extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			int i = JOptionPane.showOptionDialog(uiFrame,

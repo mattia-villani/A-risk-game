@@ -51,12 +51,12 @@ public class Oracle extends Tree{
 		return new Oracle(legalStrings, inst );
 	}
 
-	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player, TextArea textArea){
+	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player){
 		List<String> legalStrings = new ArrayList<String>();
 				
 		boolean first = true;
 		String prefix = "";
-		String inst = "enter the name of the country to reinforce \""+prefix+"<";
+		String inst = "Enter the name of the country to reinforce \""+prefix+"<";
 		for ( State state : world.getStates() )
 			if ( player == state.getOwner() ){
 				inst+=(first?"":"|")+state.getName();
