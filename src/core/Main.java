@@ -73,7 +73,7 @@ public class Main {
  
 
 		Player[] players = new Player[]{ player1, player2, neut1, neut2, neut3, neut4};
-		for (int i = 0; i < Constants.TUNRS_OF_REINFORCEMENTS; ++i){
+		for (int i = 0; i < Constants.TURNS_OF_REINFORCEMENTS; ++i){
 			for (int j = 0; j < Constants.NUM_TOTAL_PLAYERS; j++ ){
 				if (player1Turn){
 					window.setText(player1.getName() + " choose country to place reinforcements for: " + players[turn].getName());
@@ -94,7 +94,7 @@ public class Main {
 					else window.enableOracle(trees[turn]);
 					String str ;
 					while ( (str = window.getCommand() ).length() < 4){
-						window.addTextln("Make sure input is unambiguous");
+						window.addTextln("Make sure input is unambiguous and not blank");
 					};
 					setReinforcements( str , turn);
 					turn = (turn + 1) % 6;

@@ -14,7 +14,7 @@ public class Constants {
 	public static final int INIT_COUNTRIES_NEUTRAL = 6;
 	public static final int INIT_UNITS_PLAYER = 36;
 	public static final int INIT_UNITS_NEUTRAL = 24;
-	public static final int TUNRS_OF_REINFORCEMENTS = 9;
+	public static final int TURNS_OF_REINFORCEMENTS = 18;
 	public static final int NUM_TOTAL_PLAYERS = NUM_PLAYERS + NUM_NEUTRALS;
 	
 	public static final String[] COUNTRY_NAMES = {
