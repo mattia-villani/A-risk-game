@@ -286,13 +286,15 @@ public class Main {
 				// Generate and store oracle trees.
 				if (trees[j] == null) trees[j]=window.enableOracleAndReturnTree( world, player );
 				else window.enableOracle(trees[j]);
-				String str ;
+				String str;
+				
 				while ( (str = window.getCommand() ).length() < 4){
 					if (!error){
 						window.setText(window.getText()+"\nPlease make sure input is unambiguous and not blank.");
-						error=!error;
+						error=true;
 					}
-				};	
+				};
+				error=false;
 				setReinforcements( str , j);
 			}	
 			
