@@ -1,10 +1,13 @@
+/** 
+ *  Group Name: 42
+ *  Team Members: Jimmy Carney (15207581), Mattia Villani (15201690), Andrew Kilbride (04429516)
+ **/
+
 package oracle;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 public class Tree {
 	static final private boolean verboseAdd = false;

@@ -1,5 +1,9 @@
-package tests;
+/** 
+ *  Group Name: 42
+ *  Team Members: Jimmy Carney (15207581), Mattia Villani (15201690), Andrew Kilbride (04429516)
+ **/
 
+package tests;
 
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;

@@ -5,44 +5,78 @@
 
 package core.entities;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import core.entities.TerritoryCard.CardType;
 
 public class TerritoryDeck {
 	
-	private ArrayList<TerritoryCard> Deck;
-	private int top = 0;
+	private LinkedList<TerritoryCard> deck;
 	
-	
-	public TerritoryDeck() {
-		Deck = new ArrayList<TerritoryCard>(42);
+	/**
+	 * <p>	Deck of Territory Cards.
+	 * <p> 	By default there are 14 cards of each of the three types, Infantry, Cavalry & Artillery.
+	 * <br>	The deck may also contain 2 Wild cards.
+	 * 
+	 * @param wilds If true, 2 wild cards will be added.
+	 */
+	public TerritoryDeck(boolean wilds) {
+		deck = new LinkedList<TerritoryCard>();
 		
 		for (int i=0; i<42; i++){
-			Deck.add(new TerritoryCard(i));
+			if (i % 3 == 0)deck.add(new TerritoryCard(i, CardType.INFANTRY));
+			if (i % 3 == 1)deck.add(new TerritoryCard(i, CardType.CAVALRY));
+			if (i % 3 == 2)deck.add(new TerritoryCard(i, CardType.ARTILLERY));
 		}
 		
-		Collections.shuffle(Deck);
+		if (wilds){
+			deck.add(new TerritoryCard(43, CardType.WILD));
+			deck.add(new TerritoryCard(44, CardType.WILD));
+		}
+		
+		Collections.shuffle(deck);
+		return;
 	}
 	
-	public ArrayList<TerritoryCard> getTerritoryDeck(){
-		return Deck;
+	/**
+	 * <p>	Gets the deck.
+	 * 		@return The deck of Territory Cards
+	 */
+	public LinkedList<TerritoryCard> getTerritoryDeck(){
+		return deck;
 	}
 	
-	public int getTop(){
-		return top;
-	}
-	
+	/**
+	 * <p>	Shuffles the deck.
+	 */
 	public void shuffle(){
-		Collections.shuffle(Deck);
+		Collections.shuffle(deck);
+		return;
 	}
 
-	public void addTerritoryCard(int index){
-		Deck.add(new TerritoryCard (index));
+	/**
+	 * <p>	Adds a new territory card to the deck
+	 * 		@param index The country to be added.
+	 * 		@param cardType The type of card to be added.
+	 */
+	public void addNewTerritoryCard(int index, CardType cardType){
+		deck.add(new TerritoryCard (index, cardType));
+		return;
 	}
 	
+	/**
+	 * <p>	Adds a pre-existing territory card to the deck
+	 * 		@param territoryCard the card to be added.
+	 */
+	public void addTerritoryCard(TerritoryCard territoryCard){
+		deck.add(territoryCard);
+	}
+	
+	/**
+	 * <p>	Draws a territory card from the deck.
+	 * 		@return the top territory card.
+	 */
 	public TerritoryCard drawTerritoryCard(){
-		TerritoryCard topTerritoryCard = Deck.get(top);
-		top++;
-		return topTerritoryCard;	
+		return deck.pop();
 	}	
 }

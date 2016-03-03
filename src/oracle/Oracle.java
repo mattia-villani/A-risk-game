@@ -1,16 +1,19 @@
+/** 
+ *  Group Name: 42
+ *  Team Members: Jimmy Carney (15207581), Mattia Villani (15201690), Andrew Kilbride (04429516)
+ **/
+
 package oracle;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.sun.glass.ui.Window;
-
 import core.entities.Player;
 import core.entities.State;
 import core.entities.World;
-import gui.TextArea;
+
 
 public class Oracle extends Tree{
 	

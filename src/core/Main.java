@@ -147,7 +147,7 @@ public class Main {
 	 * <p>	Serial country assignment to each player still provides random countries as card deck is randomized upon creation.
 	 */
 	public static void assignStates(){
-		TerritoryDeck Deck = new TerritoryDeck();
+		TerritoryDeck Deck = new TerritoryDeck(false); // no wild cards in this deck
 		
 		window.clearCommands();
 		window.setText("It's time to draw territory cards. Press enter when ready.");

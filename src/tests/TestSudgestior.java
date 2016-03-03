@@ -1,9 +1,13 @@
+/** 
+ *  Group Name: 42
+ *  Team Members: Jimmy Carney (15207581), Mattia Villani (15201690), Andrew Kilbride (04429516)
+ **/
+
 package tests;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
 import oracle.Oracle;
 import oracle.Result;
 import oracle.Tree;
