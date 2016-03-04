@@ -15,7 +15,6 @@ import core.Constants;
 import core.WorldBuilder;
 import core.entities.World;
 import gui.MapPanel;
-import gui.MouseInput;
 import gui.map.MapRenderer;
 
 public class MouseTest {	
@@ -38,7 +37,7 @@ public class MouseTest {
 		worldMap.setBounds(0, 0, 1000, 600);
 		layeredPane.add(mapPanel,1);
 		layeredPane.add(worldMap,0);	
-		layeredPane.addMouseListener(new MouseInput());
+		//layeredPane.addMouseListener(new MouseInput());
 		frame.add(layeredPane);
 		frame.pack();
 		frame.setVisible(true);

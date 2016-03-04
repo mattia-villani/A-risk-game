@@ -30,9 +30,11 @@ public class GUI {
 	private static TextArea textArea;
 	private static PlayerList playerList;
 	private static MapRenderer worldMap;
+	private World gameWorld;
 	private Animator animator;
 	final static String newline = "\n";
 	private LinkedList<String> commandBuffer = new LinkedList<String>();
+	private boolean acceptMouseInput=false;
 
 	/**
 	 * 	<p>The visual interface for the game.
@@ -41,6 +43,7 @@ public class GUI {
 	 * 	@throws IOException exception handled due to images used.
 	 */
 	public GUI (World world) throws IOException {
+		gameWorld = world;
 		animator = new Animator();	
 		uiFrame=new FancyFullFrameAnimation();
 		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 700));
@@ -156,25 +159,7 @@ public class GUI {
 		uiFrame.setVisible(true);
 		return;
 	}
-	
-	/**
-	 * <p>	Method for finding a state clicked by mouse input (currently unused).
-	 * 		@param world The game world.
-	 * 		@param x The X coordinate of the mouse click.
-	 * 		@param y The Y coordinate of the mouse click.
-	 * 		@return The state clicked on or null.
-	 */
-	public State findState(World world, int x, int y){
-		int[][] COUNTRY_COORD=Constants.COUNTRY_COORD;
-		
-		for (int i=0; i<42; i++){
-			if ( (x-21<COUNTRY_COORD[i][0] && COUNTRY_COORD[i][0]<x+21) && (y-21<COUNTRY_COORD[i][1] && COUNTRY_COORD[i][1]<y+21) ){
-				return world.getState(i);
-			}			
-		}
-		return null;
-	}
-	
+
 	/**
 	 * <p>	Generates oracle tree and returns tree for storage.
 	 * <br>	Enables oracle text detection.
@@ -289,6 +274,63 @@ public class GUI {
 	}
 	
 	/**
+	 * <p>	Toggles the ability to accept mouse commands. Default off.
+	 */
+	public void toggleMouseInput(){
+		acceptMouseInput=!acceptMouseInput;
+	}
+	
+	/**
+	 * <p>	Private class for the mouse listener
+	 * <br>	Determines state from mouse click location,adds to command buffer and notifies sync
+	 */
+	private class MouseInput implements MouseListener{	
+		@Override
+		public void mouseClicked(MouseEvent e) {		
+			int x=e.getX();
+			int y=e.getY();
+			String stateFound=findState(x,y);
+			if(stateFound.length()>0 && acceptMouseInput==true){
+				synchronized (commandBuffer) {
+					commandBuffer.add(stateFound);
+					commandBuffer.notify();
+				}
+			} 
+			return;
+		}
+		@Override
+		public void mouseEntered(MouseEvent e) {	
+		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+		}
+		
+		/**
+		 * <p>	Method for finding a state clicked by mouse input.
+		 * 		@param x The X coordinate of the mouse click.
+		 * 		@param y The Y coordinate of the mouse click.
+		 * 		@return The state clicked on or "" if no state is found.
+		 */
+		public String findState(int x, int y){
+			int[][] COUNTRY_COORD=Constants.COUNTRY_COORD;
+			
+			for (int i=0; i<42; i++){
+				if ( (x-21<COUNTRY_COORD[i][0] && COUNTRY_COORD[i][0]<x+21) && (y-21<COUNTRY_COORD[i][1] && COUNTRY_COORD[i][1]<y+21) ){
+					return gameWorld.getState(i).getName();
+				}			
+			}
+			return "";
+		}
+
+	}
+	
+	/**
 	 * <p>	Clears the command buffer
 	 * <p>	Used to prevent additional unwanted commands being input by the user and then retrieved by getCommand()
 	 * <br>	For example hitting the enter key when sleep has been called.
@@ -296,6 +338,15 @@ public class GUI {
 	public void clearCommands(){
 		commandBuffer.clear();
 		return;
+	}
+	
+	/**
+	 * <p> 	Checks if the commandBuffer has content.
+	 * 		@return true if the buffer has content.
+	 */
+	public boolean queuedCommands(){
+		if(commandBuffer.isEmpty())return false;	
+		return true;
 	}
 	
 	/**

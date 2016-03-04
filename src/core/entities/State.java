@@ -122,5 +122,4 @@ abstract public class State {
 		assert army>=0 : "something wired happend: army in a state can't be negative";
 		this.army = army;
 	}
-
 }

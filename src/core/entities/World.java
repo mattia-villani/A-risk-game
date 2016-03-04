@@ -36,39 +36,53 @@ abstract public class World {
 	private boolean invalidated = true;
 	
 	/**
-	 * Constructor. It just call the init method 
+	 * <p>	Constructor. It just calls the init method 
 	 */
 	public World (){ init(); }
 	
 	/**
-	 * Initializer method, it must be inplmented by the inherinting class 
+	 * <p>	Initializer method, it must be implemented by the inheriting class 
 	 */
 	abstract protected void init();
 	
 	/**
-	 * Getter. 
-	 * @return the list of continents.
+	 * <p>	Getter. 
+	 * 		@return the list of continents.
 	 */
 	public List<Continent> getContinents(){
 		return continents;
 	}
 
 	/**
-	 * Getter
-	 * @return the list of states
+	 * <p>	Getter
+	 * 		@return the list of states
 	 */
 	public List<State> getStates(){
 		return states;
 	}
 	
 	/**
-	 * Getter
-	 * WORNING: no checks over index are done, so it may return an error
-	 * @param index is the index in the list. if the worning is respected by the initializator, it will be the same of the state.index
-	 * @return the state at the index position
+	 * <p> 	Getter
+	 * <br>	WARNING: no checks over index are done, so it may return an error
+	 * 		@param index is the index in the list. if the warning is respected by the initializator, it will be the same of the state.index
+	 * 		@return the state at the index position
 	 */
 	public State getState( int index ){
 		return states.get(index);
+	}
+	
+	/**
+	 * <p>	Acquires a state by name
+	 * 		@param string the name of the state
+	 * 		@return the state
+	 */
+	public State getStateByName(String string){
+		for (State state : getStates()){
+			if (string.toLowerCase().equals(state.getName().toLowerCase())){
+				return state;
+			}
+		}
+		return null;
 	}
 	
 	public static ArrayList<Player> getPlayers() {

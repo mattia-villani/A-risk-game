@@ -180,10 +180,9 @@ public class Main {
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				world.getState(temp.getIndex()).setOwner(neut4);
 			}
-			
+
 			// adds army to state, decreases owners army count
 			world.getState(temp.getIndex()).setArmy(1);
-			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
 
 			// determines what text to display to the user
 			if (world.getState(temp.getIndex()).getOwner() != tempPlayer ) {
@@ -201,6 +200,14 @@ public class Main {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
 			window.refreshMap();
+			
+			// Allows user to skip the country assignment once the players have received their countries.
+			if (i==2*Constants.INIT_COUNTRIES_PLAYER) window.clearCommands();
+			if (i>(2*Constants.INIT_COUNTRIES_PLAYER)-1){
+				if(window.queuedCommands()){
+					test="test";
+				}
+			}
 			if (!test.equals("test")) sleep(400);
 		}
 		
@@ -264,12 +271,11 @@ public class Main {
 	public static void chooseReinforcements(){
 		
 		window.clearCommands();
-		
+		window.toggleMouseInput();
 		Player[] players = new Player[]{ player2, neut1, neut2, neut3, neut4};
 		Tree[] trees = new Tree[5];
 		Tree player1Tree=null;
 		Tree player2Tree=null;
-		boolean error=false;
 
 		if (player1Start) players[0]=player1;
 		for (int i = 0; i < Constants.TURNS_OF_REINFORCEMENTS; ++i){
@@ -286,16 +292,22 @@ public class Main {
 				// Generate and store oracle trees.
 				if (trees[j] == null) trees[j]=window.enableOracleAndReturnTree( world, player );
 				else window.enableOracle(trees[j]);
-				String str;
+				String command;
 				
-				while ( (str = window.getCommand() ).length() < 4){
-					if (!error){
-						window.setText(window.getText()+"\nPlease make sure input is unambiguous and not blank.");
-						error=true;
+				// Handling bad text or mouse inputs
+				String badText=window.getText()+"\nPlease make sure input is unambiguous and not blank.";
+				String badClick=window.getText()+"\nPlease select a country owned by "+players[j].getName()+".";
+				if(j==0) badClick=window.getText()+"\nPlease select one of your own countires.";
+				while ( ((command = window.getCommand()).length() < 4) || (world.getStateByName(command).getOwner()!=players[j]) ) {				
+					if(command.length()<4){
+						window.setText(badText);
 					}
-				};
-				error=false;
-				setReinforcements( str , j);
+					else
+					{
+						window.setText(badClick);
+					}
+				}
+				setReinforcements(command, j);
 			}	
 			
 			// Swap position 0 to the other human player. Also swap the two players trees.
@@ -326,11 +338,9 @@ public class Main {
 			if (stateName.toLowerCase().equals(state.getName().toLowerCase())){
 				if(player == 0){
 					state.setArmy(state.getArmy() + 3);
-					state.getOwner().setNumArmies(state.getOwner().getNumArmies()-3);
 				}
 				else{
 					state.setArmy(state.getArmy() + 1);
-					state.getOwner().setNumArmies(state.getOwner().getNumArmies()-1);
 				}
 			}
 		}
