@@ -336,5 +336,6 @@ public class Main {
 		}
 		window.refreshMap();
 		return;
+		
 	}
 }
