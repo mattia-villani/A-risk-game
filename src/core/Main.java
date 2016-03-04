@@ -81,7 +81,7 @@ public class Main {
 		while (player1Name.length()<1){
 			player1Name = window.getCommand();
 			if (player1Name.length()<1){
-				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't have an empty name. Please pick a name.");
+				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't have a blank name. Please pick a name.");
 			}
 			
 		}
@@ -92,7 +92,7 @@ public class Main {
 		while (player2Name.length()<1){
 			player2Name = window.getCommand();
 			if (player2Name.length()<1){
-				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have an empty name. Please pick a name.");
+				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have a blank name. Please pick a name.");
 			}
 		}
 		

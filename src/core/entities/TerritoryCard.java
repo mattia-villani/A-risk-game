@@ -22,6 +22,7 @@ public class TerritoryCard {
 	public TerritoryCard(int index, CardType cardType){
 		this.index = index;
 		this.cardType = cardType;
+		return;
 	}
 	
 	/**

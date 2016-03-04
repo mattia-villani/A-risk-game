@@ -23,10 +23,10 @@ public class TerritoryDeck {
 	public TerritoryDeck(boolean wilds) {
 		deck = new LinkedList<TerritoryCard>();
 		
-		for (int i=0; i<42; i++){
-			if (i % 3 == 0)deck.add(new TerritoryCard(i, CardType.INFANTRY));
-			if (i % 3 == 1)deck.add(new TerritoryCard(i, CardType.CAVALRY));
-			if (i % 3 == 2)deck.add(new TerritoryCard(i, CardType.ARTILLERY));
+		for (int i=0; i<42; i+=3){
+			deck.add(new TerritoryCard(i, CardType.INFANTRY));
+			deck.add(new TerritoryCard(i+1, CardType.CAVALRY));
+			deck.add(new TerritoryCard(i+2, CardType.ARTILLERY));
 		}
 		
 		if (wilds){
@@ -70,6 +70,7 @@ public class TerritoryDeck {
 	 */
 	public void addTerritoryCard(TerritoryCard territoryCard){
 		deck.add(territoryCard);
+		return;
 	}
 	
 	/**
