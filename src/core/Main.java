@@ -45,6 +45,17 @@ public class Main {
 		rollTheDiceToStart();
 		chooseReinforcements();
 		
+		/* while loop for turns:
+		while (true){
+		
+			
+			checkLosers();
+			checkWinners();
+			
+		}
+		*/
+		
+		
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
@@ -347,5 +358,13 @@ public class Main {
 		window.refreshMap();
 		return;
 		
+	}
+	
+	public static void checkLosers() {
+		for (Player player : world.getPlayers() ){
+			if (player.getNumStates() == 0){
+				world.getPlayers().remove(player);
+			}
+		}
 	}
 }

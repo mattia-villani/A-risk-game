@@ -23,6 +23,17 @@ public class Player {
 	
 	private int numArmies;
 	
+	private int numStates;
+	
+	
+	public int getNumStates() {
+		return numStates;
+	}
+
+	public void setNumStates(int numStates) {
+		this.numStates = numStates;
+	}
+
 	/**
 	 * Constructor
 	 * @param name of the player
