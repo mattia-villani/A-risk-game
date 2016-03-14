@@ -60,14 +60,14 @@ public class DeckDrawer extends View {
 
 	@Override
 	public int getHeight() {
-		return (int)(componentFromWhichReadTheSize.getHeight()*0.4f);
+		return (int)(componentFromWhichReadTheSize.getHeight()*0.73f);
 	}
 
 	@Override
 	public void paint(Graphics2D g2d, float useThisAlpha) {
 		assert World.getPlayers().size() == 6 : "There should be 6 players";
 		int i=0;
-		final float gapWidth = getWidth() * 0.2f;
+		final float gapWidth = getWidth() * 0.05f;
 		final float gapHeight = getHeight() * 0.005f;
 		final float smallWidth = (getWidth()-gapWidth )/ 2;
 		final float smallHeight = (getHeight()-gapHeight*2 ) /3; 
@@ -103,6 +103,7 @@ public class DeckDrawer extends View {
 			g2d.setStroke(stroke);
 			g2d.drawRect((int)x, (int)y, (int)smallWidth, (int)smallHeight);
 		}
+		Stroke stroke = new BasicStroke(2);
 		for ( i=0; i<deck.length; i++ )
 			if ( deck[i] != null ){
 				State state = world.getState( deck[i].getIndex() );
@@ -117,8 +118,10 @@ public class DeckDrawer extends View {
 				point = (float)Math.pow(Math.sin(Math.PI*Math.pow(point,0.4)/2),2);//(float) Math.sqrt(point);
 				x = cardDeckX + (x-cardDeckX)*point;
 				y = cardDeckY + (y-cardDeckY)*(float)Math.sqrt(point);
-				g2d.setColor(Color.BLUE);
-				g2d.fillRect((int)x, (int)y, (int)cardWidth, (int)(cardWidth/this.cardRatio));
+				g2d.drawImage(deck[i].getImage(), (int)x, (int)y, (int)(cardWidth), (int)(cardWidth/this.cardRatio), null);
+				g2d.setColor(Color.black);
+				g2d.setStroke(stroke);
+				g2d.drawRect((int)x, (int)y, (int)cardWidth, (int)(cardWidth/this.cardRatio));
 				
 			}
 		if ( deck[deck.length-1] == null ){
