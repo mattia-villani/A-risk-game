@@ -114,9 +114,9 @@ public class DeckDrawer extends View {
 						(col==0?j*cardMarginWidth:(innerSmallWidth-j*cardMarginWidth-cardWidth));
 				float y = row*smallHeight + row*gapHeight + (smallHeight-innerSmallHeight)/2 + (innerSmallHeight-cardHeight)/2;
 				float point = Math.min(	1.0f, 0.3f*cardTimes[i]/singleDuration);
-				point = (float) Math.sqrt(point);
+				point = (float)Math.pow(Math.sin(Math.PI*Math.pow(point,0.4)/2),2);//(float) Math.sqrt(point);
 				x = cardDeckX + (x-cardDeckX)*point;
-				y = cardDeckY + (y-cardDeckY)*point;
+				y = cardDeckY + (y-cardDeckY)*(float)Math.sqrt(point);
 				g2d.setColor(Color.BLUE);
 				g2d.fillRect((int)x, (int)y, (int)cardWidth, (int)(cardWidth/this.cardRatio));
 				

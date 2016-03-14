@@ -68,7 +68,7 @@ public class Animator {
 	}
 		
 	static final private boolean verbose = false;
-	static private int timeToWait = 27;
+	static private int timeToWait = 5;
 	static ArrayList<Handler> list = new ArrayList<Handler>();
 	static private boolean init = false;
 	static private Thread thread ;
