@@ -16,16 +16,16 @@ public class NeutralPlayer extends Player {
 	 * @param name of the player
 	 * @param color of the player
 	 */	
-	public NeutralPlayer(String name, Color color) {
-		super(name, color);
+	public NeutralPlayer(int id,String name, Color color) {
+		super(id,name, color);
 	}
 	
 	/**
 	 * Constructor. Color is set to default to GRAY
 	 * @param name to assign to the neutral player
 	 */
-	public NeutralPlayer(String name){
-		super(name, Color.GRAY);
+	public NeutralPlayer(int id, String name){
+		super(id, name, Color.GRAY);
 	}
 
 }

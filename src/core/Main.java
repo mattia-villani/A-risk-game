@@ -9,8 +9,10 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import core.entities.*;
+import gui.DeckDrawer;
 import gui.GUI;
 import gui.Rolling;
+import gui.map.MapRenderer;
 import oracle.Tree;
 
 public class Main {
@@ -119,17 +121,17 @@ public class Main {
 	 * <br>	The 4 neutral player names are hardcoded.
 	 */
 	public static void createPlayers(){
-		player1 = new Player(player1Name, new Color(0, 0, 180));
+		player1 = new Player(0,player1Name, new Color(0, 0, 180));
 		World.getPlayers().add(player1);
-		player2 = new Player(player2Name, new Color(210, 0, 0));
+		player2 = new Player(1,player2Name, new Color(210, 0, 0));
 		World.getPlayers().add(player2);
-		neut1 = new Player("Neutral 1", Color.magenta);
+		neut1 = new Player(2,"Neutral 1", Color.magenta);
 		World.getPlayers().add(neut1);
-		neut2 = new Player("Neutral 2", new Color(0, 140, 0));
+		neut2 = new Player(3,"Neutral 2", new Color(0, 140, 0));
 		World.getPlayers().add(neut2);
-		neut3 = new Player("Neutral 3", Color.gray);
+		neut3 = new Player(4,"Neutral 3", Color.gray);
 		World.getPlayers().add(neut3);
-		neut4 = new Player("Neutral 4", Color.BLACK);
+		neut4 = new Player(5,"Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
 		
 		window.displayPlayerList(World.getPlayers());
@@ -158,17 +160,29 @@ public class Main {
 	 * <p>	Serial country assignment to each player still provides random countries as card deck is randomized upon creation.
 	 */
 	public static void assignStates(){
-		TerritoryDeck Deck = new TerritoryDeck(false); // no wild cards in this deck
-		
-		window.clearCommands();
+
+		TerritoryDeck Deck = new TerritoryDeck(false);
+
+		try {
+			Thread.sleep(800);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		window.setText("It's time to draw territory cards. Press enter when ready.");
-		
-		// If "test" is entered the method will skip the sleep timer on each passthrough of the loop below
 		String test = window.getCommand();
 		window.resetText();
 
 		Player tempPlayer=null;
+		int singleTemp = 400;
+		int tempo = singleTemp * world.getStates().size() ;
+		TerritoryCard[] cards = new TerritoryCard[world.getStates().size()];
+		window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()));				
 
+		try{
+			Thread.sleep(window.getUiFrame().getTransitionTime());
+		}catch(Exception e){}
+		
 		for (int i=0; i<world.getStates().size(); i++) {
 
 			TerritoryCard temp=Deck.drawTerritoryCard();
@@ -191,11 +205,9 @@ public class Main {
 			else if(i < 4*Constants.INIT_COUNTRIES_NEUTRAL + 2*Constants.INIT_COUNTRIES_PLAYER ){ 
 				world.getState(temp.getIndex()).setOwner(neut4);
 			}
-
-			// adds army to state, decreases owners army count
 			world.getState(temp.getIndex()).setArmy(1);
+			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
 
-			// determines what text to display to the user
 			if (world.getState(temp.getIndex()).getOwner() != tempPlayer ) {
 				if (tempPlayer == null) {
 					window.addText(world.getState(temp.getIndex()).getOwner().getName());
@@ -210,21 +222,24 @@ public class Main {
 			else {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
-			window.refreshMap();
+
+//			synchronized(cards){
+				cards[i] = temp;
+//			}
 			
-			// Allows user to skip the country assignment once the players have received their countries.
-			if (i==2*Constants.INIT_COUNTRIES_PLAYER) window.clearCommands();
-			if (i>(2*Constants.INIT_COUNTRIES_PLAYER)-1){
-				if(window.queuedCommands()){
-					test="test";
-				}
+			window.refreshMap();
+			if (test.equals("test")){
 			}
-			if (!test.equals("test")) sleep(400);
+			else{
+				try {
+					MapRenderer.Invalidate();
+					Thread.sleep(singleTemp);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} 
+			}
+			
 		}
-		
-		sleep(1000);
-		window.clearCommands();
-		return;
 	}
 	
 	/**

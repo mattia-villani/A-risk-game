@@ -66,7 +66,7 @@ public class WorldBuilder {
 					} );
 				
 				// default neutral player 
-				NeutralPlayer default_player = new NeutralPlayer("Default");
+				NeutralPlayer default_player = new NeutralPlayer(0,"Default");
 				for ( int i=0; i<Constants.NUM_COUNTRIES; i++ )
 					// for each country a new country is added the list after been instantiad and initialized
 					states.add( new State( i ){

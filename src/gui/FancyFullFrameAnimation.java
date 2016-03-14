@@ -1,8 +1,3 @@
-/** 
- *  Group Name: 42
- *  Team Members: Jimmy Carney (15207581), Mattia Villani (15201690), Andrew Kilbride (04429516)
- **/
-
 package gui;
 
 import java.awt.BasicStroke;
@@ -55,6 +50,10 @@ public class FancyFullFrameAnimation extends JFrame {
 	private int transitionTime = 350;
 	private JTextField inputToDisable ;
 	
+	public int getTransitionTime(){
+		return transitionTime;
+	}
+	
 	public void setInputToDisable(JTextField inputTextField){
 		inputToDisable = inputTextField;
 	}
@@ -72,16 +71,17 @@ public class FancyFullFrameAnimation extends JFrame {
 				(int)(alpha*(float)color.getAlpha()));
 	}
 	
-	
 	public void paintComponents(Graphics g){
 		if ( animating == false ){
 			super.paintComponents(g);
 		}else {
-			if ( copyOfTheBack == null )
+			if ( copyOfTheBack == null || copyOfTheBack.getWidth()!=getWidth() || copyOfTheBack.getHeight()!=getHeight() ) 
 				copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
 			super.paintComponents( copyOfTheBack.getGraphics() );
 		}
 	}
+	
+	@Override	
 	public void paint(Graphics g){
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
@@ -90,7 +90,7 @@ public class FancyFullFrameAnimation extends JFrame {
 			super.paint(g);
 			return;
 		}
-		if ( copyOfTheBack == null ) 
+		if ( copyOfTheBack == null || copyOfTheBack.getWidth()!=getWidth() || copyOfTheBack.getHeight()!=getHeight() ) 
 			copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
 		else 
 			copyOfTheBack.flush();

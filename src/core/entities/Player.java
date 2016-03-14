@@ -25,6 +25,7 @@ public class Player {
 	
 	private int numStates;
 	
+	private int id;
 	
 	public int getNumStates() {
 		return numStates;
@@ -39,13 +40,18 @@ public class Player {
 	 * @param name of the player
 	 * @param color to show in the map
 	 */
-	public Player(String name, Color color){
+	public Player(int id, String name, Color color){
 		this.name=name;
 		this.color=color;
 		this.numArmies = 0;
+		this.id = id;
 	}
 
-	public int getNumArmies() {
+	public int getId(){
+		return id;
+	}
+	
+ 	public int getNumArmies() {
 		return numArmies;
 	}
 
