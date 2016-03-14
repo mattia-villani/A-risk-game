@@ -3,6 +3,7 @@ package gui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -22,7 +23,10 @@ public class FancyFullFrameAnimation extends JFrame {
 		private float point = 0;
 		abstract public int getWidth();
 		abstract public int getHeight();
-		abstract public void paint( Graphics2D g2d, float useThisAlpha );
+		/* returns true if the border has to be draw, false otherwise */
+		abstract public boolean paint( Graphics2D g2d, float useThisAlpha );
+		public float pointAlterator(float point){ return (float)Math.pow(point, 4); }
+		public boolean drawGrayBack(){ return true; }
 		public View(int duration) {
 			super(0, duration);
 		}
@@ -66,6 +70,7 @@ public class FancyFullFrameAnimation extends JFrame {
 	}
 
 	static public Color alphaColor(Color color, float alpha){
+		alpha = alpha>1.0f ? alpha : ( alpha<0? 0 : alpha );
 		return new Color(
 				color.getRed(),
 				color.getGreen(),
@@ -95,9 +100,11 @@ public class FancyFullFrameAnimation extends JFrame {
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		super.paint( g2d );
 		
+		Font font = g2d.getFont(); // back up
 		if ( animating )
 			animatingPaint( g2d );
 
+		g2d.setFont(font);
 		// toasts
 		float x = this.getWidth()/2;
 		float y = this.getHeight()*0.98f;
@@ -112,7 +119,7 @@ public class FancyFullFrameAnimation extends JFrame {
 
 	public void animatingPaint(Graphics2D g2d){
 
-		float powered = backAlpha*backAlpha*backAlpha*backAlpha;
+		float powered = view.pointAlterator(backAlpha);
 		
 		float w = powered*(float)view.getWidth();
 		float h = powered*(float)view.getHeight();
@@ -121,19 +128,23 @@ public class FancyFullFrameAnimation extends JFrame {
 			AffineTransform state = g2d.getTransform();
 			float x0 = (getWidth()-w)/2;
 			float y0 = (getHeight()-h)/2;
-
-			g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));
-			g2d.fillRect((int)x0, (int)y0, (int)w, (int)h);
-	
+			
+			if (view.drawGrayBack()){
+				g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));
+				g2d.fillRect((int)x0, (int)y0, (int)w, (int)h);
+			}
+				
 			g2d.translate( x0 , y0 );
 			g2d.scale( w/(float)view.getWidth() , h/(float)view.getHeight() );
 			
-			view.paint( g2d, powered );
+			boolean drawBorder = view.paint( g2d, powered );
 
 			g2d.setTransform(state);
-			g2d.setStroke(new BasicStroke(2));
-			g2d.setColor(alphaColor(Color.black, powered));
-			g2d.drawRect((int)x0, (int)y0, (int)w, (int)h);
+			if ( drawBorder ){
+				g2d.setStroke(new BasicStroke(2));
+				g2d.setColor(alphaColor(Color.black, powered));
+				g2d.drawRect((int)x0, (int)y0, (int)w, (int)h);
+			}
 		}
 	}
 	

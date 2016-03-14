@@ -64,7 +64,7 @@ public class DeckDrawer extends View {
 	}
 
 	@Override
-	public void paint(Graphics2D g2d, float useThisAlpha) {
+	public boolean paint(Graphics2D g2d, float useThisAlpha) {
 		assert World.getPlayers().size() == 6 : "There should be 6 players";
 		int i=0;
 		final float gapWidth = getWidth() * 0.05f;
@@ -128,6 +128,7 @@ public class DeckDrawer extends View {
 			g2d.setColor(Color.black);
 			g2d.fillRect((int)cardDeckX, (int)cardDeckY, (int)cardWidth, (int)cardHeight);		
 		}
+		return true;
 	}
 
 }

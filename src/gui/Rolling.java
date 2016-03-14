@@ -93,7 +93,7 @@ public class Rolling extends View {
 	}
 	
 	@Override
-	public void paint(Graphics2D g2d, float useThisAlpha) {
+	public boolean paint(Graphics2D g2d, float useThisAlpha) {
 		int base_h = (marginHeight+1)/2;
 		float alpha = 1.0f;
 		for ( int i=0;i<colors.length;i++){
@@ -117,6 +117,7 @@ public class Rolling extends View {
 			}
 			y += marginHeight+littleViewHeight;
 		}
+		return true;
 	}
 
 }

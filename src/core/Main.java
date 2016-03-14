@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import core.entities.*;
 import gui.DeckDrawer;
 import gui.GUI;
+import gui.Notification;
 import gui.Rolling;
+import gui.Toast;
 import gui.map.MapRenderer;
 import oracle.Tree;
 
@@ -35,6 +37,7 @@ public class Main {
 		 */
 		world = WorldBuilder.Build();		
 		window = new GUI(world);
+		new Toast("Loading the pictures", Toast.SHORT);
 		Rolling.loadImages( window.getClass() );
 		TerritoryCard.loadImages( window.getClass(), world.getStates() );
 
