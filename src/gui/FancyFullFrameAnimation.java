@@ -73,7 +73,7 @@ public class FancyFullFrameAnimation extends JFrame {
 				(int)(alpha*(float)color.getAlpha()));
 	}
 	
-	public void paintComponents(Graphics g){
+/*	public void paintComponents(Graphics g){
 		if ( animating == false ){
 			super.paintComponents(g);
 		}else {
@@ -81,31 +81,36 @@ public class FancyFullFrameAnimation extends JFrame {
 				copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
 			super.paintComponents( copyOfTheBack.getGraphics() );
 		}
-	}
+	}*/
 	
 	@Override	
 	public void paint(Graphics g){
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
-		if ( animating == false ){
-			super.paint(g);
-			// draw toasts ( in case of not animating... there is another at the end of the function
-			float x = this.getWidth()/2;
-			float y = this.getHeight()*0.9f;
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.translate(x,y);
-			Toast.drawToasts(g2d);
-			g2d.translate(-x,-y);		
-
-			return;
-		}
 		if ( copyOfTheBack == null || copyOfTheBack.getWidth()!=getWidth() || copyOfTheBack.getHeight()!=getHeight() ) 
 			copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
 		else 
 			copyOfTheBack.flush();
-		super.paint( copyOfTheBack.getGraphics() );
+
 		Graphics2D g2d = (Graphics2D) copyOfTheBack.getGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		super.paint( g2d );
+		
+		if ( animating )
+			animatingPaint( g2d );
+
+		// toasts
+		float x = this.getWidth()/2;
+		float y = this.getHeight()*0.98f;
+		g2d.translate(x,y);
+		Toast.drawToasts(g2d);
+		g2d.translate(-x,-y);		
+
+		
+		g.drawImage(copyOfTheBack, 0, 0, null);
+		g2d.dispose();
+	}
+
+	public void animatingPaint(Graphics2D g2d){
 
 		float powered = backAlpha*backAlpha*backAlpha*backAlpha;
 		
@@ -128,17 +133,8 @@ public class FancyFullFrameAnimation extends JFrame {
 			g2d.setTransform(state);
 			g2d.setStroke(new BasicStroke(2));
 			g2d.setColor(alphaColor(Color.black, powered));
-			g2d.drawRect((int)x0, (int)y0, (int)w+1, (int)h+1);
+			g2d.drawRect((int)x0, (int)y0, (int)w, (int)h);
 		}
-		// draw toasts
-		float x = this.getWidth()/2;
-		float y = this.getHeight()*0.9f;
-		g2d.translate(x,y);
-		Toast.drawToasts(g2d);
-		g2d.translate(-x,-y);		
-		// actually draw on screen
-		g.drawImage(copyOfTheBack, 0, 0, null);
-		g2d.dispose();
 	}
 	
 	

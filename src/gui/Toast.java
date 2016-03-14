@@ -45,6 +45,7 @@ public class Toast extends FromZeroToOneIntervalHandler {
 		final int paddingY = 1;
 		final int strokeSize = 3;
 		
+		g.setFont(g.getFont().deriveFont(15.0f));
 		Stroke stroke = new BasicStroke(strokeSize);
 		
 		int y=0;
@@ -53,7 +54,7 @@ public class Toast extends FromZeroToOneIntervalHandler {
 			for ( Toast toast : currentToasts ){
 				Rectangle2D size = g.getFontMetrics().getStringBounds(toast.getText(), g);
 				int w = (int) (size.getWidth()+2*paddingX);
-				int h = (int) (size.getHeight()+2*paddingY);
+				int h = (int) (size.getHeight()+2*paddingY*2);
 				float dy = y - h * toast.getYPoint();
 				
 				g.setColor(FancyFullFrameAnimation.alphaColor(toast.getBackColor(), toast.getAlphaPoint()));

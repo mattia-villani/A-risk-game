@@ -85,14 +85,11 @@ public class Main {
 	
 	/**
 	 * <p>	Gets the names for the 2 human players.
-	 * <br>	Will only accept non blank names, displays error message if attempted.
 	 */
 	public static void getNames() {
 		window.setText("Welcome to Risk! Please enter a name for player 1.");
 		window.clearCommands();
 
-		new Toast( "Follow the instructions", 4000);
-		
 		player1Name="";	
 		while (player1Name.length()<1){
 			player1Name = window.getCommand();
@@ -166,13 +163,11 @@ public class Main {
 
 		TerritoryDeck Deck = new TerritoryDeck(false);
 
-		new Toast( "Wait, states are going to be assigned", 800);
 		try {
 			Thread.sleep(800);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		new Toast( "Look at the console!!!", 800);
 
 		window.setText("It's time to draw territory cards. Press enter when ready.");
 		String test = window.getCommand();

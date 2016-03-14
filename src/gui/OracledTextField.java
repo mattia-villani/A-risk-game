@@ -74,6 +74,7 @@ public class OracledTextField extends JTextField {
 					result = tree.evalue( arg0.getDocument().getText(0, arg0.getDocument().getLength()) );
 					if ( result == null ){
 						errorColor=true;
+						new Toast("Error: \""+arg0.getDocument().getText(0, arg0.getDocument().getLength())+"\" is not a valid entry", Color.WHITE, Color.RED, Toast.LONG);
 						SwingUtilities.invokeLater(new Runnable(){
 							@Override
 						    public void run(){
