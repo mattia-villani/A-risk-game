@@ -12,6 +12,7 @@ import core.entities.*;
 import gui.DeckDrawer;
 import gui.GUI;
 import gui.Rolling;
+import gui.Toast;
 import gui.map.MapRenderer;
 import oracle.Tree;
 
@@ -89,6 +90,8 @@ public class Main {
 	public static void getNames() {
 		window.setText("Welcome to Risk! Please enter a name for player 1.");
 		window.clearCommands();
+
+		new Toast( "Follow the instructions", 4000);
 		
 		player1Name="";	
 		while (player1Name.length()<1){
@@ -163,11 +166,13 @@ public class Main {
 
 		TerritoryDeck Deck = new TerritoryDeck(false);
 
+		new Toast( "Wait, states are going to be assigned", 800);
 		try {
 			Thread.sleep(800);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		new Toast( "Look at the console!!!", 800);
 
 		window.setText("It's time to draw territory cards. Press enter when ready.");
 		String test = window.getCommand();

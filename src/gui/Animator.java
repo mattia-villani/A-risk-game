@@ -13,6 +13,8 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import gui.map.MapRenderer;
+
 public class Animator {
 		
 	static public abstract class Handler implements Runnable{
@@ -108,6 +110,8 @@ public class Animator {
 							}
 						}
 						iterator = null;
+						if ( list.size()!=0 && FancyFullFrameAnimation.frame != null  )
+							FancyFullFrameAnimation.frame.repaint();
 						list.removeAll(toIgnore);
 					}
 					for ( Runnable runnable : postHandlers )

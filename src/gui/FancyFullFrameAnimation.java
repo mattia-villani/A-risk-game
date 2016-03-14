@@ -42,6 +42,7 @@ public class FancyFullFrameAnimation extends JFrame {
 	
 
 	static final private boolean verbose = false;
+	static public FancyFullFrameAnimation frame;
 	
 	private boolean animating = false;
 	private View view;
@@ -60,6 +61,7 @@ public class FancyFullFrameAnimation extends JFrame {
 	
 	public FancyFullFrameAnimation(){
 		super();
+		frame = this;
 		if ( verbose ) System.out.println("FullFrame initialized");
 	}
 
@@ -88,6 +90,14 @@ public class FancyFullFrameAnimation extends JFrame {
 
 		if ( animating == false ){
 			super.paint(g);
+			// draw toasts ( in case of not animating... there is another at the end of the function
+			float x = this.getWidth()/2;
+			float y = this.getHeight()*0.9f;
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.translate(x,y);
+			Toast.drawToasts(g2d);
+			g2d.translate(-x,-y);		
+
 			return;
 		}
 		if ( copyOfTheBack == null || copyOfTheBack.getWidth()!=getWidth() || copyOfTheBack.getHeight()!=getHeight() ) 
@@ -96,23 +106,20 @@ public class FancyFullFrameAnimation extends JFrame {
 			copyOfTheBack.flush();
 		super.paint( copyOfTheBack.getGraphics() );
 		Graphics2D g2d = (Graphics2D) copyOfTheBack.getGraphics();
-/*		g2d.setColor(Color.black);
-		g2d.drawRect(0, 0, 2000, 2000);*/
-		g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));
-		g2d.fillRect(0, 0, getWidth()+1, getHeight()+1);
-				
+
 		float powered = backAlpha*backAlpha*backAlpha*backAlpha;
-/*		g2d.setStroke(new BasicStroke(4));
-		g2d.setColor(alphaColor(Color.black, powered));
-		g2d.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);*/
 		
 		float w = powered*(float)view.getWidth();
 		float h = powered*(float)view.getHeight();
+		
 		if ( w!=0 && h!=0 ){
 			AffineTransform state = g2d.getTransform();
 			float x0 = (getWidth()-w)/2;
 			float y0 = (getHeight()-h)/2;
-			
+
+			g2d.setColor(alphaColor(alphaColor(Color.GRAY, 0.6f), backAlpha));
+			g2d.fillRect((int)x0, (int)y0, (int)w, (int)h);
+	
 			g2d.translate( x0 , y0 );
 			g2d.scale( w/(float)view.getWidth() , h/(float)view.getHeight() );
 			
@@ -123,6 +130,13 @@ public class FancyFullFrameAnimation extends JFrame {
 			g2d.setColor(alphaColor(Color.black, powered));
 			g2d.drawRect((int)x0, (int)y0, (int)w+1, (int)h+1);
 		}
+		// draw toasts
+		float x = this.getWidth()/2;
+		float y = this.getHeight()*0.9f;
+		g2d.translate(x,y);
+		Toast.drawToasts(g2d);
+		g2d.translate(-x,-y);		
+		// actually draw on screen
 		g.drawImage(copyOfTheBack, 0, 0, null);
 		g2d.dispose();
 	}
