@@ -50,7 +50,10 @@ public class Player {
 	public int getId(){
 		return id;
 	}
-	
+	@Override
+	public int hashCode(){
+		return getId();
+	}
  	public int getNumArmies() {
 		return numArmies;
 	}
