@@ -41,7 +41,6 @@ public class AttackManager {
 				State stateToAttack = stateToAttackQuestion.askQuestion(attackableContext);
 				if ( attackableContext.contains(stateToAttack) == false ) 
 					throw new OutOfContextException( stateToAttackQuestion.outOfContextMessage() );
-				if ( stateToAttack )
 			}catch(ChangeOfMindException e){
 			}catch(OutOfContextException e){}
 		}
