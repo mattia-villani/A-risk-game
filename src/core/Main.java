@@ -378,6 +378,7 @@ public class Main {
 		
 	}
 	
+
 	public static void checkLosers() {
 		for (Player player : world.getPlayers() ){
 			if (player.getNumStates() == 0){
@@ -385,4 +386,77 @@ public class Main {
 			}
 		}
 	}
+
+	public static void checkWinners(){
+		if (!world.getPlayers().contains(player1)){
+			window.setText(player1.getName() + " is the winner! Thanks for playing!");
+		}
+		else if (!world.getPlayers().contains(player2)){
+			window.setText(player2.getName() + " is the winner! Thanks for playing!");
+		}
+
+	}
+
+	public static void moveArmies(){
+		boolean done = false;
+		
+		String giverString = null;
+		String getterString = null;
+		int numMoved = 0;
+
+		while (!done){
+			window.setText(currentPlayer.getName() + ", please choose a country to move armies from");
+			giverString = window.getCommand();
+
+
+
+			window.setText("Now choose a connected country to move armies to");
+			getterString = window.getCommand();
+			State giver = world.getStateByName(giverString);
+			State getter = world.getStateByName(getterString);
+			if (isConnected(giver, getter)){
+				done = true;
+			}
+			else {
+				window.setText("Needs to be a country of yours that is connected. Try again.");
+				sleep(500);
+			}
+
+		}
+		
+			window.setText("And how many countries do you like moved?");
+			done = false;
+			while (!done){
+				State giver = world.getStateByName(giverString);
+				State getter = world.getStateByName(getterString);
+				String stringNumMoved = window.getCommand();
+				try
+				{
+					numMoved = Integer.parseInt(stringNumMoved);
+					if (numMoved >= giver.getArmy()){
+						window.setText("Needs to be a number less " + giver.getArmy());
+					}
+					else{
+						done = true;
+					}
+				} catch (NumberFormatException ex)
+				{
+					window.setText("Needs to be a number!");
+
+				}
+				getter.setArmy(getter.getArmy() + numMoved);
+				giver.setArmy(giver.getArmy() - numMoved);
+			}
+		
+
+	}
+	
+	public static boolean isConnected(State start, State end, Player owner){
+		for (int state : start.getAdjacent()){
+			if (end == world.getState(state)) return true;
+			else if (world.getState(state).getOwner() == owner) return isConnected (world.getState(state), end, owner);
+		}
+		return false;
+	}
+
 }
