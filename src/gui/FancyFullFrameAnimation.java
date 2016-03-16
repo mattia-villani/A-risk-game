@@ -19,6 +19,12 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class FancyFullFrameAnimation extends JFrame {
 	
+	static private class Holder {
+		boolean holding = false;
+		public boolean getHolding (){ return holding; }
+		public void setHolding ( boolean holding ){ this.holding = holding ; }
+	}
+	
 	public abstract class View extends Animator.FromZeroToOneIntervalHandler{
 		private float point = 0;
 		abstract public int getWidth();
@@ -47,6 +53,7 @@ public class FancyFullFrameAnimation extends JFrame {
 
 	static final private boolean verbose = false;
 	static public FancyFullFrameAnimation frame;
+	static final private Holder lock = new Holder();
 	
 	private boolean animating = false;
 	private View view;
@@ -78,15 +85,6 @@ public class FancyFullFrameAnimation extends JFrame {
 				(int)(alpha*(float)color.getAlpha()));
 	}
 	
-/*	public void paintComponents(Graphics g){
-		if ( animating == false ){
-			super.paintComponents(g);
-		}else {
-			if ( copyOfTheBack == null || copyOfTheBack.getWidth()!=getWidth() || copyOfTheBack.getHeight()!=getHeight() ) 
-				copyOfTheBack = new BufferedImage ( getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB );
-			super.paintComponents( copyOfTheBack.getGraphics() );
-		}
-	}*/
 	
 	@Override	
 	public void paint(Graphics g){
@@ -107,7 +105,7 @@ public class FancyFullFrameAnimation extends JFrame {
 		g2d.setFont(font);
 		// toasts
 		float x = this.getWidth()/2;
-		float y = this.getHeight()*0.98f;
+		float y = this.getHeight()*0.8f;
 		g2d.translate(x,y);
 		Toast.drawToasts(g2d);
 		g2d.translate(-x,-y);		
@@ -149,8 +147,16 @@ public class FancyFullFrameAnimation extends JFrame {
 	}
 	
 	
-	public void startAnimation(View view){
+	public void startAnimation(View view, boolean blockThread){
 		if ( verbose ) System.out.println("FullFrame starting animation");		
+		
+		synchronized ( lock ){
+			while ( lock.getHolding() )
+				try {
+					lock.wait();
+				} catch (InterruptedException e) {e.printStackTrace();}
+			lock.setHolding(true);
+		}
 		
 		if ( inputToDisable != null )
 			inputToDisable.setEnabled(false);
@@ -173,6 +179,15 @@ public class FancyFullFrameAnimation extends JFrame {
 			@Override
 			public void post() { Animator.add(view); }
 		});
+		
+		if ( blockThread )
+			synchronized(lock){
+				while ( lock.getHolding() )
+					try {
+						lock.wait();
+					} catch (InterruptedException e) {e.printStackTrace();}
+				lock.notify();
+			}
 	}
 	
 	public void endAnimation(){
@@ -195,6 +210,10 @@ public class FancyFullFrameAnimation extends JFrame {
 				FancyFullFrameAnimation.this.invalidate();
 				if ( inputToDisable != null )
 					inputToDisable.setEnabled(true);
+				synchronized( lock ){
+					lock.setHolding(false);
+					lock.notify();
+				}
 				if ( verbose ) System.out.println("FullFrame animation ended");
 			}
 		});

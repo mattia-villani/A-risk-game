@@ -14,24 +14,16 @@ public class Notification extends FancyFullFrameAnimation.View {
 		fancyFullFrameAnimation.super(duration);
 		this.text = text;
 		this.player = player;
-		fancyFullFrameAnimation.startAnimation(this);
+		fancyFullFrameAnimation.startAnimation(this,true);
 	}
 
-	public static final int LONG = 6000, SHORT = 4000;
+	public static final int LONG = 3000, SHORT = 1500;
 	private static final int paddingX = 20, paddingY = 40;
 	private static final int fontSize = 40;
 	Rectangle2D textSize;
 	
 	private String text;
 	private Player player;
-	
-	
-	private class Holder {
-		boolean holding = false;
-		public boolean getHolding (){ return holding; }
-		public void setHolding ( boolean holding ){ this.holding = holding ; }
-	}
-	
 
 
 	@Override

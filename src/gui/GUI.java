@@ -265,7 +265,7 @@ public class GUI {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			synchronized (commandBuffer) {
-				commandBuffer.add(inputArea.getText());
+				commandBuffer.add(inputArea.getValidatedText());
 				inputArea.setText("");
 				commandBuffer.notify();
 			}

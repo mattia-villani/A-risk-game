@@ -20,6 +20,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 
+import com.sun.xml.internal.messaging.saaj.soap.impl.TreeException;
+
 import oracle.Tree;
 
 public class OracledTextField extends JTextField {
@@ -74,7 +76,7 @@ public class OracledTextField extends JTextField {
 					result = tree.evalue( arg0.getDocument().getText(0, arg0.getDocument().getLength()) );
 					if ( result == null ){
 						errorColor=true;
-						new Toast("Error: \""+arg0.getDocument().getText(0, arg0.getDocument().getLength())+"\" is not a valid entry", Color.WHITE, Color.RED, Toast.LONG);
+						new Toast.ErrorToast("Error: \""+arg0.getDocument().getText(0, arg0.getDocument().getLength())+"\" is not a valid entry", Toast.LONG);
 						SwingUtilities.invokeLater(new Runnable(){
 							@Override
 						    public void run(){
@@ -130,6 +132,18 @@ public class OracledTextField extends JTextField {
 			
 		});
 				
+	}
+	
+	public String getValidatedText(){
+		String str = getText();
+		if ( oracleEnabled )
+			try{
+				tree.evalue(str).getUniquePath();
+			}catch(Tree.NotUniqueException e){
+				str = "";
+				new Toast.ErrorToast("\""+str+"\" does not identify a unique string", Toast.LONG);
+			}
+		return str;
 	}
 	
 	public String getExtendedText () {

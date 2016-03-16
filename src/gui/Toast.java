@@ -5,14 +5,24 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import gui.Animator.FromZeroToOneIntervalHandler;
 
 public class Toast extends FromZeroToOneIntervalHandler {
+	
+	static public class ErrorToast extends Toast{
+
+		public ErrorToast(String text, int duration) {
+			super(text,Color.WHITE, Color.RED, duration);
+		}
+		
+	}
+	
 	static final public int SHORT = 3000, LONG = 4000;
-	static private List <Toast> currentToasts = new LinkedList<>();
+	static private LinkedList <Toast> currentToasts = new LinkedList<>();
 	static final public boolean verbose = false;
 	
 	private String text;
@@ -51,7 +61,9 @@ public class Toast extends FromZeroToOneIntervalHandler {
 		int y=0;
 		synchronized( currentToasts ){
 			if ( verbose ) System.out.println("Drawing toasts ("+currentToasts.size()+")");
-			for ( Toast toast : currentToasts ){
+			Iterator<Toast> iterator = currentToasts.descendingIterator();
+			while ( iterator.hasNext() ){
+				Toast toast = iterator.next();
 				Rectangle2D size = g.getFontMetrics().getStringBounds(toast.getText(), g);
 				int w = (int) (size.getWidth()+2*paddingX);
 				int h = (int) (size.getHeight()+2*paddingY*2);

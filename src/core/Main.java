@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import core.entities.*;
 import gui.DeckDrawer;
 import gui.GUI;
-import gui.Notification;
 import gui.Rolling;
 import gui.Toast;
 import gui.map.MapRenderer;
@@ -48,6 +47,11 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
+		
+		for ( State state : world.getStates() )
+			state.setArmy( 1 + (int)(Math.random()*3) );
+		AttackPhase.performPhace(player1, world, window);
+		
 		rollTheDiceToStart();
 		chooseReinforcements();
 		
@@ -180,7 +184,7 @@ public class Main {
 		int singleTemp = 400;
 		int tempo = singleTemp * world.getStates().size() ;
 		TerritoryCard[] cards = new TerritoryCard[world.getStates().size()];
-		window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()));				
+		window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()),false);				
 
 		try{
 			Thread.sleep(window.getUiFrame().getTransitionTime());
@@ -288,8 +292,7 @@ public class Main {
 			new int[] { returnVal }
 		}, new Player[]{
 				player
-		}));
-		sleep(2000);
+		}), true);
 		return returnVal;
 	}
 	
@@ -405,7 +408,7 @@ public class Main {
 		int numMoved = 0;
 
 		while (!done){
-			window.setText(currentPlayer.getName() + ", please choose a country to move armies from");
+/*			window.setText(currentPlayer.getName() + ", please choose a country to move armies from");
 			giverString = window.getCommand();
 
 
@@ -415,13 +418,13 @@ public class Main {
 			State giver = world.getStateByName(giverString);
 			State getter = world.getStateByName(getterString);
 			if (isConnected(giver, getter)){
-				done = true;
-			}
+*/				done = true;
+/*			}
 			else {
 				window.setText("Needs to be a country of yours that is connected. Try again.");
 				sleep(500);
 			}
-
+*/
 		}
 		
 			window.setText("And how many countries do you like moved?");

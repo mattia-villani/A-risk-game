@@ -78,5 +78,10 @@ public class Player {
 		return color;
 	}
 	
+	public int decreaseAndGetNumOfState(int decreaseOf){
+		this.numStates -= decreaseOf;
+		return this.numStates;
+	}
+	
 	
 }

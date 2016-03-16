@@ -128,6 +128,12 @@ abstract public class State {
 	}
 	
 	@Override
+	public String toString(){
+		return this.getName();
+	}
+	
+	
+	@Override
 	public int hashCode(){
 		return index;
 	}
