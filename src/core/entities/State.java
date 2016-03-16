@@ -123,6 +123,10 @@ abstract public class State {
 		this.army = army;
 	}
 	
+	public void updateArmyWithVariation( int deltaArmy ){
+		setArmy( getArmy()+deltaArmy );
+	}
+	
 	@Override
 	public int hashCode(){
 		return index;
