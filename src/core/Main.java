@@ -456,7 +456,7 @@ public class Main {
 	
 	public static boolean isConnected(State start, State end, Player owner){
 		for (int state : start.getAdjacent()){
-			if (end == world.getState(state)) return true;
+			if (end == world.getState(state) && end.getOwner() == owner) return true;
 			else if (world.getState(state).getOwner() == owner) return isConnected (world.getState(state), end, owner);
 		}
 		return false;
