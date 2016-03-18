@@ -27,9 +27,10 @@ public class Main {
 	private static Player neut4;
 	private static World world;
 	private static GUI window;
+	public static int turn;
 	private static boolean player1Start;
 
-	
+
 	public static void main(String[] args) throws IOException {
 		/*
 		 * Create world and GUI.
@@ -47,25 +48,28 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
-		
+
 		for ( State state : world.getStates() )
 			state.setArmy( 1 + (int)(Math.random()*3) );
 		AttackPhase.performPhace(player1, world, window);
-		
+		turn = 1;
+		moveArmies();
+
+
 		rollTheDiceToStart();
 		chooseReinforcements();
-		
+
 		/* while loop for turns:
 		while (true){
-		
-			
+
+
 			checkLosers();
 			checkWinners();
-			
+
 		}
-		*/
-		
-		
+		 */
+
+
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
@@ -89,7 +93,7 @@ public class Main {
 		}
 		return;
 	}
-	
+
 	/**
 	 * <p>	Gets the names for the 2 human players.
 	 */
@@ -103,11 +107,11 @@ public class Main {
 			if (player1Name.length()<1){
 				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't have a blank name. Please pick a name.");
 			}
-			
+
 		}
-		
+
 		window.setText(player1Name + " will be blue. Please enter a name for player 2.");
-		
+
 		player2Name="";
 		while (player2Name.length()<1){
 			player2Name = window.getCommand();
@@ -115,14 +119,14 @@ public class Main {
 				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have a blank name. Please pick a name.");
 			}
 		}
-		
+
 		window.setText(player2Name + " will be red."); 
-		
+
 		sleep(1000);
 		window.clearCommands();
 		return;
 	}
-	
+
 	/**
 	 * <p>	Creates the players & Displays the player list.
 	 * <br>	The 4 neutral player names are hardcoded.
@@ -140,7 +144,7 @@ public class Main {
 		World.getPlayers().add(neut3);
 		neut4 = new Player(5,"Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
-		
+
 		window.displayPlayerList(World.getPlayers());
 		return;
 	}
@@ -160,7 +164,7 @@ public class Main {
 		}
 		return;
 	}
-	
+
 	/**
 	 * <p>	Assigns all countries to the players.
 	 * <br>	Number of countries assigned determined by constants.
@@ -189,7 +193,7 @@ public class Main {
 		try{
 			Thread.sleep(window.getUiFrame().getTransitionTime());
 		}catch(Exception e){}
-		
+
 		for (int i=0; i<world.getStates().size(); i++) {
 
 			TerritoryCard temp=Deck.drawTerritoryCard();
@@ -230,10 +234,10 @@ public class Main {
 				window.addText(", "+world.getState(temp.getIndex()).getName());
 			}
 
-//			synchronized(cards){
-				cards[i] = temp;
-//			}
-			
+			//			synchronized(cards){
+			cards[i] = temp;
+			//			}
+
 			window.refreshMap();
 			if (test.equals("test")){
 			}
@@ -245,10 +249,10 @@ public class Main {
 					e.printStackTrace();
 				} 
 			}
-			
+
 		}
 	}
-	
+
 	/**
 	 * <p>	Dice rolls to determine which player goes first with placing reinforcements
 	 */
@@ -257,12 +261,12 @@ public class Main {
 		window.setText("Press enter to roll, " + player1.getName() + "!");
 		window.getCommand();
 		int player1Roll = diceRollNumber( player1 );
-		
+
 		window.clearCommands();
 		window.setText("Press enter to roll, " + player2.getName() + "!");
 		window.getCommand();
 		int player2Roll = diceRollNumber( player2 );
-		
+
 		if (player1Roll > player2Roll){
 			window.setText(player1.getName()+" rolled a "+player1Roll+", which beats "+player2.getName()+"'s "+player2Roll+". So "+player1.getName()+" will go first!");
 			player1Start=true;
@@ -295,13 +299,13 @@ public class Main {
 		}), true);
 		return returnVal;
 	}
-	
+
 	/**
 	 * <p>	Reinforcement placing during game setup phase.
 	 * <br>	Uses oracle to assist player by predicting country names based upon text entered.
 	 */
 	public static void chooseReinforcements(){
-		
+
 		window.clearCommands();
 		window.toggleMouseInput();
 		Player[] players = new Player[]{ player2, neut1, neut2, neut3, neut4};
@@ -312,20 +316,20 @@ public class Main {
 		if (player1Start) players[0]=player1;
 		for (int i = 0; i < Constants.TURNS_OF_REINFORCEMENTS; ++i){
 			for (int j=0; j < Constants.NUM_TOTAL_PLAYERS-1; j++ ){
-				
+
 				// Display text to the user
 				if (j==0) window.setText(players[0].getName()+" please choose one of your countries to reinforce.");
 				else window.setText(players[0].getName()+" please choose a country to reinforce for: "+players[j].getName()+".");
 
 				window.addText("\nYou will only be able to type in a name if it has the correct owner.");
-				
+
 				Player player = players[j];
-				
+
 				// Generate and store oracle trees.
 				if (trees[j] == null) trees[j]=window.enableOracleAndReturnTree( world, player );
 				else window.enableOracle(trees[j]);
 				String command;
-				
+
 				// Handling bad text or mouse inputs
 				String badText=window.getText()+"\nPlease make sure input is unambiguous and not blank.";
 				String badClick=window.getText()+"\nPlease select a country owned by "+players[j].getName()+".";
@@ -341,7 +345,7 @@ public class Main {
 				}
 				setReinforcements(command, j);
 			}	
-			
+
 			// Swap position 0 to the other human player. Also swap the two players trees.
 			if(players[0]==player1){
 				players[0]=player2;
@@ -378,9 +382,9 @@ public class Main {
 		}
 		window.refreshMap();
 		return;
-		
+
 	}
-	
+
 
 	public static void checkLosers() {
 		for (Player player : world.getPlayers() ){
@@ -402,42 +406,51 @@ public class Main {
 
 	public static void moveArmies(){
 		boolean done = false;
-		
+
 		String giverString = null;
 		String getterString = null;
 		int numMoved = 0;
 
 		while (!done){
-/*			window.setText(currentPlayer.getName() + ", please choose a country to move armies from");
+			window.setText(world.getPlayers().get(turn).getName() + ", please choose a country to move armies from, or type skip to end turn");
 			giverString = window.getCommand();
 
+			if (giverString == "skip");
+			else{
 
-
-			window.setText("Now choose a connected country to move armies to");
-			getterString = window.getCommand();
-			State giver = world.getStateByName(giverString);
-			State getter = world.getStateByName(getterString);
-			if (isConnected(giver, getter)){
-*/				done = true;
-/*			}
-			else {
-				window.setText("Needs to be a country of yours that is connected. Try again.");
-				sleep(500);
-			}
-*/
-		}
-		
-			window.setText("And how many countries do you like moved?");
-			done = false;
-			while (!done){
+				window.setText("Now choose a connected country to move armies to");
+				getterString = window.getCommand();
 				State giver = world.getStateByName(giverString);
 				State getter = world.getStateByName(getterString);
-				String stringNumMoved = window.getCommand();
+				if (isConnected(giver, getter, world.getPlayers().get(turn), new ArrayList<State>())){
+
+					done = true;
+				}
+				else {
+					window.setText("Both countries need to be a country of yours that is connected. Try again.");
+					sleep(500);
+				}
+
+			}
+
+			window.setText("And how many countries do you like moved?");
+			done = false;
+			State giver = world.getStateByName(giverString);
+			State getter = world.getStateByName(getterString);
+
+			String stringNumMoved = window.getCommand();
+			while (!done){
+
 				try
 				{
 					numMoved = Integer.parseInt(stringNumMoved);
 					if (numMoved >= giver.getArmy()){
-						window.setText("Needs to be a number less " + giver.getArmy());
+						window.setText("Needs to be a number less than " + giver.getArmy());
+						sleep(500);
+					}
+					else if (giver.getArmy() == 1) {
+						window.setText("Giving State needs to have more than one army.");
+						sleep(500);
 					}
 					else{
 						done = true;
@@ -447,17 +460,23 @@ public class Main {
 					window.setText("Needs to be a number!");
 
 				}
-				getter.setArmy(getter.getArmy() + numMoved);
-				giver.setArmy(giver.getArmy() - numMoved);
-			}
-		
 
+			}
+			getter.setArmy(getter.getArmy() + numMoved);
+			giver.setArmy(giver.getArmy() - numMoved);
+			window.refreshMap();
+
+		}
 	}
-	
-	public static boolean isConnected(State start, State end, Player owner){
+
+	public static boolean isConnected(State start, State end, Player owner, ArrayList<State> visited){
+		if (start.getOwner() != owner) return false;
 		for (int state : start.getAdjacent()){
+			visited.add(start);
 			if (end == world.getState(state) && end.getOwner() == owner) return true;
-			else if (world.getState(state).getOwner() == owner) return isConnected (world.getState(state), end, owner);
+			else if (world.getState(state).getOwner() == owner && !visited.contains(world.getState(state))){
+				return isConnected (world.getState(state), end, owner, visited);
+			}
 		}
 		return false;
 	}
