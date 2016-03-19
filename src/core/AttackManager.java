@@ -132,14 +132,15 @@ public class AttackManager {
 	}
 	
 	public void conquerContry( State from, State to, int with ){
-		to.setOwner( from.getOwner() );
-		to.setArmy( with );
-		invalidateStores(from);
-		invalidateStores(to);
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
 			new Notification(FancyFullFrameAnimation.frame, to.getOwner().getName()+" lost", to.getOwner(), Notification.SHORT);
 		}
+		to.setOwner( from.getOwner() );
+		to.setArmy( with );
+		from.updateArmyWithVariation(-with);
+		invalidateStores(from);
+		invalidateStores(to);
 	}
 	
 	public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending ){
@@ -170,12 +171,11 @@ public class AttackManager {
 				with--;
 			}
 		// interpretating the results.
+		from.updateArmyWithVariation( -(originWith-with) ); // remove dead armies
+		to.updateArmyWithVariation( -(originDefending-defending) ); // remove dead armies
 		if ( defending == 0 ){
 			conquerContry( from, to, with );
 			new Toast( from.getOwner().getName()+" conquers "+to.getArmy(), Notification.SHORT);
-		} else {
-			from.updateArmyWithVariation( -(originWith-with) ); // remove dead armies
-			to.updateArmyWithVariation( -(originDefending-defending) ); // remove dead armies
 		}
 	}
 	
@@ -206,17 +206,19 @@ public class AttackManager {
 							stateToAttack.getOwner().getName()+", chose with how many armies from "+stateToAttack.getName()+" you wanna use for defending by the attack from "+attackingState.getName());
 					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount );
 					if ( this.getStatesAbleToAttack().contains(attackingState) && !stateToAttack.getOwner().equals(player) ) 
-						keepAttacking = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
+						keepAttackingTheSameStateFromTheSameState = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
 								player.getName()+", do you wanna keep inviding "+stateToAttack.getName()+" from "+attackingState.getName()
-								).equals(Question.YES);
+								).toLowerCase().equals(Question.YES.toLowerCase());
 				}while ( keepAttackingTheSameStateFromTheSameState );
 			}catch(ChangeOfMindException e){
 				keepAttacking = false;
 			}catch(BreakException e){
 			}catch(OutOfContextException e){
 			}finally{
-				if ( keepAttacking )
+				if ( keepAttacking ){
 					keepAttacking = isPlayerAbleToAttack();
+					if ( ! keepAttacking ) new Toast(player.getName()+" unable to attack", Toast.LONG);
+				}
 			}
 	}
 	
