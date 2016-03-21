@@ -30,7 +30,7 @@ public class Main {
 	public static int turn;
 	private static boolean player1Start;
 
-
+//FIX - if attacks with 2 and fails, should lose both
 	public static void main(String[] args) throws IOException {
 		/*
 		 * Create world and GUI.
@@ -428,7 +428,7 @@ public class Main {
 				}
 				else {
 					window.setText("Both countries need to be a country of yours that is connected. Try again.");
-					sleep(500);
+					sleep(1000);
 				}
 
 			}

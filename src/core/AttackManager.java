@@ -190,7 +190,7 @@ public class AttackManager {
 		while(keepAttacking)
 			try{
 				Set<State> stateWhichMayBeAttacked = this.getAttackableStates();
-				State stateToAttack = stateToAttackQuestion.validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", chose the state you wanna attack");
+				State stateToAttack = stateToAttackQuestion.validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", chose the state you would like to attack, or type 'skip' to end turn");
 				State attackingState = stateToAttackFromQuestion.notTrivialValidatedAskQuestion(
 						// possible attacking states
 						intersect( this.getStatesAbleToAttack(), this.getAdjacentEnemyStatesFromState(stateToAttack) ),
@@ -200,14 +200,14 @@ public class AttackManager {
 					keepAttackingTheSameStateFromTheSameState = false;
 					Integer attackingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(attackingState, 3, 1), 
-							player.getName()+", chose how many army you wanna use to attack "+stateToAttack.getName()+" from the state "+attackingState.getName());
+							player.getName()+", chose how many army you would like to use to attack "+stateToAttack.getName()+" from the state "+attackingState.getName());
 					Integer defendingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(stateToAttack, 2, 0),
 							stateToAttack.getOwner().getName()+", chose with how many armies from "+stateToAttack.getName()+" you wanna use for defending by the attack from "+attackingState.getName());
 					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount );
 					if ( this.getStatesAbleToAttack().contains(attackingState) && !stateToAttack.getOwner().equals(player) ) 
 						keepAttackingTheSameStateFromTheSameState = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
-								player.getName()+", do you wanna keep inviding "+stateToAttack.getName()+" from "+attackingState.getName()
+								player.getName()+", would you like to keep inviding "+stateToAttack.getName()+" from "+attackingState.getName()
 								).toLowerCase().equals(Question.YES.toLowerCase());
 				}while ( keepAttackingTheSameStateFromTheSameState );
 			}catch(ChangeOfMindException e){
