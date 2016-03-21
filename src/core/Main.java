@@ -446,11 +446,11 @@ public class Main {
 					numMoved = Integer.parseInt(stringNumMoved);
 					if (numMoved >= giver.getArmy()){
 						window.setText("Needs to be a number less than " + giver.getArmy());
-						sleep(500);
+						sleep(1000);
 					}
 					else if (giver.getArmy() == 1) {
 						window.setText("Giving State needs to have more than one army.");
-						sleep(500);
+						sleep(1000);
 					}
 					else{
 						done = true;
