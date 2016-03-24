@@ -48,6 +48,8 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
+		rollTheDiceToStart();
+		chooseReinforcements();
 
 		for ( State state : world.getStates() )
 			state.setArmy( 1 + (int)(Math.random()*3) );
