@@ -7,7 +7,6 @@ package core.entities;
 
 import java.util.Collections;
 import java.util.LinkedList;
-import core.entities.TerritoryCard.CardType;
 
 public class TerritoryDeck {
 	
@@ -23,15 +22,13 @@ public class TerritoryDeck {
 	public TerritoryDeck(boolean wilds) {
 		deck = new LinkedList<TerritoryCard>();
 		
-		for (int i=0; i<42; i+=3){
-			deck.add(new TerritoryCard(i, CardType.INFANTRY));
-			deck.add(new TerritoryCard(i+1, CardType.CAVALRY));
-			deck.add(new TerritoryCard(i+2, CardType.ARTILLERY));
+		for (int i=0; i<42; i++){
+			deck.add(new TerritoryCard(i));
 		}
 		
 		if (wilds){
-			deck.add(new TerritoryCard(43, CardType.WILD));
-			deck.add(new TerritoryCard(44, CardType.WILD));
+			deck.add(new TerritoryCard(42, true));
+			deck.add(new TerritoryCard(43, true));
 		}
 		
 		Collections.shuffle(deck);
@@ -59,8 +56,13 @@ public class TerritoryDeck {
 	 * 		@param index The country to be added.
 	 * 		@param cardType The type of card to be added.
 	 */
-	public void addNewTerritoryCard(int index, CardType cardType){
-		deck.add(new TerritoryCard (index, cardType));
+	public void addNewTerritoryCard(int index){
+		deck.add(new TerritoryCard (index));
+		return;
+	}
+	
+	public void addNewWildCard(int index, boolean wild){
+		deck.add(new TerritoryCard (index, wild));
 		return;
 	}
 	
