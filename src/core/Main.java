@@ -48,8 +48,10 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
-		rollTheDiceToStart();
-		chooseReinforcements();
+		
+		// just comment these out for testing.
+		//rollTheDiceToStart();
+		//chooseReinforcements();
 
 		for ( State state : world.getStates() )
 			state.setArmy( 1 + (int)(Math.random()*3) );
@@ -57,9 +59,6 @@ public class Main {
 		turn = 1;
 		moveArmies();
 
-
-		rollTheDiceToStart();
-		chooseReinforcements();
 
 		/* while loop for turns:
 		while (true){
