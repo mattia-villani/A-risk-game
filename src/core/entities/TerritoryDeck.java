@@ -7,6 +7,7 @@ package core.entities;
 
 import java.util.Collections;
 import java.util.LinkedList;
+import core.Constants;
 
 public class TerritoryDeck {
 	
@@ -22,7 +23,7 @@ public class TerritoryDeck {
 	public TerritoryDeck(boolean wilds) {
 		deck = new LinkedList<TerritoryCard>();
 		
-		for (int i=0; i<42; i++){
+		for (int i=0; i<Constants.NUM_COUNTRIES; i++){
 			deck.add(new TerritoryCard(i));
 		}
 		

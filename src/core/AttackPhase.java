@@ -99,8 +99,9 @@ public class AttackPhase {
 		}
 	}
 
-	static void performPhace( Player player, World world, GUI gui ){
+	static void performPhase( Player player, World world, GUI gui ){
 		AttackPhase.gui = gui;
+		gui.toggleMouseInput();
 		new Notification(FancyFullFrameAnimation.frame, "Attack Phase", player, Notification.SHORT);
 		new AttackManager(player, world).attackLoop(
 				stateQuestion, 
@@ -109,6 +110,8 @@ public class AttackPhase {
 				numberQuestion, 
 				yesNoQuestion);
 		new Notification(FancyFullFrameAnimation.frame, "Attack Phase ended", player, Notification.SHORT);
+		gui.toggleMouseInput();
+		gui.clearCommands();
 	}
 	
 }

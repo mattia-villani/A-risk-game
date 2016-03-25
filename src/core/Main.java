@@ -49,13 +49,16 @@ public class Main {
 		assignArmies();
 		assignStates();
 		
-		// just comment these out for testing.
-		//rollTheDiceToStart();
-		//chooseReinforcements();
+		//just comment these 2 out for testing.
+		rollTheDiceToStart();
+		chooseReinforcements();
 
-		for ( State state : world.getStates() )
-			state.setArmy( 1 + (int)(Math.random()*3) );
-		AttackPhase.performPhace(player1, world, window);
+		
+		for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
+		
+		ReinforcementPhase.performPhase(player1, world, window);
+		AttackPhase.performPhase(player1, world, window);
+		
 		turn = 1;
 		moveArmies();
 
@@ -175,12 +178,9 @@ public class Main {
 
 		TerritoryDeck Deck = new TerritoryDeck(false);
 
-		try {
-			Thread.sleep(800);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
+		sleep(800);
+		
+		window.clearCommands();
 		window.setText("It's time to draw territory cards. Press enter when ready.");
 		String test = window.getCommand();
 		window.resetText();
@@ -360,6 +360,7 @@ public class Main {
 			}
 		}		
 		window.disableOracle();
+		window.toggleMouseInput();
 		window.clearCommands();
 		return;
 	}		

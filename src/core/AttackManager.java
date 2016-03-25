@@ -121,7 +121,7 @@ public class AttackManager {
 		int n = state.getArmy() - decreaseOf; 
 		if ( n == 1 ) return Question.oneSet;
 		if ( n == 2 ) return Question.twoSet;
-		if ( n == 3 ) return Question.threeSet;		
+		if ( n == 3 ) return Question.threeSet;
 		throw new RuntimeException("Controls are wrong");
 	}
 	
@@ -163,11 +163,11 @@ public class AttackManager {
 		// fight
 		while ( (--i)>=0 && (--j)>=0 && with!=0 && defending!=0 )
 			if ( attackingDices[i]>defendingDices[j] ){ 
-				new Toast("Attacker rolled "+attackingDices[i]+", which is greater than the defender's roll "+defendingDices[j]+"... one army of defender destroied", Toast.LONG);
+				new Toast("The attacker rolled a "+attackingDices[i]+", which is greater than the defender's roll of "+defendingDices[j]+"... one defending unit has been destroyed", Toast.LONG);
 				defending--;
 			}
 			else{
-				new Toast("Attacker rolled "+attackingDices[i]+", which is NOT greater than the defender's roll "+defendingDices[j]+"... one army of attacker destroied", Toast.LONG);
+				new Toast("The attacker rolled a "+attackingDices[i]+", which is NOT greater than the defender's roll of "+defendingDices[j]+"... one attacking unit has been destroyed", Toast.LONG);
 				with--;
 			}
 		// interpretating the results.
@@ -190,20 +190,20 @@ public class AttackManager {
 		while(keepAttacking)
 			try{
 				Set<State> stateWhichMayBeAttacked = this.getAttackableStates();
-				State stateToAttack = stateToAttackQuestion.validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", chose the state you would like to attack, or type 'skip' to end turn");
+				State stateToAttack = stateToAttackQuestion.validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", choose the country you would like to attack, or type 'skip' to end your attack phase.");
 				State attackingState = stateToAttackFromQuestion.notTrivialValidatedAskQuestion(
 						// possible attacking states
 						intersect( this.getStatesAbleToAttack(), this.getAdjacentEnemyStatesFromState(stateToAttack) ),
-						player.getName()+", chose the state you wanna attack "+stateToAttack.getName()+" with"
+						player.getName()+", choose the country you would like to attack "+stateToAttack.getName()+" with"
 						);
 				do{
 					keepAttackingTheSameStateFromTheSameState = false;
 					Integer attackingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(attackingState, 3, 1), 
-							player.getName()+", chose how many army you would like to use to attack "+stateToAttack.getName()+" from the state "+attackingState.getName());
+							player.getName()+", choose how many units you wish to attack "+stateToAttack.getName()+" with from "+attackingState.getName());
 					Integer defendingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(stateToAttack, 2, 0),
-							stateToAttack.getOwner().getName()+", chose with how many armies from "+stateToAttack.getName()+" you wanna use for defending by the attack from "+attackingState.getName());
+							stateToAttack.getOwner().getName()+", choose with how many units from "+stateToAttack.getName()+" you wish defend with against the attack from "+attackingState.getName());
 					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount );
 					if ( this.getStatesAbleToAttack().contains(attackingState) && !stateToAttack.getOwner().equals(player) ) 
 						keepAttackingTheSameStateFromTheSameState = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
