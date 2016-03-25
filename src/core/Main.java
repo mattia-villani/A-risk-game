@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import core.entities.*;
 import gui.DeckDrawer;
+import gui.FancyFullFrameAnimation;
 import gui.GUI;
+import gui.Notification;
 import gui.Rolling;
 import gui.Toast;
 import gui.map.MapRenderer;
@@ -30,7 +32,7 @@ public class Main {
 	public static int turn;
 	private static boolean player1Start;
 
-//FIX - if attacks with 2 and fails, should lose both
+	//FIX - if attacks with 2 and fails, should lose both
 	public static void main(String[] args) throws IOException {
 		/*
 		 * Create world and GUI.
@@ -48,17 +50,17 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
-		
-		//just comment these 2 out for testing.
-		rollTheDiceToStart();
-		chooseReinforcements();
 
-		
+		//just comment these 2 out for testing.
+		//rollTheDiceToStart();
+		//chooseReinforcements();
+
+
 		for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
-		
+
 		ReinforcementPhase.performPhase(player1, world, window);
 		AttackPhase.performPhase(player1, world, window);
-		
+
 		turn = 1;
 		moveArmies();
 
@@ -179,7 +181,7 @@ public class Main {
 		TerritoryDeck Deck = new TerritoryDeck(false);
 
 		sleep(800);
-		
+
 		window.clearCommands();
 		window.setText("It's time to draw territory cards. Press enter when ready.");
 		String test = window.getCommand();
@@ -407,19 +409,29 @@ public class Main {
 	}
 
 	public static void moveArmies(){
+		new Notification(FancyFullFrameAnimation.frame, "Move Phase", world.getPlayers().get(turn), Notification.SHORT);
+		
 		boolean done = false;
 
 		String giverString = null;
 		String getterString = null;
 		int numMoved = 0;
-
+		Tree tree = null;
+		if (tree == null) tree = window.enableOracleAndReturnTreeForMove( world, (world.getPlayers().get(turn)));
+		
 		while (!done){
 			window.setText(world.getPlayers().get(turn).getName() + ", please choose a country to move armies from, or type skip to end turn");
 			giverString = window.getCommand();
-
-			if (giverString == "skip");
+			if (giverString.equals("skip")){
+				
+				done = true;
+			}
+			else if(giverString.length() < 4){
+				window.setText("Ambiguous input, try again");
+				sleep(1000);
+			}
 			else{
-
+				
 				window.setText("Now choose a connected country to move armies to");
 				getterString = window.getCommand();
 				State giver = world.getStateByName(giverString);
@@ -433,42 +445,45 @@ public class Main {
 					sleep(1000);
 				}
 
-			}
 
-			window.setText("And how many countries do you like moved?");
-			done = false;
-			State giver = world.getStateByName(giverString);
-			State getter = world.getStateByName(getterString);
+				window.disableOracle();
+				window.setText("And how many countries do you like moved?");
+				done = false;
+				giver = world.getStateByName(giverString);
+				getter = world.getStateByName(getterString);
 
-			String stringNumMoved = window.getCommand();
-			while (!done){
+				String stringNumMoved = window.getCommand();
+				while (!done){
 
-				try
-				{
-					numMoved = Integer.parseInt(stringNumMoved);
-					if (numMoved >= giver.getArmy()){
-						window.setText("Needs to be a number less than " + giver.getArmy());
-						sleep(1000);
+					try
+					{
+						numMoved = Integer.parseInt(stringNumMoved);
+						if (numMoved >= giver.getArmy()){
+							window.setText("Needs to be a number less than " + giver.getArmy());
+							sleep(1000);
+						}
+						else if (giver.getArmy() == 1) {
+							window.setText("Giving State needs to have more than one army.");
+							sleep(1000);
+						}
+						else{
+							done = true;
+						}
+					} catch (NumberFormatException ex)
+					{
+						window.setText("Needs to be a number!");
+
 					}
-					else if (giver.getArmy() == 1) {
-						window.setText("Giving State needs to have more than one army.");
-						sleep(1000);
-					}
-					else{
-						done = true;
-					}
-				} catch (NumberFormatException ex)
-				{
-					window.setText("Needs to be a number!");
 
 				}
-
+				getter.setArmy(getter.getArmy() + numMoved);
+				giver.setArmy(giver.getArmy() - numMoved);
+				window.refreshMap();
 			}
-			getter.setArmy(getter.getArmy() + numMoved);
-			giver.setArmy(giver.getArmy() - numMoved);
-			window.refreshMap();
-
 		}
+			new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", world.getPlayers().get(turn), Notification.SHORT);
+
+		
 	}
 
 	public static boolean isConnected(State start, State end, Player owner, ArrayList<State> visited){

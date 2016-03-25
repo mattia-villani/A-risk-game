@@ -39,7 +39,7 @@ public class Oracle extends Tree{
 	
 	static public Tree GenerateOracleTreeForAttacking(World world, Player player){
 		List<String> legalStrings = new ArrayList<String>();
-				
+			
 		boolean first = true;
 		String prefix = "attack ";
 		String inst = "type \""+prefix+"<";
@@ -51,9 +51,27 @@ public class Oracle extends Tree{
 					legalStrings.add( prefix + world.getState(index).getName() );
 				}
 		inst +=">\"";
+		
 		return new Oracle(legalStrings, inst );
 	}
 
+	static public Tree GenerateOracleTreeForMoving(World world, Player player){
+		List<String> legalStrings = new ArrayList<String>();
+			
+		boolean first = true;
+		String prefix = "attack ";
+		String inst = "type \""+prefix+"<";
+		for ( State state : world.getStates() )
+			if ( state.getOwner() == player )
+				for ( int index : state.getAdjacent() ){
+					inst+=(first?"":"|")+world.getState(index).getName();
+					first = false;
+					legalStrings.add( prefix + world.getState(index).getName() );
+				}
+		inst +=">\"";
+		legalStrings.add("skip");
+		return new Oracle(legalStrings, inst );
+	}
 	static public Tree GenerateOracleTreeForIncreasingArmy(World world, Player player){
 		List<String> legalStrings = new ArrayList<String>();
 				

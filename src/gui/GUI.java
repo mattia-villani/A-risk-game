@@ -173,6 +173,11 @@ public class GUI {
 		return tree;
 	}
 	
+	public Tree enableOracleAndReturnTreeForMove(World world, Player player){
+		Tree tree = Oracle.GenerateOracleTreeForMoving(world, player);
+		inputArea.enableOracle(tree);
+		return tree;
+	}
 	/**
 	 * <p>	Enables oracle text detection.
 	 * 		@param tree Tree to be used for text detection.
