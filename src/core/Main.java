@@ -133,6 +133,10 @@ public class Main {
 			if (player2Name.length()<1){
 				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have a blank name. Please pick a name.");
 			}
+			if (player2Name.equals(player1Name)){
+				player2Name="";
+				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have the same name. Please pick a different one.");
+			}
 		}
 
 		window.setText(player2Name + " will be red."); 
