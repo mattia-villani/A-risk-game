@@ -105,6 +105,7 @@ public class AttackPhase {
 		AttackPhase.gui = gui;
 		gui.toggleMouseInput();
 		new Toast.SuperToast("Attack Phase", player, Notification.LONG);
+//		new Notification(FancyFullFrameAnimation.frame, "Attack Phase ended", player, Notification.SHORT);
 		List<Player> losers = new AttackManager(player, world).attackLoop(
 				stateQuestion, 
 				stateQuestion, 
@@ -112,6 +113,8 @@ public class AttackPhase {
 				numberQuestion, 
 				yesNoQuestion);
 		new Toast.SuperToast("Attack Phase ended", player, Notification.LONG);
+		gui.disableOracle();
+		gui.resetText();
 		gui.toggleMouseInput();
 		gui.clearCommands();
 		return losers;
