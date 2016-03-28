@@ -179,7 +179,7 @@ public class AttackManager {
 		// interpretating the results.
 		from.updateArmyWithVariation( -(originWith-with) ); // remove dead armies
 		to.updateArmyWithVariation( -(originDefending-defending) ); // remove dead armies
-		if ( defending == 0 ){
+		if ( defending == 0 && to.getArmy() == 0){
 			conquerContry( from, to, with );
 			new Toast( from.getOwner().getName()+" conquers "+to.getArmy(), Notification.SHORT);
 		}

@@ -35,8 +35,8 @@ public class Main {
 
 	static public Player letsPlay() throws InterruptedException{
 		List<Player> playingPlayers = new ArrayList<Player>(6);
-		playingPlayers.addAll(Arrays.asList( new Player[]{player1, neut1, neut2, neut3, neut4} ));
-		playingPlayers.add(player1Start?1:0, player2);
+		playingPlayers.addAll(Arrays.asList( new Player[]
+				{ player1Start?player1:player2, !player1Start?player1:player2, neut2, neut3, neut4} ));
 		int indexOfThePlayerWhoHasToPlayTheTurn = 0;
 		while ( playingPlayers.size()>1 ){
 			Player currentPlayer = playingPlayers.get(indexOfThePlayerWhoHasToPlayTheTurn);
@@ -53,7 +53,7 @@ public class Main {
 			}
 			new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 			// setting up for the next turn.
-			indexOfThePlayerWhoHasToPlayTheTurn ++;
+			indexOfThePlayerWhoHasToPlayTheTurn++;
 			if ( indexOfThePlayerWhoHasToPlayTheTurn >= playingPlayers.size() ) 
 				indexOfThePlayerWhoHasToPlayTheTurn = 0;
 		}
@@ -77,13 +77,13 @@ public class Main {
 		getNames();
 		createPlayers();
 		assignArmies();
-		assignStates();
-	//	rollTheDiceToStart();
-	//	chooseReinforcements();
-
-
-		for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
-				
+		boolean isTest = assignStates();
+		if ( isTest ){
+			for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
+		}else{
+			rollTheDiceToStart();
+			chooseReinforcements();			
+		}
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
@@ -187,8 +187,8 @@ public class Main {
 	 * <br>	Number of countries assigned determined by constants.
 	 * <p>	Serial country assignment to each player still provides random countries as card deck is randomized upon creation.
 	 */
-	public static void assignStates(){
-
+	public static boolean assignStates(){
+		boolean isTest = false;
 		TerritoryDeck Deck = new TerritoryDeck(false);
 
 		sleep(800);
@@ -202,7 +202,7 @@ public class Main {
 		int singleTemp = 400;
 		int tempo = singleTemp * world.getStates().size() ;
 		TerritoryCard[] cards = new TerritoryCard[world.getStates().size()];
-		if (test.equals("test")){}
+		if (test.equals("test")){ isTest = true; }
 		else
 			try{
 				window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()),false);				
@@ -266,6 +266,7 @@ public class Main {
 			}
 
 		}
+		return isTest;
 	}
 
 	/**
@@ -285,12 +286,12 @@ public class Main {
 		if (player1Roll > player2Roll){
 			window.setText(player1.getName()+" rolled a "+player1Roll+", which beats "+player2.getName()+"'s "+player2Roll+". So "+player1.getName()+" will go first!");
 			player1Start=true;
-			sleep(5000);
+			sleep(2000);
 		}
 		else if(player2Roll > player1Roll){
 			window.setText(player2.getName()+" rolled a "+player2Roll+", which beats "+player1.getName()+"'s "+player1Roll+". So "+player2.getName()+" will go first!");
 			player1Start=false;
-			sleep(5000);
+			sleep(2000);
 		}
 		else{
 			window.setText("Tie! We'll roll again! Press enter when ready.");
