@@ -111,7 +111,7 @@ static void moveArmies(Player player, World world, GUI window) throws Interrupte
 			visited.add(start);
 			if (end == world.getState(state) && end.getOwner() == owner) return true;
 			else if (world.getState(state).getOwner() == owner && !visited.contains(world.getState(state))){
-				return isConnected (world.getState(state), end, owner, visited, world);
+				isConnected (world.getState(state), end, owner, visited, world);
 			}
 		}
 		return false;

@@ -107,7 +107,7 @@ public class ReinforcementPhase {
 		gui.toggleMouseInput();
 		gui.clearCommands();
 		
-		new Notification(FancyFullFrameAnimation.frame, "Reinforcement Phase finished", player, Notification.SHORT);
+		new Notification(FancyFullFrameAnimation.frame, "Reinforcement Phase ended", player, Notification.SHORT);
 
 		return;
 	}

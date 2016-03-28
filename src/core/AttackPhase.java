@@ -112,6 +112,8 @@ public class AttackPhase {
 				numberQuestion, 
 				yesNoQuestion);
 		new Notification(FancyFullFrameAnimation.frame, "Attack Phase ended", player, Notification.SHORT);
+		gui.disableOracle();
+		gui.resetText();
 		gui.toggleMouseInput();
 		gui.clearCommands();
 		return losers;
