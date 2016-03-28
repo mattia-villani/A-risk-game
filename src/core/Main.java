@@ -94,6 +94,15 @@ public class Main {
 		/*
 		ReinforcementPhase.performPhase(player1, world, window);
 		AttackPhase.performPhase(player1, world, window);
+<<<<<<< HEAD
+=======
+		try {
+			MovePhase.moveArmies(player1, world, window);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+>>>>>>> dc2b6e34782897665fa70e3eb9fc993d8451f53b
 
 		moveArmies(player1);
 		 */
@@ -481,7 +490,7 @@ public class Main {
 				getterString = window.getCommand();
 
 				State getter = world.getStateByName(getterString);
-				if (isConnected(giver, getter, world.getPlayers().get(turn), new ArrayList<State>())){
+				if (true/*isConnected(giver, getter, world.getPlayers().get(turn), new ArrayList<State>())*/){
 
 					done = true;
 					window.disableOracle();
@@ -526,23 +535,9 @@ public class Main {
 				window.refreshMap();
 			}
 		}
-			new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", world.getPlayers().get(turn), Notification.SHORT);
-
-
-		}
-
-		public static boolean isConnected(State start, State end, Player owner, ArrayList<State> visited){
-			if (start.getOwner() != owner) return false;
-			for (int state : start.getAdjacent()){
-				visited.add(start);
-				if (end == world.getState(state) && end.getOwner() == owner) return true;
-				else if (world.getState(state).getOwner() == owner && !visited.contains(world.getState(state))){
-					return isConnected (world.getState(state), end, owner, visited);
-				}
-			}
-			return false;
-		}
-
+		new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", world.getPlayers().get(turn), Notification.SHORT);
 	}
+		
+}
 
 
