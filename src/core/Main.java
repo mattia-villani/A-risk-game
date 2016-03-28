@@ -122,6 +122,10 @@ public class Main {
 			if (player1Name.length()<1){
 				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't have a blank name. Please pick a name.");
 			}
+			if (player1Name.toLowerCase().equals("neutral 1") || player1Name.toLowerCase().equals("neutral 2") || player1Name.toLowerCase().equals("neutral 3") || player1Name.toLowerCase().equals("neutral 4")){
+				player1Name="";
+				window.setText("Welcome to Risk! Please enter a name for player 1.\n\nYou can't use that name. Please pick a different one.");
+			}
 
 		}
 
@@ -132,6 +136,14 @@ public class Main {
 			player2Name = window.getCommand();
 			if (player2Name.length()<1){
 				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have a blank name. Please pick a name.");
+			}
+			if (player2Name.toLowerCase().equals(player1Name.toLowerCase())){
+				player2Name="";
+				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't have the same name. Please pick a different one.");
+			}
+			if (player2Name.toLowerCase().equals("neutral 1") || player2Name.toLowerCase().equals("neutral 2") || player2Name.toLowerCase().equals("neutral 3") || player2Name.toLowerCase().equals("neutral 4")){
+				player2Name="";
+				window.setText(player1Name + " will be blue. Please enter a name for player 2.\n\nYou can't use that name. Please pick a different one.");
 			}
 		}
 
