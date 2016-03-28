@@ -73,7 +73,6 @@ public class ReinforcementPhase {
 		// Generate tree.
 		Tree tree = null;
 		if (tree == null) tree=gui.enableOracleAndReturnTree( world, player );
-		//else gui.enableOracle(tree);
 		String command;
 		gui.toggleMouseInput();
 
@@ -112,11 +111,7 @@ public class ReinforcementPhase {
 	}
 	
 	public static void setReinforcements (String stateName){
-		for (State state : world.getStates()){
-			if (stateName.toLowerCase().equals(state.getName().toLowerCase())){
-					state.setArmy(state.getArmy() + 1);
-			}
-		}
+		world.getStateByName(stateName).setArmy(world.getStateByName(stateName).getArmy() + 1);
 		gui.refreshMap();
 		return;
 
