@@ -135,7 +135,13 @@ public class AttackManager {
 		AttackManager.storedEnemyStatesThatAreAdjacentToState.remove(state);
 	}
 	
-	public void conquerContry( State from, State to, int with ){
+	public Set<Integer> getSetOfRangeNumberWithMax(int max){
+		Set<Integer> set = new HashSet<>();
+		for (int i=0;i<=max;i++) set.add(i);
+		return set;
+	}
+	
+	public void conquerContry( State from, State to, int with, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
 			losers.add(to.getOwner());
@@ -146,9 +152,13 @@ public class AttackManager {
 		from.updateArmyWithVariation(-with);
 		invalidateStores(from);
 		invalidateStores(to);
+		// fortification
+		int amountToMove = unitToMoveForFortifingAfterAttackQuestion.notTrivialValidatedAskQuestion(getSetOfRangeNumberWithMax(from.getArmy()-1), "Do you want to fortify the "+to+" moving army from "+from);
+		to.updateArmyWithVariation(amountToMove);
+		from.updateArmyWithVariation(-amountToMove);
 	}
 	
-	public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending ){
+	public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		assert with != 0 && defending != 0 : "There should be some army fighting";
 		int originWith = with , originDefending = defending;
 		int[] attackingDices = new int[with];
@@ -179,8 +189,8 @@ public class AttackManager {
 		from.updateArmyWithVariation( -(originWith-with) ); // remove dead armies
 		to.updateArmyWithVariation( -(originDefending-defending) ); // remove dead armies
 		if ( defending == 0 && to.getArmy() == 0){
-			conquerContry( from, to, with );
-			new Toast( from.getOwner().getName()+" conquers "+to.getArmy(), Notification.SHORT);
+			conquerContry( from, to, with, unitToMoveForFortifingAfterAttackQuestion );
+			new Toast( from.getOwner().getName()+" conquers "+to.getName(), Notification.SHORT);
 		}
 	}
 	
@@ -190,7 +200,8 @@ public class AttackManager {
 			Question<State> stateToAttackFromQuestion,
 			Question<Integer> numberOfArmyToAttackWithQuestion,
 			Question<Integer> numberOfArmyToDefendWithQuestion,
-			Question<String> keepAttackingTheSameStateFromTheSameStateQuestion){
+			Question<String> keepAttackingTheSameStateFromTheSameStateQuestion,
+			Question<Integer> unitToMoveForFortifingAfterAttackQuestion){
 		boolean keepAttacking = true;
 		boolean keepAttackingTheSameStateFromTheSameState;
 		while(keepAttacking)
@@ -210,7 +221,7 @@ public class AttackManager {
 					Integer defendingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(stateToAttack, 2, 0),
 							stateToAttack.getOwner().getName()+", choose with how many units from "+stateToAttack.getName()+" you wish defend with against the attack from "+attackingState.getName());
-					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount );
+					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount, unitToMoveForFortifingAfterAttackQuestion );
 					if ( this.getStatesAbleToAttack().contains(attackingState) && !stateToAttack.getOwner().equals(player) ) 
 						keepAttackingTheSameStateFromTheSameState = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
 								player.getName()+", would you like to keep inviding "+stateToAttack.getName()+" from "+attackingState.getName()

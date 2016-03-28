@@ -100,6 +100,29 @@ public class AttackPhase {
 		}
 	}
 	
+	static private class FortificationAfterAttackQuestion extends AttackManager.Question<String>{
+		static Oracle oracle ;
+		@Override
+		public String askQuestion(Set<String> context, String title) {
+			if ( context.equals(AttackManager.Question.yesNoSet) == false )
+				throw new AttackManager.OutOfContextException("This question should be yes/no");
+			new Toast(title,Toast.LONG);
+			if ( oracle == null )
+				oracle = createExtendedOracle(context, "Answer with yes or no");
+			gui.setText(title);
+			gui.enableOracle(oracle);
+			try{
+				String ret = throwExceptionsIfControlsAreUsed(gui.getCommand());
+				gui.disableOracle();
+				return ret;
+			}catch( Exception e ){
+				gui.disableOracle();
+				throw e;
+			}
+		}
+	}
+	
+	
 	// returns the list of players defeded.
 	static List<Player> performPhase( Player player, World world, GUI gui ){
 		AttackPhase.gui = gui;
@@ -111,7 +134,9 @@ public class AttackPhase {
 				stateQuestion, 
 				numberQuestion, 
 				numberQuestion, 
-				yesNoQuestion);
+				yesNoQuestion,
+				numberQuestion
+				);
 		new Toast.SuperToast("Attack Phase ended", player, Notification.LONG);
 		gui.disableOracle();
 		gui.resetText();
