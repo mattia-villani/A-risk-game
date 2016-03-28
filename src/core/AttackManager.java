@@ -1,6 +1,5 @@
 package core;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +12,9 @@ import core.entities.Player;
 import core.entities.State;
 import core.entities.World;
 import gui.FancyFullFrameAnimation;
-import gui.GUI;
 import gui.Notification;
 import gui.Rolling;
 import gui.Toast;
-import jdk.nashorn.internal.ir.SetSplitState;
 import oracle.Oracle;
 
 public class AttackManager {
@@ -27,13 +24,16 @@ public class AttackManager {
 	static Map<State, Set<State>> storedEnemyStatesThatAreAdjacentToState = new HashMap<>();
 
 	static public class ChangeOfMindException extends RuntimeException { 
+		private static final long serialVersionUID = 1L;
 		static public String throwCommand = "skip";
 	}
 	static public class BreakException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		static public String throwCommand = "break";
 	}
 	// shouldn't be possible to throw but a break operator will be introduced during the attack phases
 	static public class OutOfContextException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
 		public OutOfContextException(String message){
 			super(message);
 			new Toast.ErrorToast(message, Toast.LONG);
@@ -89,14 +89,18 @@ public class AttackManager {
 		}
 	}
 	
+	static private List<Player> losers = new LinkedList<Player>();
 	
 	private Player player;
 	private World world;
 
 	public AttackManager(Player player, World world){
+		losers.clear(); 
 		this.player = player;
 		this.world = world;
 	}
+	
+	public List<Player> getLosers(){ return losers; }
 	
 	public boolean isPlayerAbleToAttack(){
 		return this.getStatesAbleToAttack().size()!=0;
@@ -119,6 +123,7 @@ public class AttackManager {
 		final int MAX = 3 ; 
 		assert max>=1 && max<=MAX : "Invalid max number" ;
 		int n = state.getArmy() - decreaseOf; 
+		n = Math.min( n , max );
 		if ( n == 1 ) return Question.oneSet;
 		if ( n == 2 ) return Question.twoSet;
 		if ( n == 3 ) return Question.threeSet;
@@ -134,6 +139,7 @@ public class AttackManager {
 	public void conquerContry( State from, State to, int with ){
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
+			losers.add(to.getOwner());
 			new Notification(FancyFullFrameAnimation.frame, to.getOwner().getName()+" lost", to.getOwner(), Notification.SHORT);
 		}
 		to.setOwner( from.getOwner() );
@@ -179,7 +185,8 @@ public class AttackManager {
 		}
 	}
 	
-	public void attackLoop(
+	// loosers
+	public List<Player> attackLoop(
 			Question<State> stateToAttackQuestion, 
 			Question<State> stateToAttackFromQuestion,
 			Question<Integer> numberOfArmyToAttackWithQuestion,
@@ -220,6 +227,7 @@ public class AttackManager {
 					if ( ! keepAttacking ) new Toast(player.getName()+" unable to attack", Toast.LONG);
 				}
 			}
+		return losers;
 	}
 	
 	public Set<State> getAttackableStates(){

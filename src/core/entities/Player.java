@@ -82,6 +82,9 @@ public class Player {
 		this.numStates -= decreaseOf;
 		return this.numStates;
 	}
-	
+	@Override
+	public String toString(){
+		return getName();
+	}
 	
 }

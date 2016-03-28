@@ -125,8 +125,10 @@ public class DeckDrawer extends View {
 				
 			}
 		if ( deck[deck.length-1] == null ){
+			g2d.drawImage(TerritoryCard.getCoverImage(), (int)cardDeckX, (int)cardDeckY, (int)(cardWidth), (int)(cardWidth/this.cardRatio), null);
 			g2d.setColor(Color.black);
-			g2d.fillRect((int)cardDeckX, (int)cardDeckY, (int)cardWidth, (int)cardHeight);		
+			g2d.setStroke(stroke);
+			g2d.drawRect((int)cardDeckX, (int)cardDeckY, (int)cardWidth, (int)(cardWidth/this.cardRatio));
 		}
 		return true;
 	}

@@ -8,6 +8,12 @@ package core;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.event.ListSelectionEvent;
+
 import core.entities.*;
 import gui.DeckDrawer;
 import gui.FancyFullFrameAnimation;
@@ -32,6 +38,34 @@ public class Main {
 	public static int turn;
 	private static boolean player1Start;
 
+	static public Player letsPlay(){
+		List<Player> playingPlayers = new ArrayList<Player>(6);
+		playingPlayers.addAll(Arrays.asList( new Player[]{player1, neut1, neut2, neut3, neut4} ));
+		playingPlayers.add(player1Start?1:0, player2);
+		int indexOfThePlayerWhoHasToPlayTheTurn = 0;
+		while ( playingPlayers.size()>1 ){
+			Player currentPlayer = playingPlayers.get(indexOfThePlayerWhoHasToPlayTheTurn);
+			new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
+			
+			if ( currentPlayer != player1 && currentPlayer!=player2 ){
+				new Toast("Boot not implemented yet, turn skipped", Toast.LONG);
+			}else{
+				ReinforcementPhase.performPhase(currentPlayer, world, window);
+				playingPlayers.removeAll( // performPhase will return the list of the losers.
+						AttackPhase.performPhase(currentPlayer, world, window)
+						);
+	
+				moveArmies(currentPlayer);
+			}
+			new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
+			// setting up for the next turn.
+			indexOfThePlayerWhoHasToPlayTheTurn ++;
+			if ( indexOfThePlayerWhoHasToPlayTheTurn >= playingPlayers.size() ) 
+				indexOfThePlayerWhoHasToPlayTheTurn = 0;
+		}
+		return playingPlayers.get(0);
+	}
+	
 	//FIX - if attacks with 2 and fails, should lose both
 	public static void main(String[] args) throws IOException {
 		/*
@@ -57,13 +91,12 @@ public class Main {
 
 
 		for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
-
+		/*
 		ReinforcementPhase.performPhase(player1, world, window);
-		//AttackPhase.performPhase(player1, world, window);
+		AttackPhase.performPhase(player1, world, window);
 
-		turn = 1;
-		moveArmies();
-
+		moveArmies(player1);
+		 */
 
 		/* while loop for turns:
 		while (true){
@@ -79,7 +112,10 @@ public class Main {
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
-		window.setText("Let's play!");
+		Player winner = letsPlay();
+		window.setText("And the winner is "+winner);
+		new Notification(window.getUiFrame(), "And the winner is "+winner, winner, Notification.LONG);
+		System.exit(0);
 	}
 
 	// 	Returns the world.
@@ -191,13 +227,12 @@ public class Main {
 		int singleTemp = 400;
 		int tempo = singleTemp * world.getStates().size() ;
 		TerritoryCard[] cards = new TerritoryCard[world.getStates().size()];
-		//window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()),false);				
 		if (test.equals("test")){}
-		else{
+		else
 			try{
+				window.getUiFrame().startAnimation(new DeckDrawer(window.getUiFrame(), world, cards,tempo+window.getUiFrame().getTransitionTime()*2, singleTemp, window.getUiFrame()),false);				
 				Thread.sleep(window.getUiFrame().getTransitionTime());
 			}catch(Exception e){}
-		}
 
 		for (int i=0; i<world.getStates().size(); i++) {
 
@@ -410,7 +445,8 @@ public class Main {
 
 	}
 
-	public static void moveArmies(){
+	public static void moveArmies(Player playerPlayingThisTurn){
+		turn = world.getPlayers().indexOf(playerPlayingThisTurn);
 		new Notification(FancyFullFrameAnimation.frame, "Move Phase", world.getPlayers().get(turn), Notification.SHORT);
 
 		boolean done = false;

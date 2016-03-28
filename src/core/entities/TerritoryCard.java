@@ -21,23 +21,24 @@ public class TerritoryCard {
 		return images[index];
 	}
 	
+	public static Image getCoverImage(){
+		return images[images.length-1];
+	}
+	
 	public static void loadImages (Class clazz, List<State> states) {
 		if ( images != null ) return;
 		int numOfJolly = 2;
-		images = new Image[states.size()+numOfJolly];
+		images = new Image[states.size()+numOfJolly+1];
 		int i=0;
-		for ( State state: states )
-			try {
+		for ( State state: states )try {
 				images[i++] = ImageIO.read(clazz.getResourceAsStream("/images/cards/"+state.getName()+".png"));
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }		
-		for ( int j=0; j<numOfJolly; j++ )
-			try {
+		    } catch (Exception e) {e.printStackTrace();}		
+		for ( int j=0; j<numOfJolly; j++ )try {
 				images[i++] = ImageIO.read(clazz.getResourceAsStream("/images/cards/Jolly.png"));
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }		
+		    } catch (Exception e) {e.printStackTrace();}		
+		try {
+			images[i++] = ImageIO.read(clazz.getResourceAsStream("/images/cards/deck.png"));
+	    } catch (Exception e) {e.printStackTrace();}		
 	}
 	
 	public Image getImage(){

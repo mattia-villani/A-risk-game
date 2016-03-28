@@ -2,6 +2,7 @@ package core;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,12 +99,13 @@ public class AttackPhase {
 			}
 		}
 	}
-
-	static void performPhase( Player player, World world, GUI gui ){
+	
+	// returns the list of players defeded.
+	static List<Player> performPhase( Player player, World world, GUI gui ){
 		AttackPhase.gui = gui;
 		gui.toggleMouseInput();
 		new Notification(FancyFullFrameAnimation.frame, "Attack Phase", player, Notification.SHORT);
-		new AttackManager(player, world).attackLoop(
+		List<Player> losers = new AttackManager(player, world).attackLoop(
 				stateQuestion, 
 				stateQuestion, 
 				numberQuestion, 
@@ -112,6 +114,7 @@ public class AttackPhase {
 		new Notification(FancyFullFrameAnimation.frame, "Attack Phase ended", player, Notification.SHORT);
 		gui.toggleMouseInput();
 		gui.clearCommands();
+		return losers;
 	}
 	
 }

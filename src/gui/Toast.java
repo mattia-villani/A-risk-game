@@ -21,7 +21,7 @@ public class Toast extends FromZeroToOneIntervalHandler {
 		
 	}
 	
-	static final public int SHORT = 3000, LONG = 4000;
+	static final public int SHORT = 4000, LONG = 6000;
 	static private LinkedList <Toast> currentToasts = new LinkedList<>();
 	static final public boolean verbose = false;
 	
@@ -39,7 +39,7 @@ public class Toast extends FromZeroToOneIntervalHandler {
 	}
 	
 	public float getAlphaPoint() {
-		double value = Math.pow( Math.sin(Math.PI*Math.pow(point,1))*1.4 , 8);
+		double value = Math.pow( Math.sin(Math.PI*Math.pow(1-point,1))*1.2*(2-point) , 8);
 		return (float)Math.min(1.0, value );
 	}
 	public float getYPoint() {
