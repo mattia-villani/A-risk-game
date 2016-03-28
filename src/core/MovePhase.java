@@ -25,6 +25,7 @@ static void moveArmies(Player player, World world, GUI window) throws Interrupte
 	int numMoved = 0;
 	Tree tree = null;
 	if (tree == null) tree = window.enableOracleAndReturnTreeForMove( world, (player));
+	window.toggleMouseInput();
 
 	while (!done){
 		window.setText(player.getName() + ", please choose a country to move armies from, or type skip to end turn");
@@ -69,7 +70,7 @@ static void moveArmies(Player player, World world, GUI window) throws Interrupte
 		State giver = world.getStateByName(giverString);
 		State getter = world.getStateByName(getterString);
 
-		window.setText("And how many countries do you like moved?");
+		window.setText("And how many units would you like to move?");
 		stringNumMoved = window.getCommand();
 		try
 		{
@@ -94,7 +95,12 @@ static void moveArmies(Player player, World world, GUI window) throws Interrupte
 			window.refreshMap();
 		}
 	}
-		new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", player, Notification.SHORT);
+	
+	window.disableOracle();
+	window.resetText();
+	window.toggleMouseInput();
+	window.clearCommands();
+	new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", player, Notification.SHORT);
 
 
 	}

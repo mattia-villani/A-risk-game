@@ -135,7 +135,8 @@ public class OracledTextField extends JTextField {
 	}
 	
 	public String getValidatedText(){
-		String str = getText();
+		String str="";
+		str = getText();
 		if ( oracleEnabled )
 			try{
 				tree.evalue(str).getUniquePath();

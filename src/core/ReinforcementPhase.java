@@ -10,12 +10,12 @@ import gui.Notification;
 import oracle.Tree;
 
 public class ReinforcementPhase {
-	static GUI gui;
-	static World world;
+	//static GUI gui;
+	//static World world;
 	
 	static void performPhase( Player player, World world, GUI gui ){
-		ReinforcementPhase.gui = gui;
-		ReinforcementPhase.world=world;
+	//	ReinforcementPhase.gui = gui;
+		//ReinforcementPhase.world=world;
 		int reinforcements=0;
 		int continentBonus=0;
 		int continentNA=0;
@@ -97,7 +97,9 @@ public class ReinforcementPhase {
 				}
 			}
 		
-			setReinforcements(command);
+			//setReinforcements(command);
+			world.getStateByName(command).setArmy(world.getStateByName(command).getArmy() + 1);
+			gui.refreshMap();
 		}
 		
 		gui.disableOracle();
@@ -110,11 +112,11 @@ public class ReinforcementPhase {
 		return;
 	}
 	
-	public static void setReinforcements (String stateName){
+	/*public static void setReinforcements (String stateName){
 		world.getStateByName(stateName).setArmy(world.getStateByName(stateName).getArmy() + 1);
 		gui.refreshMap();
 		return;
 
-	}
+	}*/
 	
 }

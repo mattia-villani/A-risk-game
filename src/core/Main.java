@@ -9,14 +9,9 @@ import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.event.ListSelectionEvent;
-
 import core.entities.*;
 import gui.DeckDrawer;
-import gui.FancyFullFrameAnimation;
 import gui.GUI;
 import gui.Notification;
 import gui.Rolling;
@@ -38,7 +33,7 @@ public class Main {
 	public static int turn;
 	private static boolean player1Start;
 
-	static public Player letsPlay(){
+	static public Player letsPlay() throws InterruptedException{
 		List<Player> playingPlayers = new ArrayList<Player>(6);
 		playingPlayers.addAll(Arrays.asList( new Player[]{player1, neut1, neut2, neut3, neut4} ));
 		playingPlayers.add(player1Start?1:0, player2);
@@ -48,14 +43,13 @@ public class Main {
 			new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
 			
 			if ( currentPlayer != player1 && currentPlayer!=player2 ){
-				new Toast("Boot not implemented yet, turn skipped", Toast.LONG);
+				new Toast("A.I not implemented yet, turn skipped", Toast.LONG);
 			}else{
 				ReinforcementPhase.performPhase(currentPlayer, world, window);
 				playingPlayers.removeAll( // performPhase will return the list of the losers.
 						AttackPhase.performPhase(currentPlayer, world, window)
 						);
-	
-				moveArmies(currentPlayer);
+				MovePhase.moveArmies(currentPlayer, world, window);
 			}
 			new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 			// setting up for the next turn.
@@ -67,7 +61,7 @@ public class Main {
 	}
 	
 	//FIX - if attacks with 2 and fails, should lose both
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		/*
 		 * Create world and GUI.
 		 */
@@ -84,40 +78,12 @@ public class Main {
 		createPlayers();
 		assignArmies();
 		assignStates();
-
-		//just comment these 2 out for testing.
-		//rollTheDiceToStart();
-		//chooseReinforcements();
+	//	rollTheDiceToStart();
+	//	chooseReinforcements();
 
 
 		for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
-		/*
-		ReinforcementPhase.performPhase(player1, world, window);
-		AttackPhase.performPhase(player1, world, window);
-<<<<<<< HEAD
-=======
-		try {
-			MovePhase.moveArmies(player1, world, window);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
->>>>>>> dc2b6e34782897665fa70e3eb9fc993d8451f53b
-
-		moveArmies(player1);
-		 */
-
-		/* while loop for turns:
-		while (true){
-
-
-			checkLosers();
-			checkWinners();
-
-		}
-		 */
-
-
+				
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
@@ -433,111 +399,7 @@ public class Main {
 		window.refreshMap();
 		return;
 
-	}
-
-
-	public static void checkLosers() {
-		for (Player player : world.getPlayers() ){
-			if (player.getNumStates() == 0){
-				world.getPlayers().remove(player);
-			}
-		}
-	}
-
-	public static void checkWinners(){
-		if (!world.getPlayers().contains(player1)){
-			window.setText(player1.getName() + " is the winner! Thanks for playing!");
-		}
-		else if (!world.getPlayers().contains(player2)){
-			window.setText(player2.getName() + " is the winner! Thanks for playing!");
-		}
-
-	}
-
-	public static void moveArmies(Player playerPlayingThisTurn){
-		turn = world.getPlayers().indexOf(playerPlayingThisTurn);
-		new Notification(FancyFullFrameAnimation.frame, "Move Phase", world.getPlayers().get(turn), Notification.SHORT);
-
-		boolean done = false;
-		boolean skipped = false;
-		String stringNumMoved = null;
-		String giverString = null;
-		String getterString = null;
-		int numMoved = 0;
-		Tree tree = null;
-		if (tree == null) tree = window.enableOracleAndReturnTreeForMove( world, (world.getPlayers().get(turn)));
-
-		while (!done){
-			window.setText(world.getPlayers().get(turn).getName() + ", please choose a country to move armies from, or type skip to end turn");
-			giverString = window.getCommand();
-			State giver = world.getStateByName(giverString);
-			if (giverString.equals("skip")){
-				skipped = true;
-				done = true;
-			}
-			else if(giverString.length() < 4){
-				window.setText("Ambiguous input, try again");
-				sleep(1000);
-			}
-			else if (giver.getArmy() == 1) {
-				window.setText("Giving State needs to have more than one army.");
-				sleep(1000);
-			}
-			else
-			{
-
-				window.setText("Now choose a connected country to move armies to");
-				getterString = window.getCommand();
-
-				State getter = world.getStateByName(getterString);
-				if (true/*isConnected(giver, getter, world.getPlayers().get(turn), new ArrayList<State>())*/){
-
-					done = true;
-					window.disableOracle();
-
-				}
-				else {
-					window.setText("Both countries need to be a country of yours that is connected. Try again.");
-					sleep(1000);
-				}
-
-			}	
-		}		
-		boolean doneInner = false;
-
-
-		while (!doneInner && !skipped){
-			State giver = world.getStateByName(giverString);
-			State getter = world.getStateByName(getterString);
-
-			window.setText("And how many countries do you like moved?");
-			stringNumMoved = window.getCommand();
-			try
-			{
-				numMoved = Integer.parseInt(stringNumMoved);
-				if (numMoved >= giver.getArmy()){
-					window.setText("Needs to be a number less than " + giver.getArmy());
-					sleep(1000);
-				}
-				else{
-					doneInner = true;
-				}
-			} catch (NumberFormatException ex)
-			{
-				window.setText("Needs to be a number!");
-				sleep(1000);
-
-			}
-
-			if (doneInner){
-				getter.setArmy(getter.getArmy() + numMoved);
-				giver.setArmy(giver.getArmy() - numMoved);
-				window.refreshMap();
-			}
-		}
-		new Notification(FancyFullFrameAnimation.frame, "Move Phase ended", world.getPlayers().get(turn), Notification.SHORT);
-	}
-		
+	}		
 }
 
 
