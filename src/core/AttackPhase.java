@@ -104,14 +104,14 @@ public class AttackPhase {
 	static List<Player> performPhase( Player player, World world, GUI gui ){
 		AttackPhase.gui = gui;
 		gui.toggleMouseInput();
-		new Notification(FancyFullFrameAnimation.frame, "Attack Phase", player, Notification.SHORT);
+		new Toast.SuperToast("Attack Phase", player, Notification.LONG);
 		List<Player> losers = new AttackManager(player, world).attackLoop(
 				stateQuestion, 
 				stateQuestion, 
 				numberQuestion, 
 				numberQuestion, 
 				yesNoQuestion);
-		new Notification(FancyFullFrameAnimation.frame, "Attack Phase ended", player, Notification.SHORT);
+		new Toast.SuperToast("Attack Phase ended", player, Notification.LONG);
 		gui.toggleMouseInput();
 		gui.clearCommands();
 		return losers;

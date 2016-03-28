@@ -36,14 +36,14 @@ public class Main {
 	static public Player letsPlay() throws InterruptedException{
 		List<Player> playingPlayers = new ArrayList<Player>(6);
 		playingPlayers.addAll(Arrays.asList( new Player[]
-				{ player1Start?player1:player2, !player1Start?player1:player2, neut2, neut3, neut4} ));
+				{ player1Start?player1:player2, !player1Start?player1:player2, neut1, neut2, neut3, neut4} ));
 		int indexOfThePlayerWhoHasToPlayTheTurn = 0;
 		while ( playingPlayers.size()>1 ){
 			Player currentPlayer = playingPlayers.get(indexOfThePlayerWhoHasToPlayTheTurn);
 			new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
 			
 			if ( currentPlayer != player1 && currentPlayer!=player2 ){
-				new Toast("A.I not implemented yet, turn skipped", Toast.LONG);
+				new Toast("A.I not implemented yet, turn skipped", Toast.SHORT);
 			}else{
 				ReinforcementPhase.performPhase(currentPlayer, world, window);
 				playingPlayers.removeAll( // performPhase will return the list of the losers.
@@ -52,10 +52,8 @@ public class Main {
 				MovePhase.moveArmies(currentPlayer, world, window);
 			}
 			new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
-			// setting up for the next turn.
-			indexOfThePlayerWhoHasToPlayTheTurn++;
-			if ( indexOfThePlayerWhoHasToPlayTheTurn >= playingPlayers.size() ) 
-				indexOfThePlayerWhoHasToPlayTheTurn = 0;
+			// setting up for the next turn. The indexOf is used in case some previous player is removed
+			indexOfThePlayerWhoHasToPlayTheTurn = (playingPlayers.indexOf(currentPlayer)+1)%playingPlayers.size();
 		}
 		return playingPlayers.get(0);
 	}
