@@ -93,7 +93,7 @@ public class Main {
 		 */
 		Player winner = letsPlay();
 		window.setText("And the winner is "+winner);
-		new Notification(window.getUiFrame(), "And the winner is "+winner, winner, Notification.LONG);
+		new Notification(window.getUiFrame(), "And the winner is "+winner, winner, Notification.LONG+Notification.SHORT);
 		System.exit(0);
 	}
 
