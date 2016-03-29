@@ -82,7 +82,7 @@ public class Constants {
 		{2,3,22},				// 08	Alaska
 		{14,15,13,10},			// 09	Great Britain
 		{9,13,11,37},			// 10	W Europe
-		{13,12,18,39,10},		// 11	S Europe
+		{13,12,18,39,10,37},	// 11	S Europe
 		{20,16,18,11,13,15},	// 12	Ukraine
 		{15,12,11,10,9},		// 13	N Europe
 		{15,9,4},				// 14	Iceland
