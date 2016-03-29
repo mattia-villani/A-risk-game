@@ -33,6 +33,10 @@ public class Main {
 	public static int turn;
 	private static boolean player1Start;
 
+	static public boolean isPlayerHuman(Player p){
+		return p==player1 || p==player2;
+	}
+	
 	static public Player letsPlay() throws InterruptedException{
 		List<Player> playingPlayers = new ArrayList<Player>(6);
 		playingPlayers.addAll(Arrays.asList( new Player[]
@@ -46,13 +50,16 @@ public class Main {
 
 				if ( currentPlayer != player1 && currentPlayer!=player2 ){
 					new Toast("I.A. not implemented yet, turn skipped", Toast.SHORT);
+					new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 				}else{
 					ReinforcementPhase.performPhase(currentPlayer, world, window);
 					List <Player> losers = AttackPhase.performPhase(currentPlayer, world, window);
 					playingPlayers.removeAll( losers );
-					MovePhase.moveArmies(currentPlayer, world, window);
+					if ( !losers.contains(player1) && !losers.contains(player2)){
+						MovePhase.moveArmies(currentPlayer, world, window);
+						new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
+					}
 				}
-				new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 				// setting up for the next turn. The indexOf is used in case some previous player is removed
 				indexOfThePlayerWhoHasToPlayTheTurn = (playingPlayers.indexOf(currentPlayer)+1)%playingPlayers.size();
 			}
@@ -79,7 +86,7 @@ public class Main {
 		assignArmies();
 		boolean isTest = assignStates();
 		if ( isTest ){
-			for ( State state : world.getStates() ) {
+			for ( State state : world.getStates() ) if (state.getOwner() != player1) {
 				int boost=4 + (int)(Math.random()*3);
 				state.setArmy(boost);
 				state.getOwner().setNumArmies(state.getOwner().getNumArmies()+boost);

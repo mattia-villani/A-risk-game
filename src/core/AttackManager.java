@@ -27,6 +27,9 @@ public class AttackManager {
 		private static final long serialVersionUID = 1L;
 		static public String throwCommand = "skip";
 	}
+	static public class EndOfGameException extends RuntimeException { 
+		private static final long serialVersionUID = 1L;
+	}
 	static public class BreakException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 		static public String throwCommand = "break";
@@ -141,19 +144,24 @@ public class AttackManager {
 	
 	synchronized public void conquerContry( State from, State to, int with, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		from.getOwner().decreaseAndGetNumOfState(-1);
+		boolean hardExit = false;
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
 			losers.add(to.getOwner());
 			new Notification(FancyFullFrameAnimation.frame, to.getOwner().getName()+" lost", to.getOwner(), Notification.SHORT);
+			if ( Main.isPlayerHuman(to.getOwner()) ) hardExit = true;
 		}
 		to.setOwner( from.getOwner() );
 		to.setArmy( with );
 		from.updateArmyWithVariation(-with);
 		invalidateStores(from);
 		invalidateStores(to);
-		// fortification
-		int amountToMove = unitToMoveForFortifingAfterAttackQuestion.notTrivialValidatedAskQuestion(getSetOfRangeNumberWithMax(from.getArmy()-1), "Do you want to fortify the "+to+" moving army from "+from);
-		to.updateArmyWithVariation(amountToMove);
-		from.updateArmyWithVariation(-amountToMove);
+
+		if ( hardExit ) throw new EndOfGameException();
+		else{// fortification
+			int amountToMove = unitToMoveForFortifingAfterAttackQuestion.notTrivialValidatedAskQuestion(getSetOfRangeNumberWithMax(from.getArmy()-1), "Do you want to fortify the "+to+" moving army from "+from);
+			to.updateArmyWithVariation(amountToMove);
+			from.updateArmyWithVariation(-amountToMove);
+		}
 	}
 	
 	synchronized public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
@@ -187,8 +195,8 @@ public class AttackManager {
 		from.updateArmyWithVariation( -(originWith-with) ); // remove dead armies
 		to.updateArmyWithVariation( -(originDefending-defending) ); // remove dead armies
 		if ( defending == 0 && to.getArmy() == 0){
-			conquerContry( from, to, with, unitToMoveForFortifingAfterAttackQuestion );
 			new Toast( from.getOwner().getName()+" conquers "+to.getName(), Notification.SHORT);
+			conquerContry( from, to, with, unitToMoveForFortifingAfterAttackQuestion );
 		}
 	}
 	
@@ -227,6 +235,8 @@ public class AttackManager {
 								).toLowerCase().equals(Question.YES.toLowerCase());
 				}while ( keepAttackingTheSameStateFromTheSameState );
 			}catch(ChangeOfMindException e){
+				keepAttacking = false;
+			}catch(EndOfGameException e){ 
 				keepAttacking = false;
 			}catch(BreakException e){
 			}catch(OutOfContextException e){
