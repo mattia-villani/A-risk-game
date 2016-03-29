@@ -80,7 +80,11 @@ public class Main {
 		assignArmies();
 		boolean isTest = assignStates();
 		if ( isTest ){
-			for ( State state : world.getStates() ) state.setArmy( 4 + (int)(Math.random()*3) );
+			for ( State state : world.getStates() ) {
+				int boost=4 + (int)(Math.random()*3);
+				state.setArmy(boost);
+				state.getOwner().setNumArmies(state.getOwner().getNumArmies()+boost);
+			}
 		}else{
 			rollTheDiceToStart();
 			chooseReinforcements();			
@@ -246,6 +250,7 @@ public class Main {
 			}
 			world.getState(temp.getIndex()).setArmy(1);
 			world.getState(temp.getIndex()).getOwner().setNumArmies(world.getState(temp.getIndex()).getOwner().getNumArmies()-1);
+			world.getState(temp.getIndex()).getOwner().setNumStates(world.getState(temp.getIndex()).getOwner().getNumStates()+1);
 
 			if (world.getState(temp.getIndex()).getOwner() != tempPlayer ) {
 				if (tempPlayer == null) {
