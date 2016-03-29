@@ -38,14 +38,14 @@ public class Main {
 		playingPlayers.addAll(Arrays.asList( new Player[]
 				{ player1Start?player1:player2, !player1Start?player1:player2, neut1, neut2, neut3, neut4} ));
 		int indexOfThePlayerWhoHasToPlayTheTurn = 0;
-		while ( playingPlayers.size()>1 ){
+		while ( playingPlayers.contains(player1) && playingPlayers.contains(player2) ){
 			if (player1.getNumStates() == 0 || player2.getNumStates() == 0) break;
 			else{
 				Player currentPlayer = playingPlayers.get(indexOfThePlayerWhoHasToPlayTheTurn);
 				new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
 
 				if ( currentPlayer != player1 && currentPlayer!=player2 ){
-					new Toast("A.I not implemented yet, turn skipped", Toast.SHORT);
+					new Toast("Boot not implemented yet, turn skipped", Toast.SHORT);
 				}else{
 					ReinforcementPhase.performPhase(currentPlayer, world, window);
 					playingPlayers.removeAll( // performPhase will return the list of the losers.
