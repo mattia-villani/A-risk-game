@@ -17,7 +17,7 @@ import gui.Toast;
 import oracle.Oracle;
 
 public class AttackManager {
-	static final private boolean TEST_LUCKY = true;
+	static final private boolean TEST_LUCKY = false;
 	// this MUST be kept updated
 /*	static Map<Player, Set<State>> storedStatesThatAreAbleToAttack = new HashMap<>();
 	static Map<Player, Set<State>> storedStatesThatAdjacentToPlayerOwnerships = new HashMap<>();
