@@ -45,12 +45,11 @@ public class Main {
 				new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
 
 				if ( currentPlayer != player1 && currentPlayer!=player2 ){
-					new Toast("Boot not implemented yet, turn skipped", Toast.SHORT);
+					new Toast("I.A. not implemented yet, turn skipped", Toast.SHORT);
 				}else{
 					ReinforcementPhase.performPhase(currentPlayer, world, window);
-					playingPlayers.removeAll( // performPhase will return the list of the losers.
-							AttackPhase.performPhase(currentPlayer, world, window)
-							);
+					List <Player> losers = AttackPhase.performPhase(currentPlayer, world, window);
+					playingPlayers.removeAll( losers );
 					MovePhase.moveArmies(currentPlayer, world, window);
 				}
 				new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);

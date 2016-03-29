@@ -17,11 +17,12 @@ import gui.Toast;
 import oracle.Oracle;
 
 public class AttackManager {
+	static final private boolean TEST_LUCKY = true;
 	// this MUST be kept updated
-	static Map<Player, Set<State>> storedStatesThatAreAbleToAttack = new HashMap<>();
+/*	static Map<Player, Set<State>> storedStatesThatAreAbleToAttack = new HashMap<>();
 	static Map<Player, Set<State>> storedStatesThatAdjacentToPlayerOwnerships = new HashMap<>();
 	static Map<State, Set<State>> storedEnemyStatesThatAreAdjacentToState = new HashMap<>();
-
+*/
 	static public class ChangeOfMindException extends RuntimeException { 
 		private static final long serialVersionUID = 1L;
 		static public String throwCommand = "skip";
@@ -94,18 +95,15 @@ public class AttackManager {
 	private World world;
 
 	public AttackManager(Player player, World world){
-		losers.clear(); 
 		this.player = player;
 		this.world = world;
 	}
 	
-	public List<Player> getLosers(){ return losers; }
-	
-	public boolean isPlayerAbleToAttack(){
+	synchronized public boolean isPlayerAbleToAttack(){
 		return this.getStatesAbleToAttack().size()!=0;
 	}
 	
-	public <T> Set<T> intersect(Set<T> a, Set<T> b){
+	synchronized public <T> Set<T> intersect(Set<T> a, Set<T> b){
 		Set<T> result = new HashSet<T>();
 		Set<T> smaller = a, bigger = b;
 		if ( a.size()>b.size() ){
@@ -118,7 +116,7 @@ public class AttackManager {
 		return result;
 	}
 	
-	public Set<Integer> getSetOfArmyAmounts(State state, int max, int decreaseOf){
+	synchronized public Set<Integer> getSetOfArmyAmounts(State state, int max, int decreaseOf){
 		final int MAX = 3 ; 
 		assert max>=1 && max<=MAX : "Invalid max number" ;
 		int n = state.getArmy() - decreaseOf; 
@@ -129,19 +127,19 @@ public class AttackManager {
 		throw new RuntimeException("Controls are wrong");
 	}
 	
-	public void invalidateStores(State state){
+	synchronized public void invalidateStores(State state){/*
 		AttackManager.storedStatesThatAdjacentToPlayerOwnerships.remove(state.getOwner());
 		AttackManager.storedStatesThatAreAbleToAttack.remove(state.getOwner());
-		AttackManager.storedEnemyStatesThatAreAdjacentToState.remove(state);
+		AttackManager.storedEnemyStatesThatAreAdjacentToState.remove(state);*/
 	}
 	
-	public Set<Integer> getSetOfRangeNumberWithMax(int max){
+	synchronized public Set<Integer> getSetOfRangeNumberWithMax(int max){
 		Set<Integer> set = new HashSet<>();
 		for (int i=0;i<=max;i++) set.add(i);
 		return set;
 	}
 	
-	public void conquerContry( State from, State to, int with, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
+	synchronized public void conquerContry( State from, State to, int with, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
 			losers.add(to.getOwner());
@@ -158,14 +156,14 @@ public class AttackManager {
 		from.updateArmyWithVariation(-amountToMove);
 	}
 	
-	public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
+	synchronized public void performAttackFromStateWithArmyToState( State from, int with, State to, int defending, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		assert with != 0 && defending != 0 : "There should be some army fighting";
 		int originWith = with , originDefending = defending;
 		int[] attackingDices = new int[with];
 		int[] defendingDices = new int[defending];
 		int i,j;
-		for ( i=0; i<with; i++ ) attackingDices[i] = (int) (1+Math.random()*6);
-		for ( j=0; j<defending; j++ ) defendingDices[j] = (int) (1+Math.random()*6);
+		for ( i=0; i<with; i++ ) attackingDices[i] = TEST_LUCKY ? 6 : (int) (1+Math.random()*6) ;
+		for ( j=0; j<defending; j++ ) defendingDices[j] = TEST_LUCKY ? 1 : (int) (1+Math.random()*6);
 
 		FancyFullFrameAnimation.frame.startAnimation(new Rolling(FancyFullFrameAnimation.frame,new int[][]{ 
 			attackingDices, defendingDices
@@ -195,7 +193,7 @@ public class AttackManager {
 	}
 	
 	// loosers
-	public List<Player> attackLoop(
+	synchronized public List<Player> attackLoop(
 			Question<State> stateToAttackQuestion, 
 			Question<State> stateToAttackFromQuestion,
 			Question<Integer> numberOfArmyToAttackWithQuestion,
@@ -204,6 +202,7 @@ public class AttackManager {
 			Question<Integer> unitToMoveForFortifingAfterAttackQuestion){
 		boolean keepAttacking = true;
 		boolean keepAttackingTheSameStateFromTheSameState;
+		losers.clear(); 
 		while(keepAttacking)
 			try{
 				Set<State> stateWhichMayBeAttacked = this.getAttackableStates();
@@ -240,14 +239,14 @@ public class AttackManager {
 		return losers;
 	}
 	
-	public Set<State> getAttackableStates(){
+	synchronized public Set<State> getAttackableStates(){
 		Set<State> states = new HashSet<>();
 		for ( State state : getStatesAbleToAttack() )
 			states.addAll(getAdjacentEnemyStatesFromState(state));
 		return states;
 	}
 	
-	public Set<State> getStatesAbleToAttack(){
+	synchronized public Set<State> getStatesAbleToAttack(){
 		Set<State> states = new HashSet<>();
 		for ( State state : world.getStates() )
 			if ( state.getOwner().equals(player) && state.getArmy()>1 )
@@ -255,26 +254,28 @@ public class AttackManager {
 		return states;
 	}
 	
-	public Set<State> getAdjacentEnemyStatesFromState(State state){
-		if ( ! storedEnemyStatesThatAreAdjacentToState.containsKey(state) ){
+	synchronized public Set<State> getAdjacentEnemyStatesFromState(State state){
+//		if ( ! storedEnemyStatesThatAreAdjacentToState.containsKey(state) ){
 			Set<State> set = new HashSet<>();
 			for ( int index : state.getAdjacent() )
 				if ( world.getState(index).getOwner().equals(state.getOwner()) == false )
 					set.add( world.getState(index) );
-			storedEnemyStatesThatAreAdjacentToState.put(state, set);
-		}
-		return storedEnemyStatesThatAreAdjacentToState.get(state);		
+//			storedEnemyStatesThatAreAdjacentToState.put(state, set);
+//		}
+//		return storedEnemyStatesThatAreAdjacentToState.get(state);		
+			return set;
 	}
 	
-	public Set<State> getAdjacentStatesFromPlayerOwnerships(){
-		if ( ! storedStatesThatAdjacentToPlayerOwnerships.containsKey(player) ){
+	synchronized public Set<State> getAdjacentStatesFromPlayerOwnerships(){
+		//if ( ! storedStatesThatAdjacentToPlayerOwnerships.containsKey(player) ){
 			Set<State> set = new HashSet<>();
 			for ( State state : world.getStates() )
 				if ( state.getOwner().equals(player) )
 					set.addAll( getAdjacentEnemyStatesFromState(state) );
-			storedStatesThatAdjacentToPlayerOwnerships.put(player, set);
-		}
-		return storedStatesThatAdjacentToPlayerOwnerships.get(player);
+		//	storedStatesThatAdjacentToPlayerOwnerships.put(player, set);
+		//}
+		//return storedStatesThatAdjacentToPlayerOwnerships.get(player);
+			return set;
 	}
 
 	

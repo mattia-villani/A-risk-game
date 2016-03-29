@@ -30,16 +30,17 @@ public class AttackPhase {
 	}
 
 	static private class StateQuestion extends AttackManager.Question<State>{
-		static Map<Set<State>,Oracle> oracles = new HashMap<>() ;
-		static final private int sizeBeforeClearing = 20; // otherwise the ram will be wasted
+		//static Map<Set<State>,Oracle> oracles = new HashMap<>() ;
+		//static final private int sizeBeforeClearing = 20; // otherwise the ram will be wasted
 		@Override
 		public State askQuestion(Set<State> context, String title) {
 			new Toast(title,Toast.LONG);
-			if ( oracles.get(context) == null )
-				oracles.put(context, createExtendedOracle(createStringSet(context), "Answer with a state name") );
+		//	if ( oracles.get(context) == null )
+		//		oracles.put(context, createExtendedOracle(createStringSet(context), "Answer with a state name") );
 			gui.setText(title);
-			gui.enableOracle(oracles.get(context));
-			if ( oracles.size()>=sizeBeforeClearing ) oracles.clear(); // free memory
+			gui.enableOracle(createExtendedOracle(createStringSet(context), "Answer with a state name"));
+	//		gui.enableOracle(oracles.get(context));
+	//		if ( oracles.size()>=sizeBeforeClearing ) oracles.clear(); // free memory
 			try{
 				String ret = throwExceptionsIfControlsAreUsed(gui.getCommand());
 				gui.disableOracle();
