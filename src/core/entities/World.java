@@ -31,7 +31,7 @@ abstract public class World {
 	protected List<Continent> continents;
 	/** list of players in the world ... */
 	private static ArrayList <Player> players = new ArrayList<Player>();
-	
+	private static TerritoryDeck deck = new TerritoryDeck(true);
 	/** flag that says if something changed in the world ( this will be used by the renderer )*/
 	private boolean invalidated = true;
 	
@@ -93,5 +93,26 @@ abstract public class World {
 		World.players = players;
 	}
 
+	public static boolean givePlayerCard(Player player){
+
+		if (player.getHand().size() == 5) return false;
+
+
+		player.addToHand(deck.drawTerritoryCard());
+
+		return true;
+
+		}
+	
+	public static boolean returnCardsToDeck(Player player, String types){
+
+		if (player.getHand().size() < 3) return false;
+
+		if (types.length() > 3) return false;
+
+		return (player.removeHand(types, deck));
+
+
+		}
 	
 }

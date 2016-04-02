@@ -6,6 +6,10 @@
 package core.entities;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import core.Constants;
 
 public class Player {
 	/**
@@ -20,13 +24,15 @@ public class Player {
 	 * Unmodificable attribute color, it is just initialized and represent the color of the player to be shown in the map
 	 */
 	private Color color;
-	
+
 	private int numArmies;
-	
+
 	private int numStates;
-	
+
 	private int id;
-	
+
+	private ArrayList<TerritoryCard> hand;
+
 	public int getNumStates() {
 		return numStates;
 	}
@@ -45,6 +51,7 @@ public class Player {
 		this.color=color;
 		this.numArmies = 0;
 		this.id = id;
+		this.hand = new ArrayList<TerritoryCard>();
 	}
 
 	public int getId(){
@@ -54,7 +61,7 @@ public class Player {
 	public int hashCode(){
 		return getId();
 	}
- 	public int getNumArmies() {
+	public int getNumArmies() {
 		return numArmies;
 	}
 
@@ -77,7 +84,108 @@ public class Player {
 	public Color getColor() {
 		return color;
 	}
-	
+
+	public ArrayList<TerritoryCard> getHand() {
+
+		return hand;
+
+	}
+	public void addToHand(TerritoryCard added) {
+
+		this.hand.add(added);
+
+	}
+
+
+
+	/*
+
+	 * added without wifi 
+
+	 */
+
+	public boolean removeHand (String types, TerritoryDeck deck){
+
+
+
+
+		LinkedList<TerritoryCard> returnList = new LinkedList<TerritoryCard>();
+
+		for (int i = 0; i < types.length(); ++i){
+
+			String typeString = "";
+
+			char type = types.charAt(i);
+
+
+
+			if (type == 'i') typeString = "INFANTRY";
+
+			else if (type == 'c') typeString = "CAVALRY";
+
+			else if (type == 'a') typeString = "ARTILLERY";
+
+			else typeString = "WILD";
+
+
+
+			for (TerritoryCard card : hand){
+
+				if (Constants.CARD_TYPES[card.getIndex()] == typeString){
+
+					returnList.add(card);
+
+					hand.remove(card);
+
+					break;
+
+				}
+
+			}
+
+		}
+
+
+		return removeHand(returnList, deck);
+
+	}
+
+	/*
+
+	 * added without wifi 
+
+	 */
+
+	public boolean removeHand (LinkedList<TerritoryCard> toDeck, TerritoryDeck deck){
+
+		if (toDeck.size() < 3){
+
+			for (int i = 0; i < toDeck.size(); ++i){
+
+				hand.add(toDeck.pop());
+
+			}
+
+			return false;
+
+		}
+
+		else {
+
+			for (int i = 0; i < toDeck.size(); ++i){
+
+				deck.addNewTerritoryCard((toDeck.pop()).getIndex());
+
+			}
+
+			return true;
+
+		}
+
+
+
+	}
+
 	public int decreaseAndGetNumOfState(int decreaseOf){
 		this.numStates -= decreaseOf;
 		return this.numStates;
@@ -86,5 +194,5 @@ public class Player {
 	public String toString(){
 		return getName();
 	}
-	
+
 }
