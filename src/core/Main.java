@@ -52,7 +52,8 @@ public class Main {
 					new Toast("I.A. not implemented yet, turn skipped", Toast.SHORT);
 					new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 				}else{
-					ReinforcementPhase.performPhase(currentPlayer, world, window);
+					int surp = ReinforcementPhase.performChangeOfCardPhase(currentPlayer, world, window, ReinforcementPhase.HumanConfQuestion.class);
+					ReinforcementPhase.performPhase(currentPlayer, world, window, surp);
 					List <Player> losers = AttackPhase.performPhase(currentPlayer, world, window);
 					playingPlayers.removeAll( losers );
 					if ( !losers.contains(player1) && !losers.contains(player2)){

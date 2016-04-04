@@ -73,11 +73,16 @@ public class AttackManager {
 				throw new OutOfContextException( outOfContextMessage() );
 			return result;
 		}
-		final public Oracle createExtendedOracle(Set<String> context, String prefix){
+		public Oracle createExtendedOracle(Set<String> context, String prefix){
+			return createExtendedOracle(context, prefix, true);
+		}
+		protected final Oracle createExtendedOracle(Set<String> context, String prefix, boolean putControls){
 			List<String> extendedContext = new LinkedList<>();
 			extendedContext.addAll(context);
-			extendedContext.add(0,ChangeOfMindException.throwCommand);
-			extendedContext.add(1,BreakException.throwCommand);
+			if ( putControls ){
+				extendedContext.add(0,ChangeOfMindException.throwCommand);
+				extendedContext.add(1,BreakException.throwCommand);
+			}
 			String options = "";
 			for ( String string : extendedContext )
 				options = (options.length()>0? options+"|" : "") + string;
