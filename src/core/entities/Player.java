@@ -106,9 +106,6 @@ public class Player {
 
 	public boolean removeHand (String types, TerritoryDeck deck){
 
-
-
-
 		LinkedList<TerritoryCard> returnList = new LinkedList<TerritoryCard>();
 
 		for (int i = 0; i < types.length(); ++i){

@@ -114,9 +114,11 @@ public class ReinforcementPhase {
 				}catch(AttackManager.ChangeOfMindException e){ notify("Can't perform this action"); 
 				}catch(AttackManager.BreakException e){ notify("Can't perform this action"); }
 		else result = choseWhatToChangeQuestion.askQuestion(commands, title);
-		if ( World.returnCardsToDeck (player, result) == false )
+
+		int armiesGiven =  World.returnCardsToDeck (player, result);
+		if (armiesGiven == 0 )
 			throw new RuntimeException("This is strange...");
-		return getValueInArmyOf(result);
+		return armiesGiven;
 	}
 	
 	static void performPhase( Player player, World world, GUI gui, int surpluss ){

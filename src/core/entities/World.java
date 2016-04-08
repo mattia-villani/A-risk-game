@@ -19,11 +19,11 @@ abstract public class World {
 	 */	
 
 	final static private boolean verbose = true;
-	
+
 	/** VIRTUAL_WIDTH/HEIGHT are the size of the rendered world. This is the referiment for the coords of the states */
 	final public static int VIRTUAL_WIDTH = Constants.FRAME_WIDTH;
 	final public static int VIRTUAL_HEIGHT = Constants.FRAME_HEIGHT;
-	
+
 	/** WORNING: for the lists the positions MUST be the same of the indexs of the object listed. */
 	/** list of states in the world... */
 	protected List<State> states;
@@ -34,17 +34,17 @@ abstract public class World {
 	private static TerritoryDeck deck = new TerritoryDeck(true);
 	/** flag that says if something changed in the world ( this will be used by the renderer )*/
 	private boolean invalidated = true;
-	
+
 	/**
 	 * <p>	Constructor. It just calls the init method 
 	 */
 	public World (){ init(); }
-	
+
 	/**
 	 * <p>	Initializer method, it must be implemented by the inheriting class 
 	 */
 	abstract protected void init();
-	
+
 	/**
 	 * <p>	Getter. 
 	 * 		@return the list of continents.
@@ -60,7 +60,7 @@ abstract public class World {
 	public List<State> getStates(){
 		return states;
 	}
-	
+
 	/**
 	 * <p> 	Getter
 	 * <br>	WARNING: no checks over index are done, so it may return an error
@@ -70,7 +70,7 @@ abstract public class World {
 	public State getState( int index ){
 		return states.get(index);
 	}
-	
+
 	/**
 	 * <p>	Acquires a state by name
 	 * 		@param string the name of the state
@@ -84,7 +84,7 @@ abstract public class World {
 		}
 		return null;
 	}
-	
+
 	public static ArrayList<Player> getPlayers() {
 		return players;
 	}
@@ -102,17 +102,33 @@ abstract public class World {
 
 		return true;
 
+	}
+
+	public static int returnCardsToDeck(Player player, String types){
+
+		if (player.getHand().size() != 3) return 0;
+
+		if (player.removeHand(types, deck)) return getValue(types);
+		else  return 0;
+
+	}
+	public static int getValue(String types){
+		
+		int[] counts = new int[4]; //A, C, I, W
+		for (int i = 0; i < types.length(); ++i){
+			if (types.charAt(i) == 'a') counts[0]++;
+			if (types.charAt(i) == 'c') counts[1]++;
+			if (types.charAt(i) == 'i') counts[2]++;
+			if (types.charAt(i) == 'w') counts[3]++;
 		}
-	
-	public static boolean returnCardsToDeck(Player player, String types){
+		if (counts[0] > 1) return 8;
+		if (counts[1] > 1) return 6;
+		if (counts[2] > 1) return 4;
+		else return 10;
+		
+		
+		
+	}
 
-		if (player.getHand().size() < 3) return false;
 
-		if (types.length() > 3) return false;
-
-		return (player.removeHand(types, deck));
-
-
-		}
-	
 }
