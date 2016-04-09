@@ -1,16 +1,13 @@
 package core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
-import core.AttackManager.BreakException;
-import core.AttackManager.OutOfContextException;
-import core.AttackManager.Question;
+import core.entities.Question.BreakException;
+import core.entities.Question.ChangeOfMindException;
+import core.entities.QuestionsForGenericPlayer.ConfQuestion;
 import core.Constants;
 import core.entities.Player;
 import core.entities.State;
@@ -20,34 +17,10 @@ import gui.FancyFullFrameAnimation;
 import gui.GUI;
 import gui.Notification;
 import gui.Toast;
-import oracle.Oracle;
 import oracle.Tree;
 
 public class ReinforcementPhase {
 	static GUI gui = null;
-	static abstract public class ConfQuestion extends AttackManager.Question<String>{
-		boolean skipAllowed = true;
-		final public void setSkipAllowed(boolean skipAllowed){ this.skipAllowed = skipAllowed; }		
-		@Override 
-		public Oracle createExtendedOracle(Set<String> context, String prefix){ return super.createExtendedOracle(context, prefix, skipAllowed); }		
-	}
-	static public class HumanConfQuestion extends ConfQuestion{
-		@Override
-		public String askQuestion(Set<String> context, String title)
-				throws OutOfContextException, RuntimeException, BreakException {
-			new Toast(title,Toast.LONG);
-			gui.setText(title);
-			gui.enableOracle(super.createExtendedOracle(context, "Chose a card conf"));
-			try{
-				String ret = throwExceptionsIfControlsAreUsed(gui.getCommand());
-				gui.disableOracle();
-				return ret;
-			}catch( Exception e ){
-				gui.disableOracle();
-				throw e;
-			}
-		}
-	}
 	
 	static private final String A = "ARTILLERY", C = "CAVALRY", I = "INFANTRY", W = "WILD";
 	static private final String[][] CONFIGURATIONS = new String[][]{ //INFANTRY, CAVALRY, ARTILLERY or WILD
@@ -71,9 +44,6 @@ public class ReinforcementPhase {
 		}		
 		return set;
 	}
-	static int getValueInArmyOf(String str){
-		return 1; //TODO!
-	}
 	static List<String[]> getPossibleConfigurations(String[] types){
 		List<String[]> result = new LinkedList<>();
 		if ( types.length >= 3 ) 
@@ -90,7 +60,7 @@ public class ReinforcementPhase {
 		new Toast.ErrorToast(str, Toast.SHORT);
 	}
 	
-	static int performChangeOfCardPhase(Player player, World world, GUI gui, Class<? extends ConfQuestion > questionClass){
+	static int performChangeOfCardPhase(Player player, World world, GUI gui, ConfQuestion confQuestion){
 		ReinforcementPhase.gui = gui;
 		List<TerritoryCard> hand = player.getHand();
 		String[] types = new String[hand.size()];
@@ -103,20 +73,19 @@ public class ReinforcementPhase {
 		boolean toManyCards = hand.size()>=5;
 		String title = "Chose the configuration to use";
 		boolean looping = true;
-		ConfQuestion choseWhatToChangeQuestion = null;
-		try { choseWhatToChangeQuestion = questionClass.newInstance(); } catch (InstantiationException | IllegalAccessException e1) {e1.printStackTrace();}
+		ConfQuestion choseWhatToChangeQuestion = confQuestion;
 		choseWhatToChangeQuestion.setSkipAllowed( ! toManyCards);
 		if ( toManyCards ) 
 			while ( looping ) 
 				try{
 					result = choseWhatToChangeQuestion.notTrivialValidatedAskQuestion(commands, title);
 					looping = false;
-				}catch(AttackManager.ChangeOfMindException e){ notify("Can't perform this action"); 
-				}catch(AttackManager.BreakException e){ notify("Can't perform this action"); }
+				}catch(ChangeOfMindException e){ notify("Can't perform this action"); 
+				}catch(BreakException e){ notify("Can't perform this action"); }
 		else result = choseWhatToChangeQuestion.askQuestion(commands, title);
 
 		int armiesGiven =  World.returnCardsToDeck (player, result);
-		if (armiesGiven == 0 )
+		if ( armiesGiven == 0 )
 			throw new RuntimeException("This is strange...");
 		return armiesGiven;
 	}

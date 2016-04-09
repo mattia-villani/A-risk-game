@@ -52,11 +52,18 @@ public class Main {
 					new Toast("I.A. not implemented yet, turn skipped", Toast.SHORT);
 					new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 				}else{
-					int surp = ReinforcementPhase.performChangeOfCardPhase(currentPlayer, world, window, ReinforcementPhase.HumanConfQuestion.class);
+					int surp = ReinforcementPhase.performChangeOfCardPhase(currentPlayer, world, window, currentPlayer.getQuestions(window).getConfQuestion());
 					ReinforcementPhase.performPhase(currentPlayer, world, window, surp);
+					// this returns NULL if currentPlayer conquered no country; a list (it can be empty) if at least one country was conquered; and a list with value if currentPlayer conquered and kicked another player out.
 					List <Player> losers = AttackPhase.performPhase(currentPlayer, world, window);
-					playingPlayers.removeAll( losers );
-					if ( !losers.contains(player1) && !losers.contains(player2)){
+					if ( losers != null ){
+						playingPlayers.removeAll( losers );
+						if ( !losers.contains(player1) && !losers.contains(player2)){
+							World.givePlayerCard(currentPlayer);
+							MovePhase.moveArmies(currentPlayer, world, window);
+							new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
+						}
+					}else {
 						MovePhase.moveArmies(currentPlayer, world, window);
 						new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 					}
@@ -173,17 +180,17 @@ public class Main {
 	 * <br>	The 4 neutral player names are hardcoded.
 	 */
 	public static void createPlayers(){
-		player1 = new Player(0,player1Name, new Color(0, 0, 180));
+		player1 = new HumanPlayer(0,player1Name, new Color(0, 0, 180));
 		World.getPlayers().add(player1);
-		player2 = new Player(1,player2Name, new Color(210, 0, 0));
+		player2 = new HumanPlayer(1,player2Name, new Color(210, 0, 0));
 		World.getPlayers().add(player2);
-		neut1 = new Player(2,"Neutral 1", Color.magenta);
+		neut1 = new NeutralPlayer(2,"Neutral 1", Color.magenta);
 		World.getPlayers().add(neut1);
-		neut2 = new Player(3,"Neutral 2", new Color(0, 140, 0));
+		neut2 = new NeutralPlayer(3,"Neutral 2", new Color(0, 140, 0));
 		World.getPlayers().add(neut2);
-		neut3 = new Player(4,"Neutral 3", Color.gray);
+		neut3 = new NeutralPlayer(4,"Neutral 3", Color.gray);
 		World.getPlayers().add(neut3);
-		neut4 = new Player(5,"Neutral 4", Color.BLACK);
+		neut4 = new NeutralPlayer(5,"Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
 
 		window.displayPlayerList(World.getPlayers());

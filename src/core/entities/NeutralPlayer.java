@@ -7,6 +7,8 @@ package core.entities;
 
 import java.awt.Color;
 
+import gui.GUI;
+
 public class NeutralPlayer extends Player {
 	/**
 	 * Represent a specific type of player: the neutral one! it is charaterized to be uncontrolled by users.
@@ -26,6 +28,11 @@ public class NeutralPlayer extends Player {
 	 */
 	public NeutralPlayer(int id, String name){
 		super(id, name, Color.GRAY);
+	}
+
+	@Override
+	public QuestionsForGenericPlayer getQuestions(GUI gui) {
+		return null;
 	}
 
 }

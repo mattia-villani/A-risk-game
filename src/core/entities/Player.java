@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import core.Constants;
+import gui.GUI;
 
-public class Player {
+public abstract class Player {
 	/**
 	 * This class represent a player.
 	 */
@@ -41,6 +42,11 @@ public class Player {
 		this.numStates = numStates;
 	}
 
+	/**
+	 * Query the behaviour of the player through the questions 
+	 */
+	abstract public QuestionsForGenericPlayer getQuestions(GUI gui);
+	
 	/**
 	 * Constructor
 	 * @param name of the player

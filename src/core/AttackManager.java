@@ -1,106 +1,27 @@
 package core;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import core.entities.Player;
+import core.entities.Question;
+import core.entities.Question.*;
+import core.entities.QuestionsForGenericPlayer;
 import core.entities.State;
 import core.entities.World;
 import gui.FancyFullFrameAnimation;
 import gui.Notification;
 import gui.Rolling;
 import gui.Toast;
-import oracle.Oracle;
 
 public class AttackManager {
-	static final private boolean TEST_LUCKY = false;
-	// this MUST be kept updated
-/*	static Map<Player, Set<State>> storedStatesThatAreAbleToAttack = new HashMap<>();
-	static Map<Player, Set<State>> storedStatesThatAdjacentToPlayerOwnerships = new HashMap<>();
-	static Map<State, Set<State>> storedEnemyStatesThatAreAdjacentToState = new HashMap<>();
-*/
-	static public class ChangeOfMindException extends RuntimeException { 
-		private static final long serialVersionUID = 1L;
-		static public String throwCommand = "skip";
-	}
-	static public class EndOfGameException extends RuntimeException { 
-		private static final long serialVersionUID = 1L;
-	}
-	static public class BreakException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		static public String throwCommand = "break";
-	}
-	// shouldn't be possible to throw but a break operator will be introduced during the attack phases
-	static public class OutOfContextException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		public OutOfContextException(String message){
-			super(message);
-			new Toast.ErrorToast(message, Toast.LONG);
-		}
-	}
-	public static abstract class Question<T>{
-		static final public String YES = "yes", NO= "no";
-		static final public Set<String> yesNoSet = new HashSet<>();
-		static final public Set<Integer> oneSet = new HashSet<>();
-		static final public Set<Integer> twoSet = new HashSet<>();
-		static final public Set<Integer> threeSet = new HashSet<>();
-		static {
-			yesNoSet.add(YES);
-			yesNoSet.add(NO);
-			oneSet.add(1);
-			twoSet.add(1);
-			twoSet.add(2);
-			threeSet.add(1);
-			threeSet.add(2);
-			threeSet.add(3);
-		}
-		abstract public T askQuestion(Set<T> context, String title) throws OutOfContextException, RuntimeException, BreakException;
-		public String outOfContextMessage(){
-			return "The value entered is invalid";
-		}
-		final public T notTrivialValidatedAskQuestion(Set<T> context, String title){
-			if ( context.size() == 0 ) throw new RuntimeException("Something is wrong: this set shouldn't be empty");
-			if ( context.size() == 1 ) return context.iterator().next();
-			return validatedAskQuestion(context,title);
-		}
-		final public T validatedAskQuestion(Set<T> context,String title) {
-			T result = askQuestion(context,title);
-			if ( context.contains(result) == false ) 
-				throw new OutOfContextException( outOfContextMessage() );
-			return result;
-		}
-		public Oracle createExtendedOracle(Set<String> context, String prefix){
-			return createExtendedOracle(context, prefix, true);
-		}
-		protected final Oracle createExtendedOracle(Set<String> context, String prefix, boolean putControls){
-			List<String> extendedContext = new LinkedList<>();
-			extendedContext.addAll(context);
-			if ( putControls ){
-				extendedContext.add(0,ChangeOfMindException.throwCommand);
-				extendedContext.add(1,BreakException.throwCommand);
-			}
-			String options = "";
-			for ( String string : extendedContext )
-				options = (options.length()>0? options+"|" : "") + string;
-			return new Oracle(extendedContext, prefix+"<"+options+">");
-		}
-		final public String throwExceptionsIfControlsAreUsed(String command){
-			if ( ChangeOfMindException.throwCommand.equals(command) ) 
-				throw new ChangeOfMindException();
-			else if ( BreakException.throwCommand.equals(command) ) 
-				throw new BreakException();
-			return command; 
-		}
-	}
-	
-	static private List<Player> losers = new LinkedList<Player>();
-	
+	static final private boolean TEST_LUCKY = false;	
+		
 	private Player player;
 	private World world;
+	private List<Player> losers = null;
 
 	public AttackManager(Player player, World world){
 		this.player = player;
@@ -135,12 +56,6 @@ public class AttackManager {
 		throw new RuntimeException("Controls are wrong");
 	}
 	
-	synchronized public void invalidateStores(State state){/*
-		AttackManager.storedStatesThatAdjacentToPlayerOwnerships.remove(state.getOwner());
-		AttackManager.storedStatesThatAreAbleToAttack.remove(state.getOwner());
-		AttackManager.storedEnemyStatesThatAreAdjacentToState.remove(state);*/
-	}
-	
 	synchronized public Set<Integer> getSetOfRangeNumberWithMax(int max){
 		Set<Integer> set = new HashSet<>();
 		for (int i=0;i<=max;i++) set.add(i);
@@ -151,6 +66,7 @@ public class AttackManager {
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		boolean hardExit = false;
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
+			if ( losers == null ) losers = new LinkedList<Player>();
 			losers.add(to.getOwner());
 			new Notification(FancyFullFrameAnimation.frame, to.getOwner().getName()+" lost", to.getOwner(), Notification.SHORT);
 			if ( Main.isPlayerHuman(to.getOwner()) ) hardExit = true;
@@ -158,8 +74,6 @@ public class AttackManager {
 		to.setOwner( from.getOwner() );
 		to.setArmy( with );
 		from.updateArmyWithVariation(-with);
-		invalidateStores(from);
-		invalidateStores(to);
 
 		if ( hardExit ) throw new EndOfGameException();
 		else{// fortification
@@ -206,36 +120,30 @@ public class AttackManager {
 	}
 	
 	// loosers
-	synchronized public List<Player> attackLoop(
-			Question<State> stateToAttackQuestion, 
-			Question<State> stateToAttackFromQuestion,
-			Question<Integer> numberOfArmyToAttackWithQuestion,
-			Question<Integer> numberOfArmyToDefendWithQuestion,
-			Question<String> keepAttackingTheSameStateFromTheSameStateQuestion,
-			Question<Integer> unitToMoveForFortifingAfterAttackQuestion){
+	synchronized public List<Player> attackLoop( QuestionsForGenericPlayer questions ){
 		boolean keepAttacking = true;
 		boolean keepAttackingTheSameStateFromTheSameState;
-		losers.clear(); 
+		losers = null; 
 		while(keepAttacking)
 			try{
 				Set<State> stateWhichMayBeAttacked = this.getAttackableStates();
-				State stateToAttack = stateToAttackQuestion.validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", choose the country you would like to attack, or type 'skip' to end your attack phase.");
-				State attackingState = stateToAttackFromQuestion.notTrivialValidatedAskQuestion(
+				State stateToAttack = questions.getStateToAttackQuestion().validatedAskQuestion(stateWhichMayBeAttacked,player.getName()+", choose the country you would like to attack, or type 'skip' to end your attack phase.");
+				State attackingState = questions.getStateToAttackFromQuestion().notTrivialValidatedAskQuestion(
 						// possible attacking states
 						intersect( this.getStatesAbleToAttack(), this.getAdjacentEnemyStatesFromState(stateToAttack) ),
 						player.getName()+", choose the country you would like to attack "+stateToAttack.getName()+" with"
 						);
 				do{
 					keepAttackingTheSameStateFromTheSameState = false;
-					Integer attackingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
+					Integer attackingAmount = questions.getNumberOfArmyToAttackWithQuestion().notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(attackingState, 3, 1), 
 							player.getName()+", choose how many units you wish to attack "+stateToAttack.getName()+" with from "+attackingState.getName());
-					Integer defendingAmount = numberOfArmyToAttackWithQuestion.notTrivialValidatedAskQuestion( 
+					Integer defendingAmount = questions.getNumberOfArmyToAttackWithQuestion().notTrivialValidatedAskQuestion( 
 							this.getSetOfArmyAmounts(stateToAttack, 2, 0),
 							stateToAttack.getOwner().getName()+", choose with how many units from "+stateToAttack.getName()+" you wish defend with against the attack from "+attackingState.getName());
-					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount, unitToMoveForFortifingAfterAttackQuestion );
+					performAttackFromStateWithArmyToState( attackingState, attackingAmount, stateToAttack, defendingAmount, questions.getUnitToMoveForFortifingAfterAttackQuestion() );
 					if ( this.getStatesAbleToAttack().contains(attackingState) && !stateToAttack.getOwner().equals(player) ) 
-						keepAttackingTheSameStateFromTheSameState = keepAttackingTheSameStateFromTheSameStateQuestion.askQuestion(Question.yesNoSet,
+						keepAttackingTheSameStateFromTheSameState = questions.getKeepAttackingTheSameStateFromTheSameStateQuestion().askQuestion(Question.yesNoSet,
 								player.getName()+", would you like to keep inviding "+stateToAttack.getName()+" from "+attackingState.getName()
 								).toLowerCase().equals(Question.YES.toLowerCase());
 				}while ( keepAttackingTheSameStateFromTheSameState );
@@ -270,27 +178,19 @@ public class AttackManager {
 	}
 	
 	synchronized public Set<State> getAdjacentEnemyStatesFromState(State state){
-//		if ( ! storedEnemyStatesThatAreAdjacentToState.containsKey(state) ){
-			Set<State> set = new HashSet<>();
-			for ( int index : state.getAdjacent() )
-				if ( world.getState(index).getOwner().equals(state.getOwner()) == false )
-					set.add( world.getState(index) );
-//			storedEnemyStatesThatAreAdjacentToState.put(state, set);
-//		}
-//		return storedEnemyStatesThatAreAdjacentToState.get(state);		
-			return set;
+		Set<State> set = new HashSet<>();
+		for ( int index : state.getAdjacent() )
+			if ( world.getState(index).getOwner().equals(state.getOwner()) == false )
+				set.add( world.getState(index) );
+		return set;
 	}
 	
 	synchronized public Set<State> getAdjacentStatesFromPlayerOwnerships(){
-		//if ( ! storedStatesThatAdjacentToPlayerOwnerships.containsKey(player) ){
-			Set<State> set = new HashSet<>();
-			for ( State state : world.getStates() )
-				if ( state.getOwner().equals(player) )
-					set.addAll( getAdjacentEnemyStatesFromState(state) );
-		//	storedStatesThatAdjacentToPlayerOwnerships.put(player, set);
-		//}
-		//return storedStatesThatAdjacentToPlayerOwnerships.get(player);
-			return set;
+		Set<State> set = new HashSet<>();
+		for ( State state : world.getStates() )
+			if ( state.getOwner().equals(player) )
+				set.addAll( getAdjacentEnemyStatesFromState(state) );
+		return set;
 	}
 
 	
