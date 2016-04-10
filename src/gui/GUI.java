@@ -238,6 +238,10 @@ public class GUI {
 		return;
 	}
 	
+	/**
+	 * <p>	Displays the player's hands.
+	 * 		@param players ArrayList of players in the world.
+	 */
 	public void displayPlayerHands(ArrayList<Player> players) {
 		playerPanel1.requestToDrawHand(players);
 		playerPanel2.requestToDrawHand(players);

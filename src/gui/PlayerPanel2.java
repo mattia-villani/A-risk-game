@@ -5,7 +5,6 @@
 
 package gui;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import core.entities.Player;
 import core.entities.TerritoryCard;
@@ -71,15 +70,18 @@ public class PlayerPanel2 extends JPanel {
 		}
 		
 		for (int i=0; i<5; i++){
-			String cardName="none";
-			if (displaycards[i]!=null) cardName=displaycards[i].getStateName();
 			int y=30;
 			int x=15+(i*95);
 			if (i>2) {
 				y=160;
 				x=62+((i-3)*95);
 			}
-		g.drawImage(ImageIO.read(getClass().getResourceAsStream("/images/cards/"+cardName+".png")),x,y,80,120,null);	
+			
+			int index;
+			if (displaycards[i]==null) index=44;
+			else index=displaycards[i].getIndex();
+			
+			g.drawImage(TerritoryCard.getImage(index),x,y,80,120,null);
 		}
 		return;
 	}
