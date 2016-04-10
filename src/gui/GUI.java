@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
-
 import core.Constants;
 import core.entities.Player;
-import core.entities.State;
 import core.entities.World;
 import gui.map.MapRenderer;
 import oracle.Oracle;
@@ -27,8 +25,11 @@ public class GUI {
 	private static MapPanel mapPanel;
 	private static RightBorder rightBorder;
 	private static LeftBorder leftBorder;
+	private static CentreBorder centreBorder;
 	private static TextArea textArea;
 	private static PlayerList playerList;
+	private static PlayerPanel1 playerPanel1;
+	private static PlayerPanel2 playerPanel2;
 	private static MapRenderer worldMap;
 	private World gameWorld;
 	private Animator animator;
@@ -45,40 +46,28 @@ public class GUI {
 	public GUI (World world) throws IOException {
 		gameWorld = world;
 		animator = new Animator();	
-		uiFrame=new FancyFullFrameAnimation();
-		uiFrame.getContentPane().setPreferredSize(new Dimension(1000, 700));
+		uiFrame = new FancyFullFrameAnimation();
+		uiFrame.getContentPane().setPreferredSize(new Dimension(1350, 700));
 		uiFrame.setTitle("Risk: The Game of Software Engineering");
 		uiFrame.setResizable(false);
 		uiFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		uiFrame.addWindowListener(new closure());
-
-		// Grid Bag Layout
-		uiFrame.getContentPane().setLayout(new GridBagLayout());
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-		gbc.insets = new Insets(0,0,0,0);
+		uiFrame.getContentPane().setLayout(null);
 
 		// Left wooden image
 		leftBorder = new LeftBorder();
-		gbc.gridx = 1;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 3;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.VERTICAL;
-		uiFrame.getContentPane().add(leftBorder, gbc);
+		leftBorder.setBounds(0,0,50,700);
+		uiFrame.getContentPane().add(leftBorder);
 
+		// Centre wooden image
+		centreBorder = new CentreBorder();
+		centreBorder.setBounds(950,0,50,700);
+		uiFrame.getContentPane().add(centreBorder);
+		
 		// Right wooden image
 		rightBorder = new RightBorder();
-		gbc.gridx = 4;
-		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 3;
-		gbc.weightx = 4;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		uiFrame.getContentPane().add(rightBorder, gbc);
+		rightBorder.setBounds(1300,0,50,700);
+		uiFrame.getContentPane().add(rightBorder);
 
 		// Central map image and world graph overlay
 		mapPanel = new MapPanel();
@@ -90,31 +79,18 @@ public class GUI {
 		layeredPane.add(mapPanel,1);
 		layeredPane.add(worldMap,0);
 		layeredPane.addMouseListener(new MouseInput());
-		gbc.gridx = 2;
-		gbc.gridy = 1;
-		gbc.gridwidth = 2;
-		gbc.gridheight = 1;
-		gbc.weightx = 2;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		uiFrame.getContentPane().add(layeredPane, gbc);
+		layeredPane.setBounds(50,0,900,600);
+		uiFrame.getContentPane().add(layeredPane);
 
 		// Display area
 		textArea = new TextArea();
 		JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane.setPreferredSize(new Dimension(650, 64));
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		DefaultCaret caret = (DefaultCaret)textArea.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-		gbc.gridx = 2;
-		gbc.gridy = 2;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 2;
-		gbc.weighty = 2;
-		gbc.fill = GridBagConstraints.BOTH;
-		uiFrame.getContentPane().add(scrollPane, gbc);
+		scrollPane.setBounds(51, 601, 899, 69);
+		uiFrame.getContentPane().add(scrollPane);
 
 		// User input area
 		inputArea = new OracledTextField() {
@@ -133,27 +109,27 @@ public class GUI {
 		inputArea.addActionListener(new InputAction());
 		inputArea.setBackground(new Color(244, 239, 202));
 		inputArea.setMargin(new Insets(5,5,5,5));
+		inputArea.setBounds(51, 670, 899, 30);
 		uiFrame.setInputToDisable(inputArea);
-		gbc.gridx = 2;
-		gbc.gridy = 3;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 1;
-		gbc.weightx = 2;
-		gbc.weighty = 3;
-		gbc.fill = GridBagConstraints.BOTH;
-		uiFrame.getContentPane().add(inputArea, gbc);
-
+		uiFrame.getContentPane().add(inputArea);
+	
+		// Player 1 panel display
+		playerPanel1 = new PlayerPanel1();
+		playerPanel1.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+		playerPanel1.setBounds(1000, 0, 300, 300);
+		uiFrame.getContentPane().add(playerPanel1);
+		
+		// Player 2 panel display
+		playerPanel2 = new PlayerPanel2();
+		playerPanel2.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+		playerPanel2.setBounds(1000, 300, 300, 300);
+		uiFrame.getContentPane().add(playerPanel2);
+		
 		// Player list display
 		playerList = new PlayerList();
 		playerList.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
-		gbc.gridx = 3;
-		gbc.gridy = 2;
-		gbc.gridwidth = 1;
-		gbc.gridheight = 2;
-		gbc.weightx = 3;
-		gbc.weighty = 3;
-		gbc.fill = GridBagConstraints.BOTH;
-		uiFrame.getContentPane().add(playerList, gbc);
+		playerList.setBounds(1001, 600, 299, 100);
+		uiFrame.getContentPane().add(playerList);
 
 		uiFrame.pack();
 		uiFrame.setVisible(true);
@@ -257,8 +233,20 @@ public class GUI {
 	 * <p>	Displays the player list.
 	 * 		@param players ArrayList of players to be displayed.
 	 */
-	public void displayPlayerList(ArrayList<Player> players) {
+	public void displayPlayerList() {
+		ArrayList<Player> players = gameWorld.getPlayers();
 		playerList.requestToDrawList(players);
+		return;
+	}
+	
+	/**
+	 * <p>	Displays the player's hands.
+	 * 		@param players ArrayList of players in the world.
+	 */
+	public void displayPlayerHands() {
+		ArrayList<Player> players = gameWorld.getPlayers();
+		playerPanel1.requestToDrawHand(players);
+		playerPanel2.requestToDrawHand(players);
 		return;
 	}
 

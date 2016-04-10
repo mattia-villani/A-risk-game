@@ -48,7 +48,7 @@ public class PlayerList extends JPanel {
 	}
 
 	public PlayerList() {			
-		setPreferredSize(new Dimension(250, 63));
+		setPreferredSize(new Dimension(350, 63));
 		setBackground(new Color(244, 239, 202));
 		return;
 	}

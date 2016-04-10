@@ -110,6 +110,7 @@ public class Main {
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
+		window.displayPlayerHands();
 		Player winner = letsPlay();
 		window.setText("And the winner is "+winner);
 		new Notification(window.getUiFrame(), "And the winner is "+winner, winner, Notification.LONG+Notification.SHORT);
@@ -197,7 +198,7 @@ public class Main {
 		neut4 = new NeutralPlayer(5,"Neutral 4", Color.BLACK);
 		World.getPlayers().add(neut4);
 
-		window.displayPlayerList(World.getPlayers());
+		window.displayPlayerList();
 		return;
 	}
 
