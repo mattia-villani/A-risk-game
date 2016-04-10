@@ -105,33 +105,29 @@ abstract public class World {
 	}
 
 	public static int returnCardsToDeck(Player player, String types){
-		System.out.flush();System.out.println("asked to return the cards "+types);System.out.flush();
-		if (player.getHand().size() < 3) return 0;
 
-		int val = 0;
-		
-		if (player.removeHand(types, deck)) val = getValue(types);
-		else val = 0;
-		
-		System.out.println(types+" was evaluated "+val);System.out.flush();
-		
-		return val;
+		if (player.getHand().size() < 3 ) return 0;
+
+		if (player.removeHand(types, deck)) return getValue(types);
+		else  return 0;
+
 	}
 	public static int getValue(String types){
 		
 		int[] counts = new int[4]; //A, C, I, W
-		Arrays.fill(counts, 0);
 		for (int i = 0; i < types.length(); ++i){
 			if (types.charAt(i) == 'a') counts[0]++;
 			if (types.charAt(i) == 'c') counts[1]++;
 			if (types.charAt(i) == 'i') counts[2]++;
-			if (types.charAt(i) == 'w') for(int j=0;j<counts.length;j++) counts[j]++;
+			if (types.charAt(i) == 'w') counts[3]++;
 		}
-		if ( (counts[0]-counts[3]>=1?1:0) + (counts[1]-counts[3]>=1?1:0) + (counts[2]-counts[3]>=1?1:0) + counts[3] >= 3 ) return 10;
-		if (counts[0] >= 3) return 8;
-		if (counts[1] >= 3) return 6;
-		if (counts[2] >= 3) return 4;
-		throw new RuntimeException("... how??");
+		if (counts[0] > 1) return 8;
+		if (counts[1] > 1) return 6;
+		if (counts[2] > 1) return 4;
+		else return 10;
+		
+		
+		
 	}
 
 
