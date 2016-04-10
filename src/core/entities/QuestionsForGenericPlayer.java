@@ -21,7 +21,8 @@ public abstract class QuestionsForGenericPlayer {
 	
 	
 	static abstract public class ConfQuestion extends Question<String>{
-		abstract public void setSkipAllowed(boolean skipAllowed);		
+		boolean skipAllowed = true;
+		final public void setSkipAllowed(boolean skipAllowed){ this.skipAllowed = skipAllowed; }		
 	}
 	
 	/** -- CARDS -- */

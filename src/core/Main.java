@@ -18,6 +18,7 @@ import gui.Rolling;
 import gui.Toast;
 import gui.map.MapRenderer;
 import oracle.Tree;
+import tests.ConfCardTester;
 
 public class Main {
 	private static String player1Name;
@@ -99,6 +100,7 @@ public class Main {
 				state.setArmy(boost);
 				state.getOwner().setNumArmies(state.getOwner().getNumArmies()+boost);
 			}
+			ConfCardTester.testCards(world, window, player1);
 		}else{
 			rollTheDiceToStart();
 			chooseReinforcements();			

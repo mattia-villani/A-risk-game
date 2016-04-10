@@ -107,8 +107,6 @@ public class QuestionsForHuman extends QuestionsForGenericPlayer {
 	private ConfQuestion getStringBasedConfQuestion(){
 		return ( confQuestion = ( confQuestion!=null?confQuestion:
 			new ConfQuestion(){
-				boolean skipAllowed = true;
-				final public void setSkipAllowed(boolean skipAllowed){ this.skipAllowed = skipAllowed; }		
 				@Override
 				public String askQuestion(Set<String> context, String title)
 						throws OutOfContextException, RuntimeException, BreakException {

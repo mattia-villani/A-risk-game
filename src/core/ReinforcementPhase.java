@@ -49,7 +49,7 @@ public class ReinforcementPhase {
 		if ( types.length >= 3 ) 
 			for ( String[] conf : CONFIGURATIONS ){
 				int conf_i = 0;
-				for ( int i=0; i<types.length && conf_i <=3 ; i++ )
+				for ( int i=0; i<types.length && conf_i <3 ; i++ )
 					if ( types[i].equals(conf[conf_i]) ) conf_i++;
 				if ( conf_i == 3 ) result.add(conf);
 			}
@@ -60,7 +60,7 @@ public class ReinforcementPhase {
 		new Toast.ErrorToast(str, Toast.SHORT);
 	}
 	
-	static int performChangeOfCardPhase(Player player, World world, GUI gui, ConfQuestion confQuestion){
+	public static int performChangeOfCardPhase(Player player, World world, GUI gui, ConfQuestion confQuestion){
 		ReinforcementPhase.gui = gui;
 		List<TerritoryCard> hand = player.getHand();
 		String[] types = new String[hand.size()];
@@ -85,8 +85,14 @@ public class ReinforcementPhase {
 		else result = choseWhatToChangeQuestion.askQuestion(commands, title);
 
 		int armiesGiven =  World.returnCardsToDeck (player, result);
-		if ( armiesGiven == 0 )
-			throw new RuntimeException("This is strange...");
+		if ( armiesGiven == 0 ){
+			String str = "This is strange... and this is the dump: \n\t";
+			str += "Player("+player.getName()+"), the conf he wanna use is "+result+
+					"\n\t\tCards he owns: ";
+			for ( TerritoryCard card : player.getHand() )
+				str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
+			throw new RuntimeException(str);	
+		}
 		return armiesGiven;
 	}
 	
