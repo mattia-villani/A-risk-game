@@ -72,7 +72,7 @@ public class ConfCardTester {
 		if ( r != 0 ) System.err.println("****TEST 2 FAILED at point 2");
 		else System.err.println("TEST 2 maybe passed");
 
-		// TEST 3 giving III cards.
+		// TEST 3 giving iii cards.
 		player.getHand().clear();
 		player.addToHand(I1);
 		player.addToHand(I2);
@@ -83,16 +83,16 @@ public class ConfCardTester {
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
-				if ( context.contains("III") == false || context.size() >= 3 ) // skip and break are controls 
-					System.err.println("****TEST 3 FAILLED. III and only it should be asked.");
+				if ( context.contains("iii") == false || context.size() >= 3 ) // skip and break are controls 
+					System.err.println("****TEST 3 FAILLED. iii and only it should be asked. context.size="+context.size());
 				else System.err.print("TEST 3 maybe passed, TO PASS IT YOU HAVE TO SEE THIS MESSAGE");
-				return "III";
+				return "iii";
 			}
 		});
 		System.err.println("Test 3 maybe (YOU HAVE TO HAVE SEEN A MEESSAGE SAING TO IT HAD TO BE SEEN) was passed with value "+r);
 		
 		
-		// TEST 4 giving III cards but question is trivial and due.
+		// TEST 4 giving iii cards but question is trivial and due.
 		player.getHand().clear();
 		player.addToHand(I1);
 		player.addToHand(I2);
@@ -102,17 +102,18 @@ public class ConfCardTester {
 		r = handleErrors(player, world, gui, new ConfQuestion(){			
 			@Override
 			public String notTrivialValidatedAskQuestion(Set<String> context, String title){
-				if ( context.contains("III") && context.size()==1 )
-					System.err.println("TEST 4 maybe is ok");
+				String retval = super.notTrivialValidatedAskQuestion(context, title);
+				if ( context.contains("iii") && context.size()==1 )
+					System.err.println("TEST 4 maybe is ok; "+retval);
 				else System.err.println("****TEST 4 failled.");
-				return super.notTrivialValidatedAskQuestion(context, title);
+				return retval;
 			}
 			@Override
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
 				System.err.println("****TEST 4 FAILLED.");
-				return "III";
+				return "iii";
 			}
 		});
 		System.err.println("Test 4 maybe was passed with value "+r);
@@ -132,12 +133,12 @@ public class ConfCardTester {
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
-				String[] options="AWA CWA AWC IWA AWI IWC CWI CIA IWI AIC ICA ACI III CAI IAC WIA AIW CIW WIC WCA ACW WAA WII IIW AAW CAW WAC WCI ICW WAI IAW".split(" ");
+				String[] options="AWA CWA AWC IWA AWI IWC CWI CIA IWI AIC ICA ACI III CAI IAC WIA AIW CIW WIC WCA ACW WAA WII IIW AAW CAW WAC WCI ICW WAI IAW".toLowerCase().split(" ");
 				if ( context.containsAll( Arrays.asList(options) ) == false )
 					System.err.println("***TEST 5 FAILLED at point 1.");
 				if ( context.size() != options.length )
 					System.err.println("***TEST 5 FAILLED at point 2. options : \""+toExtendedString(context)+"\"");
-				return "III";
+				return "iii";
 			}
 		});
 		System.err.println("Test 5 maybe was passed with value "+r);

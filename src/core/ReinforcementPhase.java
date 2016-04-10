@@ -39,7 +39,7 @@ public class ReinforcementPhase {
 		Set<String> set = new HashSet<String>();
 		for (String[] str: confs){
 			String com = "";
-			for ( String s:str) com+=s.charAt(0);
+			for ( String s:str) com+=s.toLowerCase().charAt(0);
 			set.add(com);
 		}		
 		return set;
@@ -92,8 +92,9 @@ public class ReinforcementPhase {
 					looping = false;
 				}catch(ChangeOfMindException e){ notify("Can't perform this action"); 
 				}catch(BreakException e){ notify("Can't perform this action"); }
-		else try{
+		else 
 			result = choseWhatToChangeQuestion.askQuestion(commands, title);
+		try{	
 			int armiesGiven =  World.returnCardsToDeck (player, result);
 			if ( armiesGiven == 0 ){
 				String str = "This is strange... and this is the dump: \n\t";
@@ -104,7 +105,7 @@ public class ReinforcementPhase {
 				throw new RuntimeException(str);	
 			}
 			return armiesGiven;
-		}catch(ChangeOfMindException|BreakException e){}
+		}catch(ChangeOfMindException|BreakException e){ e.printStackTrace(); }
 		return 0;
 	}
 	

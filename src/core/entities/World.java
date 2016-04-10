@@ -105,12 +105,17 @@ abstract public class World {
 	}
 
 	public static int returnCardsToDeck(Player player, String types){
-
+		System.out.flush();System.out.println("asked to return the cards "+types);System.out.flush();
 		if (player.getHand().size() < 3) return 0;
 
-		if (player.removeHand(types, deck)) return getValue(types);
-		else  return 0;
-
+		int val = 0;
+		
+		if (player.removeHand(types, deck)) val = getValue(types);
+		else val = 0;
+		
+		System.out.println(types+" was evaluated "+val);System.out.flush();
+		
+		return val;
 	}
 	public static int getValue(String types){
 		
