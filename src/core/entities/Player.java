@@ -126,7 +126,7 @@ public abstract class Player {
 
 			else if (type == 'c') typeString = "CAVALRY";
 
-			else if (type == 'a') typeString = "ARTILLERY";
+			else if (type == 'a') typeString = "ARTILLERY"; 
 
 			else typeString = "WILD";
 
@@ -134,7 +134,7 @@ public abstract class Player {
 
 			for (TerritoryCard card : hand){
 
-				if (Constants.CARD_TYPES[card.getIndex()] == typeString){
+				if (Constants.CARD_TYPES[card.getIndex()].equals(typeString)){
 
 					returnList.add(card);
 
