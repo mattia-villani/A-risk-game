@@ -233,7 +233,8 @@ public class GUI {
 	 * <p>	Displays the player list.
 	 * 		@param players ArrayList of players to be displayed.
 	 */
-	public void displayPlayerList(ArrayList<Player> players) {
+	public void displayPlayerList() {
+		ArrayList<Player> players = gameWorld.getPlayers();
 		playerList.requestToDrawList(players);
 		return;
 	}
@@ -242,7 +243,8 @@ public class GUI {
 	 * <p>	Displays the player's hands.
 	 * 		@param players ArrayList of players in the world.
 	 */
-	public void displayPlayerHands(ArrayList<Player> players) {
+	public void displayPlayerHands() {
+		ArrayList<Player> players = gameWorld.getPlayers();
 		playerPanel1.requestToDrawHand(players);
 		playerPanel2.requestToDrawHand(players);
 		return;
