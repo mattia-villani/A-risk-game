@@ -110,6 +110,7 @@ public class Main {
 		/*
 		 *  Game setup complete, ready to start turns.
 		 */
+		window.displayPlayerHands(World.getPlayers());
 		Player winner = letsPlay();
 		window.setText("And the winner is "+winner);
 		new Notification(window.getUiFrame(), "And the winner is "+winner, winner, Notification.LONG+Notification.SHORT);
