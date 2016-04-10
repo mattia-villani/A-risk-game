@@ -92,21 +92,19 @@ public class ReinforcementPhase {
 					looping = false;
 				}catch(ChangeOfMindException e){ notify("Can't perform this action"); 
 				}catch(BreakException e){ notify("Can't perform this action"); }
-		else 
+		else try{
 			result = choseWhatToChangeQuestion.askQuestion(commands, title);
-		try{	
-			int armiesGiven =  World.returnCardsToDeck (player, result);
-			if ( armiesGiven == 0 ){
-				String str = "This is strange... and this is the dump: \n\t";
-				str += "Player("+player.getName()+"), the conf he wanna use is "+result+
-						"\n\t\tCards he owns: ";
-				for ( TerritoryCard card : player.getHand() )
-					str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
-				throw new RuntimeException(str);	
-			}
-			return armiesGiven;
-		}catch(ChangeOfMindException|BreakException e){ e.printStackTrace(); }
-		return 0;
+		}catch(ChangeOfMindException|BreakException e){ return 0; }
+		int armiesGiven =  World.returnCardsToDeck (player, result);
+		if ( armiesGiven == 0 ){
+			String str = "This is strange... and this is the dump: \n\t";
+			str += "Player("+player.getName()+"), the conf he wanna use is "+result+
+					"\n\t\tCards he owns: ";
+			for ( TerritoryCard card : player.getHand() )
+				str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
+			throw new RuntimeException(str);	
+		}
+		return armiesGiven;
 	}
 	
 	static void performPhase( Player player, World world, GUI gui, int surpluss ){
