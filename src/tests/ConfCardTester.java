@@ -1,5 +1,6 @@
 package tests;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import core.ReinforcementPhase;
@@ -11,6 +12,22 @@ import gui.GUI;
 
 public class ConfCardTester {
 
+	private static String toExtendedString(Set<String> context){
+		StringBuilder sb = new StringBuilder();
+		for (String str : context)
+			sb.append(str+" ");
+		return sb.toString();
+	}
+	
+	private static int handleErrors(Player player, World world, GUI gui, ConfQuestion conf){
+		try{
+			return ReinforcementPhase.performChangeOfCardPhase(player, world, gui, conf);
+		}catch(Exception e){
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
 	public static void testCards( World world, GUI gui, Player player ){
 		TerritoryCard 
 			I1 = new TerritoryCard(37),
@@ -25,17 +42,17 @@ public class ConfCardTester {
 		
 		// TEST 1 giving no cards.
 		player.getHand().clear();
-		int r = ReinforcementPhase.performChangeOfCardPhase(player, world, gui, new ConfQuestion(){
+		int r = handleErrors(player, world, gui, new ConfQuestion(){
 			@Override
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
-				System.err.println("TEST 1 FAILED. Since there are no cards, this questions shouldn't be asked.");
+				System.err.println("****TEST 1 FAILED. Since there are no cards, this questions shouldn't be asked.");
 				throw new ChangeOfMindException();
 			}
 		});
-		if ( r != 0 ) System.err.println("TEST 1 FAILED at point 2");
-		else System.out.println("TEST 1 maybe passed");
+		if ( r != 0 ) System.err.println("****TEST 1 FAILED at point 2");
+		else System.err.println("TEST 1 maybe passed");
 
 		
 		// TEST 2 giving not the proper cards.
@@ -43,38 +60,94 @@ public class ConfCardTester {
 		player.addToHand(I2);
 		player.addToHand(A1);
 		player.addToHand(A2);
-		r = ReinforcementPhase.performChangeOfCardPhase(player, world, gui, new ConfQuestion(){
+		r = handleErrors(player, world, gui, new ConfQuestion(){
 			@Override
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
-				System.err.println("TEST 2 FAILED. Since there are no confs possibles, this questions shouldn't be asked.");
+				System.err.println("****TEST 2 FAILED. Since there are no confs possibles, this questions shouldn't be asked.");
 				throw new ChangeOfMindException();
 			}
 		});
-		if ( r != 0 ) System.err.println("TEST 2 FAILED at point 2");
-		else System.out.println("TEST 2 maybe passed");
+		if ( r != 0 ) System.err.println("****TEST 2 FAILED at point 2");
+		else System.err.println("TEST 2 maybe passed");
 
 		// TEST 3 giving III cards.
 		player.getHand().clear();
 		player.addToHand(I1);
 		player.addToHand(I2);
 		player.addToHand(I3);
-		player.addToHand(A1);
 		player.addToHand(A2);
-		r = ReinforcementPhase.performChangeOfCardPhase(player, world, gui, new ConfQuestion(){
+		r = handleErrors(player, world, gui, new ConfQuestion(){
 			@Override
 			public String askQuestion(Set<String> context, String title)
 					throws core.entities.Question.OutOfContextException, RuntimeException,
 					core.entities.Question.BreakException {
 				if ( context.contains("III") == false || context.size() >= 3 ) // skip and break are controls 
-					System.err.println("TEST 3 FAILED. III and only it should be asked.");
-				else System.out.print("Test 3, TO PASS IT YOU HAVE TO SEE THIS MESSAGE");
+					System.err.println("****TEST 3 FAILLED. III and only it should be asked.");
+				else System.err.print("TEST 3 maybe passed, TO PASS IT YOU HAVE TO SEE THIS MESSAGE");
 				return "III";
 			}
 		});
-		System.out.println("Test 3 maybe was passed with value "+r);
+		System.err.println("Test 3 maybe (YOU HAVE TO HAVE SEEN A MEESSAGE SAING TO IT HAD TO BE SEEN) was passed with value "+r);
+		
+		
+		// TEST 4 giving III cards but question is trivial and due.
+		player.getHand().clear();
+		player.addToHand(I1);
+		player.addToHand(I2);
+		player.addToHand(I3);
+		player.addToHand(A1);
+		player.addToHand(A2);
+		r = handleErrors(player, world, gui, new ConfQuestion(){			
+			@Override
+			public String notTrivialValidatedAskQuestion(Set<String> context, String title){
+				if ( context.contains("III") && context.size()==1 )
+					System.err.println("TEST 4 maybe is ok");
+				else System.err.println("****TEST 4 failled.");
+				return super.notTrivialValidatedAskQuestion(context, title);
+			}
+			@Override
+			public String askQuestion(Set<String> context, String title)
+					throws core.entities.Question.OutOfContextException, RuntimeException,
+					core.entities.Question.BreakException {
+				System.err.println("****TEST 4 FAILLED.");
+				return "III";
+			}
+		});
+		System.err.println("Test 4 maybe was passed with value "+r);
 
+		
+		// TEST 5 giving multiple options.
+		player.getHand().clear();
+		player.addToHand(I1);
+		player.addToHand(I2);
+		player.addToHand(I3);
+		player.addToHand(A1);
+		player.addToHand(A2);
+		player.addToHand(C1);
+		player.addToHand(W1);
+		r = handleErrors(player, world, gui, new ConfQuestion(){			
+			@Override
+			public String askQuestion(Set<String> context, String title)
+					throws core.entities.Question.OutOfContextException, RuntimeException,
+					core.entities.Question.BreakException {
+				String[] options="AWA CWA AWC IWA AWI IWC CWI CIA IWI AIC ICA ACI III CAI IAC WIA AIW CIW WIC WCA ACW WAA WII IIW AAW CAW WAC WCI ICW WAI IAW".split(" ");
+				if ( context.containsAll( Arrays.asList(options) ) == false )
+					System.err.println("***TEST 5 FAILLED at point 1.");
+				if ( context.size() != options.length )
+					System.err.println("***TEST 5 FAILLED at point 2. options : \""+toExtendedString(context)+"\"");
+				return "III";
+			}
+		});
+		System.err.println("Test 5 maybe was passed with value "+r);
+
+		// keep the game test with.
+		player.getHand().clear();
+		player.addToHand(I1);
+		player.addToHand(I2);
+		player.addToHand(I3);
+		player.addToHand(A1);
 		
 	}
 	

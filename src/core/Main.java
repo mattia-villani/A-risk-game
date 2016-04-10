@@ -58,6 +58,7 @@ public class Main {
 					// this returns NULL if currentPlayer conquered no country; a list (it can be empty) if at least one country was conquered; and a list with value if currentPlayer conquered and kicked another player out.
 					List <Player> losers = AttackPhase.performPhase(currentPlayer, world, window);
 					if ( losers != null ){
+						System.out.println("CurrentPlayer("+currentPlayer.getName()+") conquered at least a country.");
 						playingPlayers.removeAll( losers );
 						if ( !losers.contains(player1) && !losers.contains(player2)){
 							World.givePlayerCard(currentPlayer);
@@ -65,6 +66,7 @@ public class Main {
 							new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 						}
 					}else {
+						System.out.println("CurrentPlayer("+currentPlayer.getName()+") conquered NO country.");
 						MovePhase.moveArmies(currentPlayer, world, window);
 						new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 					}

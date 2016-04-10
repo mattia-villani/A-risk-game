@@ -65,8 +65,8 @@ public class AttackManager {
 	synchronized public void conquerContry( State from, State to, int with, Question<Integer> unitToMoveForFortifingAfterAttackQuestion ){
 		from.getOwner().decreaseAndGetNumOfState(-1);
 		boolean hardExit = false;
+		if ( losers == null ) losers = new LinkedList<Player>();
 		if ( to.getOwner().decreaseAndGetNumOfState(1) == 0 ){
-			if ( losers == null ) losers = new LinkedList<Player>();
 			losers.add(to.getOwner());
 			new Notification(FancyFullFrameAnimation.frame, to.getOwner().getName()+" lost", to.getOwner(), Notification.SHORT);
 			if ( Main.isPlayerHuman(to.getOwner()) ) hardExit = true;

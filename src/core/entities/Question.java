@@ -51,7 +51,7 @@ public abstract class Question<T>{
 	/**
 	 * calls validatedAskQuestion only if the question is not trivial: the question has more than a possibile answer.
 	 */
-	final public T notTrivialValidatedAskQuestion(Set<T> context, String title){
+	public T notTrivialValidatedAskQuestion(Set<T> context, String title){
 		if ( context.size() == 0 ) throw new RuntimeException("Something is wrong: this set shouldn't be empty");
 		if ( context.size() == 1 ) return context.iterator().next();
 		return validatedAskQuestion(context,title);

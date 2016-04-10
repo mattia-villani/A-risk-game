@@ -35,7 +35,7 @@ public class ReinforcementPhase {
 		new String[]{C,I,A}, new String[]{W,I,A}, new String[]{C,W,A}, new String[]{C,I,W}    
 	};
 	
-	static Set<String> getPossibleCommands(List<String[]> confs){
+	static Set<String> getPossibleCommands(Set<String[]> confs){
 		Set<String> set = new HashSet<String>();
 		for (String[] str: confs){
 			String com = "";
@@ -44,15 +44,25 @@ public class ReinforcementPhase {
 		}		
 		return set;
 	}
-	static List<String[]> getPossibleConfigurations(String[] types){
-		List<String[]> result = new LinkedList<>();
+	static Set<String[]> getPossibleConfigurations(String[] types){
+		Set<String[]> result = new HashSet<>();
+		/*
+		 * OK... not that awesome, sorry!  
+		 * Complexity = m*n^3 where n = types.lenght && m = CONFIGURATIONS.length
+		 * Quite a lot... but n should never be higher than 5 and
+		 * 		n^3 is actually the rounded value of n*(n-1)*(n-2) so in worst case scenario n^3 is actually 5*4*3 = 60.
+		 * */
 		if ( types.length >= 3 ) 
-			for ( String[] conf : CONFIGURATIONS ){
-				int conf_i = 0;
-				for ( int i=0; i<types.length && conf_i <3 ; i++ )
-					if ( types[i].equals(conf[conf_i]) ) conf_i++;
-				if ( conf_i == 3 ) result.add(conf);
-			}
+			for (int i=0; i<types.length; i++)
+				for (int j=0; j<types.length; j++)
+					if ( j!=i)
+						for (int k=0; k<types.length; k++)
+							if ( k!=j && k!=i )
+								for ( String[] conf : CONFIGURATIONS )
+									if (  conf[0].equals(types[i])
+									   && conf[1].equals(types[j])
+									   && conf[2].equals(types[k]))
+										result.add(conf);
 		return result;
 	}
 	
@@ -66,7 +76,7 @@ public class ReinforcementPhase {
 		String[] types = new String[hand.size()];
 		int i=0;
 		for ( TerritoryCard card : hand ) types[i++] = card.getCardType();
-		List<String[]> possibilities = getPossibleConfigurations(types);
+		Set<String[]> possibilities = getPossibleConfigurations(types);
 		Set<String> commands = getPossibleCommands(possibilities);
 		if ( commands.isEmpty() ) return 0;
 		String result = null;
@@ -82,18 +92,20 @@ public class ReinforcementPhase {
 					looping = false;
 				}catch(ChangeOfMindException e){ notify("Can't perform this action"); 
 				}catch(BreakException e){ notify("Can't perform this action"); }
-		else result = choseWhatToChangeQuestion.askQuestion(commands, title);
-
-		int armiesGiven =  World.returnCardsToDeck (player, result);
-		if ( armiesGiven == 0 ){
-			String str = "This is strange... and this is the dump: \n\t";
-			str += "Player("+player.getName()+"), the conf he wanna use is "+result+
-					"\n\t\tCards he owns: ";
-			for ( TerritoryCard card : player.getHand() )
-				str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
-			throw new RuntimeException(str);	
-		}
-		return armiesGiven;
+		else try{
+			result = choseWhatToChangeQuestion.askQuestion(commands, title);
+			int armiesGiven =  World.returnCardsToDeck (player, result);
+			if ( armiesGiven == 0 ){
+				String str = "This is strange... and this is the dump: \n\t";
+				str += "Player("+player.getName()+"), the conf he wanna use is "+result+
+						"\n\t\tCards he owns: ";
+				for ( TerritoryCard card : player.getHand() )
+					str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
+				throw new RuntimeException(str);	
+			}
+			return armiesGiven;
+		}catch(ChangeOfMindException|BreakException e){}
+		return 0;
 	}
 	
 	static void performPhase( Player player, World world, GUI gui, int surpluss ){
