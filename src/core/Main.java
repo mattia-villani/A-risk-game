@@ -62,6 +62,7 @@ public class Main {
 						playingPlayers.removeAll( losers );
 						if ( !losers.contains(player1) && !losers.contains(player2)){
 							World.givePlayerCard(currentPlayer);
+							window.displayPlayerHands();
 							MovePhase.moveArmies(currentPlayer, world, window);
 							new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
 						}

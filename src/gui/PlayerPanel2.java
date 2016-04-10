@@ -18,7 +18,6 @@ public class PlayerPanel2 extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Player> players;
 	private Player player;
-	private TerritoryCard[] displaycards=new TerritoryCard[5];
 
 	@Override
 	public void paint(Graphics g) {
@@ -65,6 +64,7 @@ public class PlayerPanel2 extends JPanel {
 
 		g2.drawString(name, titlewidth, 20);
 		
+		TerritoryCard[] displaycards=new TerritoryCard[5];
 		for (int i=0; i<player.getHand().size(); i++){
 			displaycards[i]=player.getHand().get(i);
 		}
