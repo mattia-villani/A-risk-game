@@ -90,13 +90,13 @@ public class ReinforcementPhase {
 		if ( toManyCards ) {
 			while ( looping ) 
 				try{
-					result = choseWhatToChangeQuestion.notTrivialValidatedAskQuestion(commands, title);
+					result = choseWhatToChangeQuestion.notTrivialValidatedAskQuestion(commands, title).toLowerCase();
 					looping = false;
 				}catch(ChangeOfMindException e){ notify("You have 5 cards, you must choose 3 to use"); 
 				}catch(BreakException e){ notify("You have 5 cards, you must choose 3 to use"); }
 		}
 		else try{
-			result = choseWhatToChangeQuestion.askQuestion(commands, title);
+			result = choseWhatToChangeQuestion.askQuestion(commands, title).toLowerCase();
 		}catch(ChangeOfMindException|BreakException e){ return 0; }
 		int armiesGiven =  World.returnCardsToDeck (player, result);
 		if ( armiesGiven == 0 ){
