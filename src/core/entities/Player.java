@@ -177,7 +177,8 @@ public abstract class Player {
 
 			for (int i = 0; i < toDeck.size(); ++i){
 
-				deck.addNewTerritoryCard((toDeck.pop()).getIndex());
+				//deck.addNewTerritoryCard((toDeck.pop()).getIndex());
+				toDeck.pop();
 
 			}
 

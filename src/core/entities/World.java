@@ -32,6 +32,7 @@ abstract public class World {
 	/** list of players in the world ... */
 	private static ArrayList <Player> players = new ArrayList<Player>();
 	private static TerritoryDeck deck = new TerritoryDeck(true);
+	public static int GoldenCav=0;
 	/** flag that says if something changed in the world ( this will be used by the renderer )*/
 	private boolean invalidated = true;
 
@@ -114,7 +115,9 @@ abstract public class World {
 	}
 	public static int getValue(String types){
 		
+		/*
 		int[] counts = new int[4]; //A, C, I, W
+		 
 		for (int i = 0; i < types.length(); ++i){
 			if (types.charAt(i) == 'a') counts[0]++;
 			if (types.charAt(i) == 'c') counts[1]++;
@@ -125,6 +128,12 @@ abstract public class World {
 		if (counts[1] > 1) return 6;
 		if (counts[2] > 1) return 4;
 		else return 10;
+		*/
+		int value=0;
+		if (GoldenCav<=3) value=4+(2*GoldenCav);
+		if (GoldenCav>3) value=10+(5*(GoldenCav-3));
+		GoldenCav++;
+		return value;
 		
 		
 		

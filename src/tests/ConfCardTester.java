@@ -145,6 +145,7 @@ public class ConfCardTester {
 
 		// keep the game test with.
 		player.getHand().clear();
+		World.GoldenCav=0;
 		player.addToHand(I1);
 		player.addToHand(I2);
 		player.addToHand(I3);
