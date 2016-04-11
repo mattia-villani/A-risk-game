@@ -81,7 +81,9 @@ public class ReinforcementPhase {
 		if ( commands.isEmpty() ) return 0;
 		String result = null;
 		boolean toManyCards = hand.size()>=5;
-		String title = "Please select which Reinforcement cards you would like to use or type SKIP.";
+		String title = "";
+		if (toManyCards) title = "Please select which Reinforcement cards you would like to use (no skipping)";
+		else title = "Please select which Reinforcement cards you would like to use or type SKIP.";
 		boolean looping = true;
 		ConfQuestion choseWhatToChangeQuestion = confQuestion;
 		choseWhatToChangeQuestion.setSkipAllowed( ! toManyCards);

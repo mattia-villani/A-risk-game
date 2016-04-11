@@ -149,7 +149,7 @@ public class ConfCardTester {
 		player.addToHand(I1);
 		player.addToHand(I2);
 		player.addToHand(I3);
-		player.addToHand(A1);
+		player.addToHand(W1);
 		
 	}
 	

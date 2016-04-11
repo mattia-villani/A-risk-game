@@ -67,7 +67,9 @@ public class Constants {
 		"ARTILLERY",	// 38	S Africa
 		"INFANTRY",		// 39	Egypt
 		"ARTILLERY",	// 40	E Africa
-		"INFANTRY"		// 41	Madagascar		
+		"INFANTRY",		// 41	Madagascar
+		"WILD",
+		"WILD"
 	};
 	
 	public static final int[][] ADJACENT = { 

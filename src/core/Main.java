@@ -48,11 +48,11 @@ public class Main {
 			else{
 				Player currentPlayer = playingPlayers.get(indexOfThePlayerWhoHasToPlayTheTurn);
 				new Notification(window.getUiFrame(), currentPlayer+"'s turn begin", currentPlayer, Notification.SHORT);
-
+				
 				if ( currentPlayer != player1 && currentPlayer!=player2 ){
 					new Toast("I.A. not implemented yet, turn skipped", Toast.SHORT);
 					new Notification(window.getUiFrame(), currentPlayer+"'s turn ended", currentPlayer, Notification.SHORT);
-				}else{
+				}else{ 
 					int surp = ReinforcementPhase.performChangeOfCardPhase(currentPlayer, world, window, currentPlayer.getQuestions(window).getConfQuestion());
 					ReinforcementPhase.performPhase(currentPlayer, world, window, surp);
 					// this returns NULL if currentPlayer conquered no country; a list (it can be empty) if at least one country was conquered; and a list with value if currentPlayer conquered and kicked another player out.

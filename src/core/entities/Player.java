@@ -122,11 +122,11 @@ public abstract class Player {
 
 
 
-			if (type == 'i') typeString = "INFANTRY";
+			if (type == 'i' || type == 'I') typeString = "INFANTRY";
 
-			else if (type == 'c') typeString = "CAVALRY";
+			else if (type == 'c' || type == 'C') typeString = "CAVALRY";
 
-			else if (type == 'a') typeString = "ARTILLERY"; 
+			else if (type == 'a' || type == 'A') typeString = "ARTILLERY"; 
 
 			else typeString = "WILD";
 
