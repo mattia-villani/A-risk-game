@@ -81,17 +81,18 @@ public class ReinforcementPhase {
 		if ( commands.isEmpty() ) return 0;
 		String result = null;
 		boolean toManyCards = hand.size()>=5;
-		String title = "Chose the configuration to use";
+		String title = "Please select which Reinforcement cards you would like to use or type SKIP.";
 		boolean looping = true;
 		ConfQuestion choseWhatToChangeQuestion = confQuestion;
 		choseWhatToChangeQuestion.setSkipAllowed( ! toManyCards);
-		if ( toManyCards ) 
+		if ( toManyCards ) {
 			while ( looping ) 
 				try{
 					result = choseWhatToChangeQuestion.notTrivialValidatedAskQuestion(commands, title);
 					looping = false;
-				}catch(ChangeOfMindException e){ notify("Can't perform this action"); 
-				}catch(BreakException e){ notify("Can't perform this action"); }
+				}catch(ChangeOfMindException e){ notify("You have 5 cards, you must choose 3 to use"); 
+				}catch(BreakException e){ notify("You have 5 cards, you must choose 3 to use"); }
+		}
 		else try{
 			result = choseWhatToChangeQuestion.askQuestion(commands, title);
 		}catch(ChangeOfMindException|BreakException e){ return 0; }
@@ -104,6 +105,10 @@ public class ReinforcementPhase {
 				str+="\n\t\t\t"+card.getCardType()+",\t"+card.getStateName();
 			throw new RuntimeException(str);	
 		}
+		gui.disableOracle();
+		gui.resetText();
+		gui.clearCommands();
+		gui.displayPlayerHands();
 		return armiesGiven;
 	}
 	
@@ -125,10 +130,7 @@ public class ReinforcementPhase {
 		for ( State state : world.getStates() ){
 			if (state.getOwner().equals(player)) reinforcements++;
 		}
-		reinforcements=reinforcements/3; //integer division
-		
-		reinforcements += surpluss;
-		
+		reinforcements=reinforcements/3; //integer division	
 		if (reinforcements < 3) reinforcements=3;
 		
 		
@@ -162,20 +164,25 @@ public class ReinforcementPhase {
 		
 		// Assign reinforcements for cards used (not done yet) - Sprint 4
 				
-		player.setNumArmies(player.getNumArmies()+reinforcements+continentBonus);
+		player.setNumArmies(player.getNumArmies()+reinforcements+continentBonus+surpluss);
 			
 		// Generate tree.
 		Tree tree = null;
 		if (tree == null) tree=gui.enableOracleAndReturnTree( world, player );
 		String command;
 		gui.toggleMouseInput();
+		String glue="and";
 
-		for (int i=0; i<reinforcements+continentBonus; i++)
+		for (int i=0; i<reinforcements+continentBonus+surpluss; i++)
 		{
-			gui.setText(player.getName()+" recieves "+reinforcements+" reinforcements from territories owned");
-			if (continentBonus > 0) gui.addText(" and a bonus of "+continentBonus+" from continents owned");
+			gui.setText(player.getName()+" recieves "+reinforcements+" reinforcements from territories owned ");
+			if (surpluss > 0) glue=",";
+			if (continentBonus > 0) gui.addText(glue+" a bonus of "+continentBonus+" from continents owned ");
+			glue ="and";
+			if (surpluss > 0) gui.addText(glue+" a bonus of "+surpluss+" from cards");
+
 			gui.addText(".");
-			gui.addTextln("Please choose a country to reinforce. Reinforcements remaining: "+(reinforcements+continentBonus-i));
+			gui.addTextln("Please choose a country to reinforce. Reinforcements remaining: "+(reinforcements+continentBonus+surpluss-i));
 			
 			// Handling bad text or mouse inputs
 			String badText=gui.getText()+"\nPlease make sure input is unambiguous and not blank.";
