@@ -134,7 +134,7 @@ public abstract class Player {
 
 			for (TerritoryCard card : hand){
 
-				if (Constants.CARD_TYPES[card.getIndex()].equals(typeString)){
+				if (card.getCardType().equals(typeString)){
 
 					returnList.add(card);
 
