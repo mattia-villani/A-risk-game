@@ -337,4 +337,18 @@ public class Team42 implements Bot {
 		return(command);
 	}
 
+	public float howClosetoOwningContinent(int countryId){
+		int contId = GameData.CONTINENT_IDS[countryId];
+		int owned = 0;
+		int unowned = 0;
+		for (int i = 0; i < GameData.CONTINENT_IDS.length; ++i){
+			if (contId == GameData.CONTINENT_IDS[i]){
+				owned++;
+			}
+			else unowned++;
+		}
+		return owned/(unowned + owned);
+	}
+	
 }
+
