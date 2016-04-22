@@ -243,7 +243,16 @@ public class Team42 implements Bot {
 		numOfAttacksDoneInThisTurn = 0; // this is needed by the getBattle in order to make at least one attack
 		String command = "";
 		// put your code here
-		command = GameData.COUNTRY_NAMES[(int)(Math.random() * GameData.NUM_COUNTRIES)];
+		List<CountryValuePair> list = 
+				this.sortCountryValuePair(
+						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
+						REINFORCE_PROFILE) 
+				);
+		
+		int countryToAttackId  = list.get(0).country;
+		
+		
+		command = GameData.COUNTRY_NAMES[(int)countryToAttackId];
 		command = command.replaceAll("\\s", "");
 		command += " 1";
 		return(command);
@@ -268,6 +277,7 @@ public class Team42 implements Bot {
 		String command = "skip";
 		
 		// TODO: fix this value as good as possible
+		
 		int minNumOfAttacks = 1, maxNumOfAttacks = 5;
 		final float tresholdToAttack = 0.7f;
 		final float tresholdToBeSelectedToAttack = 0.7f;
