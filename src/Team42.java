@@ -104,41 +104,105 @@ public class Team42 implements Bot {
 	 * GIVING VALUE TO A COUNTRY
 	 */
 	static class Profile{
-		//TODO: put here the coefficients for evaluating a country
-		float coefficient1;
-		float coefficient2;
-		// ecc... 
+		//TODO: give meaning to the following
+		static float[] point_for_continent = { .5f , .5f , .5f , .5f , .5f , .5f };
+		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 30f; // TODO ???
+
+		
+		float[] coefficients;
+		public Profile ( float[]coeffs ){this.coefficients = coeffs;}
+		float eval( float[] points ){
+			if ( coefficients.length != points.length ) throw new RuntimeException("Check code, the coeffs don't corrisponds to the values");
+			float result = 0;
+			for ( int i=0; i<points.length; i++ )
+				result+= points[i] * this.coefficients[i];
+			return result;
+		}
+		@Override public String toString(){
+			StringBuilder st = new StringBuilder();
+			st.append("{ ");
+			for ( int i=0; i<this.coefficients.length; i++ ){
+				if ( i != 0 ) st.append(", "); 
+				st.append(this.coefficients[i]);
+				st.append(" ");
+			}
+			st.append("}");
+			return st.toString();
+		}
 	}
 	//TODO: initialize the profiles with the right coefficients
-	static final private Profile ATTACK_PROFILE = new Profile();
-	static final private Profile MOST_ADAPT_TO_ATTACK_PROFILE = new Profile();
-	static final private Profile REINFORCE_PROFILE = new Profile();
+	static final private Profile ATTACK_PROFILE = new Profile( new float[9]/*{ insert here values.... }*/ );
+	static final private Profile MOST_ADAPT_TO_ATTACK_PROFILE = new Profile( new float[9] );
+	static final private Profile REINFORCE_PROFILE = new Profile( new float[9] );
 
+	
+	//TODO fill the following list;
+	static int[] BORDER_STATES = {};
+	static int MAX_ADJACENT_STATES ;
+	static {
+		int max = 0;
+		for ( int[] adj : GameData.ADJACENT )
+			max = Math.max( max , adj.length );
+		MAX_ADJACENT_STATES = max;
+	}
+	
 	/*
-	 * 
+	 *  END OF PROFILING , COUNTRY VALUE PAIR TIME 
 	 */
-	static class CountryValuePair implements Comparable<CountryValuePair>{
+	class CountryValuePair implements Comparable<CountryValuePair>{
 		int country;
 		Profile profile;
+		float value;
 		public CountryValuePair( int country, Profile profile ){
 			//TODO: use the profile coefficients to evaluate the value of the country with id countryID
+			
+			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
+			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length ;
+			
+			float[] pointSystemValues = new float[9];
+			
+			// point_system_adjacent_states_owned_by_the_other_player  
+			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
+			
+			//TODO: fix the following value 
+			//point_system_continent_value 
+			pointSystemValues[1] = Profile.point_for_continent[ 0 ];
+			
+			//how close are we to owning the continent			
+			// pointSystemValues[2] = TODO
+			
+			//point_system_is_border_country 
+			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
+			
+			// point_system_enemy_armies_around 
+			pointSystemValues[4] = 0 ;
+			for( int id : foeAdjacentStates ) pointSystemValues[4] += board.getNumUnits( id );
+			pointSystemValues[4] /= Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT;
+
+			//how likely we are to win		
+			// pointSystemValues[5] = TODO
+			
+			//if it connects two blocks		
+			// pointSystemValues[6] = TODO
+			
+			// point_system_would_we_be_more_protected  
+			pointSystemValues[7] = 
+					Math.min( 1.f , ( (float)( totalNumberOfAdjs - foeAdjacentStates.size()) ) / (float)foeAdjacentStates.size() );
+			
+			//are they part of a opponent's continent?			
+			// pointSystemValues[8] = TODO
+			
 			this.country = country;
 			this.profile = profile;
+			this.value = this.profile.eval( pointSystemValues );
 		}
 		public int getCountry(){ return country; }
-		public float getValue(){ return 1; }
-		@Override
-		public int compareTo(CountryValuePair arg0) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-		@Override
-		public boolean equals(Object obj){
+		public float getValue(){ return value; }
+		public boolean isUpperTheThreshold( float treshold ){return value >= treshold;}
+		@Override public int compareTo(CountryValuePair arg0) {return Float.compare( value , arg0.getValue() );}
+		@Override public boolean equals(Object obj){
 			CountryValuePair cvp = (CountryValuePair)obj;
 			return this.country==cvp.country && this.profile==cvp.profile;
-		}
-		public boolean isUpperTheThreshold( float treshold ){
-			return true;
 		}
 	}
 	
