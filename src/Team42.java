@@ -318,8 +318,9 @@ public class Team42 implements Bot {
 	}
 
 	public String getDefence (int countryId) {
-		String command = "";
-		command = "2";
+		String command = "2";
+		// we have to return 1 when we don't have enough armies
+		if ( board.getNumUnits(countryId) == 1 ) command = "1";
 		return(command);
 	}
 
