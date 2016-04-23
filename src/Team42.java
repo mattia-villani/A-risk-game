@@ -140,6 +140,7 @@ public class Team42 implements Bot {
 	static int[] BORDER_STATES = {};
 	static int MAX_ADJACENT_STATES ;
 	static {
+		Arrays.sort( BORDER_STATES );
 		int max = 0;
 		for ( int[] adj : GameData.ADJACENT )
 			max = Math.max( max , adj.length );
