@@ -206,7 +206,7 @@ public class Team42 implements Bot {
 			
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
 			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
-			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length ;
+			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
 			int armiesInThisCountry = foldl( foeAdjacentStates, 0, sumArmies );
 			int myArmiesInTheJointStates = foldl( myJointCountries, 0, sumArmies );
@@ -322,7 +322,39 @@ public class Team42 implements Bot {
 	public String getCardExchange () {
 		String command = "";
 		// put your code here
-		command = "skip";
+		int [] cardTypes = new int [3];
+		for (int i = 0; i < player.getCards().size(); ++i){
+			cardTypes[player.getCards().get(i).getCountryId()]++;
+		}
+		if (cardTypes[0] == 3) command = "iii";
+		else if (cardTypes[1] == 3) command = "ccc";
+		else if (cardTypes[2] == 3) command = "aaa";
+		else if (cardTypes[1] >= 1 && cardTypes [2] == 1 && cardTypes [3] == 1 ) command = "ica";
+		else if (cardTypes[0] >= 2 && cardTypes[3] >= 1) command = "iiw";
+		else if (cardTypes[1] >= 2 && cardTypes[3] >= 1) command = "ccw";
+		else if (cardTypes[2] >= 2 && cardTypes[3] >= 1) command = "aaw";
+		else if (cardTypes[0] >= 1 && cardTypes[1] >= 1 || (cardTypes[0] >= 1 && cardTypes[2] >= 1) || (cardTypes[2] >= 1 && cardTypes[1] >= 1)){
+			command = "w";
+			if (cardTypes[0] >= 1 && cardTypes[1] >= 1){
+				command += "ic";
+			}
+			else if (cardTypes[0] >= 1 && cardTypes[2] >= 1){
+				command += "ia";
+			}
+			else command += "ca";
+		}
+		else if (cardTypes[3] >= 2){
+			command = "ww";
+			if (cardTypes[0] >= 1) command += "i";
+			else if (cardTypes[1] >= 1) command += "c";
+			else if (cardTypes[2] >= 1) command += "a";	
+			
+		}
+		else{
+			command = "skip";
+		}
+		
+		
 		return(command);
 	}
 
@@ -378,7 +410,9 @@ public class Team42 implements Bot {
 
 	public String getMoveIn (int attackCountryId) {
 		String command = "";
-		// put your code here
+		/*
+		 * look at if both states had one, what their values would be, then give each state ratio of points
+		 */
 		command = "0";
 		return(command);
 	}
