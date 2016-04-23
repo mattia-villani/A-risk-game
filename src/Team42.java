@@ -65,6 +65,18 @@ public class Team42 implements Bot {
 				it.remove();
 		return list;
 	}
+	interface Op<RET_T, PARAM_T>{ RET_T op ( RET_T a, PARAM_T b ); } // TxT -> T 
+	class SumArmies implements Op<Integer,Integer>{
+		@Override public Integer op ( Integer sum, Integer countryId ){ return sum + board.getNumUnits(countryId); }
+	}
+	/**
+	 * @return op( ... op( op( op( val, values[0] ), values[1] ) ... , values[ values.length-1] ); 
+	 */
+	<RET_T, PARAM_T> RET_T foldl ( Iterable<PARAM_T> values, RET_T val, Op<RET_T,PARAM_T> operation ){
+		for ( PARAM_T t : values ) val = operation.op( val , t );
+		return val;
+	}
+	
 	List<Integer> getAllCountries(){
 		List<Integer> list = new LinkedList<>();
 		for (int i=0; i<GameData.NUM_COUNTRIES; i++)
@@ -104,9 +116,26 @@ public class Team42 implements Bot {
 	 * GIVING VALUE TO A COUNTRY
 	 */
 	static class Profile{
+		static float[][] WINNING_PROPABILITY = new float[][]{ // rows: attackers-1; colums: defender-1
+			// values taken from http://boardgames.stackexchange.com/questions/3514/how-can-i-estimate-my-chances-to-win-a-risk-battle
+			//DEFENDERS: 0		1      2      3      4      5      6      7      8      9     10
+			new float[]{ 0f, .000f, .000f, .000f, .000f, .002f, .000f, .000f, .000f, .000f, .000f }, // 0 attacker 
+			new float[]{ 1f, .417f, .106f, .027f, .007f, .002f, .000f, .000f, .000f, .000f, .000f }, // 1 attacker 
+			new float[]{ 1f, .754f, .363f, .206f, .091f, .049f, .021f, .011f, .005f, .003f, .001f }, // 2 attacker 
+			new float[]{ 1f, .916f, .656f, .470f, .315f, .206f, .134f, .084f, .054f, .033f, .021f }, // 3 attacker 
+			new float[]{ 1f, .972f, .785f, .642f, .477f, .359f, .253f, .181f, .123f, .086f, .057f }, // 4 attacker 
+			new float[]{ 1f, .990f, .890f, .769f, .638f, .506f, .397f, .297f, .224f, .162f, .118f }, // 5 attacker 
+			new float[]{ 1f, .997f, .934f, .857f, .754f, .638f, .521f, .423f, .329f, .258f, .193f }, // 6 attacker 
+			new float[]{ 1f, .999f, .967f, .910f, .834f, .736f, .640f, .536f, .446f, .357f, .287f }, // 7 attacker 
+			new float[]{ 1f,  1.0f, .980f, .947f, .888f, .818f, .730f, .643f, .547f, .464f, .380f }, // 8 attacker 
+			new float[]{ 1f,  1.0f, .990f, .967f, .930f, .873f, .808f, .726f, .646f, .558f, .480f }, // 9 attacker 
+			new float[]{ 1f,  1.0f, .994f, .981f, .954f, .916f, .861f, .800f, .724f, .650f, .568f } // 10 attacker 
+		};
+		
 		//TODO: give meaning to the following
 		static float[] point_for_continent = { .5f , .5f , .5f , .5f , .5f , .5f };
-		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 30f; // TODO ???
+		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 15f; // TODO 
+		static float PENALIZATION_FOR_EXTRA_COUNTRY = 0.7f; // TODO 
 
 		
 		float[] coefficients;
@@ -128,6 +157,24 @@ public class Team42 implements Bot {
 			}
 			st.append("}");
 			return st.toString();
+		}
+		static public float coefficientForJointOwnedArmies( int numOfCountries ){
+			return 1.f + PENALIZATION_FOR_EXTRA_COUNTRY*(float)(numOfCountries-1);
+		}
+		static public float howLikelyWeAreToWin( int attacking, int defending ){
+			if ( attacking < 0 || defending < 0 ) throw new RuntimeException("Something wired happend");
+			if ( attacking <= 10 && defending <= 10 )
+				return Profile.WINNING_PROPABILITY[attacking][defending];
+			// consideration in documentation
+			if ( attacking == defending ) return attacking < 20 ? 0.5062f : 0.63343f;
+			if ( attacking == defending -1 ) return 0.50650f;
+			if ( attacking == defending -2 ) return 0.50393f;
+			// unknown cases... try to reduce to a known situation
+			while ( attacking > 10 || defending > 10 ){
+				attacking *= 0.8f;
+				defending *= 0.8f;
+			}
+			return Profile.WINNING_PROPABILITY[attacking][defending];			
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
@@ -158,7 +205,12 @@ public class Team42 implements Bot {
 			//TODO: use the profile coefficients to evaluate the value of the country with id countryID
 			
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
+			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length ;
+			SumArmies sumArmies = new SumArmies();
+			int armiesInThisCountry = foldl( foeAdjacentStates, 0, sumArmies );
+			int myArmiesInTheJointStates = foldl( myJointCountries, 0, sumArmies );
+			
 			
 			float[] pointSystemValues = new float[9];
 			
@@ -176,12 +228,12 @@ public class Team42 implements Bot {
 			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
 			
 			// point_system_enemy_armies_around 
-			pointSystemValues[4] = 0 ;
-			for( int id : foeAdjacentStates ) pointSystemValues[4] += board.getNumUnits( id );
-			pointSystemValues[4] /= Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT;
+			pointSystemValues[4] = armiesInThisCountry / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
 
 			//how likely we are to win		
-			// pointSystemValues[5] = TODO
+			pointSystemValues[5] = Profile.howLikelyWeAreToWin( 
+					(int)( myArmiesInTheJointStates / Profile.coefficientForJointOwnedArmies( myJointCountries.size() ) ), // attacking
+					armiesInThisCountry ); // defending
 			
 			//if it connects two blocks		
 			// pointSystemValues[6] = TODO
