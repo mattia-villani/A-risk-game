@@ -318,8 +318,7 @@ public class Team42 implements Bot {
 
 	public String getDefence (int countryId) {
 		String command = "";
-		// put your code here
-		command = "1";
+		command = "2";
 		return(command);
 	}
 
