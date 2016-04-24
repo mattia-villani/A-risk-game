@@ -322,17 +322,23 @@ public class Team42 implements Bot {
 	public String getCardExchange () {
 		String command = "";
 		// put your code here
-		int [] cardTypes = new int [3];
+		int [] cardTypes = new int [3]; //too small, creates positions [0], [1] and [2]. should be new int [4];
+		// may want a ' if getcards.size() <3 return "skip"; ' here since there's no point going through the below if you've less than 3 cards
 		for (int i = 0; i < player.getCards().size(); ++i){
-			cardTypes[player.getCards().get(i).getCountryId()]++;
+			cardTypes[player.getCards().get(i).getCountryId()]++; 
+			// getCountyId() returns from 0 to 43, you want getInsigniaId() which will give you 0,1,2 or 3 (inf, cav, arty, wild respectively)
 		}
 		if (cardTypes[0] == 3) command = "iii";
 		else if (cardTypes[1] == 3) command = "ccc";
 		else if (cardTypes[2] == 3) command = "aaa";
 		else if (cardTypes[1] >= 1 && cardTypes [2] == 1 && cardTypes [3] == 1 ) command = "ica";
+		// should that not be [0] >= 1 && [1] >= 1 && [2] >= 1   ?? if I understand it [3] is wilds, and the others need to be >= not == in case of for eg iicca
+		
 		else if (cardTypes[0] >= 2 && cardTypes[3] >= 1) command = "iiw";
 		else if (cardTypes[1] >= 2 && cardTypes[3] >= 1) command = "ccw";
 		else if (cardTypes[2] >= 2 && cardTypes[3] >= 1) command = "aaw";
+		
+		// should be if cardtypes[3] == 1. and then check for each type inside the loop. otherwise its assuming you have a wild that you don't. as is a hand of ii, ia, iia etc will be successful here...
 		else if (cardTypes[0] >= 1 && cardTypes[1] >= 1 || (cardTypes[0] >= 1 && cardTypes[2] >= 1) || (cardTypes[2] >= 1 && cardTypes[1] >= 1)){
 			command = "w";
 			if (cardTypes[0] >= 1 && cardTypes[1] >= 1){
@@ -341,8 +347,10 @@ public class Team42 implements Bot {
 			else if (cardTypes[0] >= 1 && cardTypes[2] >= 1){
 				command += "ia";
 			}
+			//needs if cardtypes[1] >=1 && cardtypes[2] >=1
 			else command += "ca";
 		}
+		// I should add you could just have if (whatever) return "xxx"; if (whatever2) return "xyz"; instead of else if else if else if return command;
 		else if (cardTypes[3] >= 2){
 			command = "ww";
 			if (cardTypes[0] >= 1) command += "i";
