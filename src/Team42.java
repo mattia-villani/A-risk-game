@@ -210,7 +210,7 @@ public class Team42 implements Bot {
 		for ( int[] adj : GameData.ADJACENT )
 			max = Math.max( max , adj.length );
 		MAX_ADJACENT_STATES = max;
-		
+
 		COUNTRY_CONTINENT = new int[GameData.NUM_COUNTRIES];
 		for ( int continentId = 0 ; continentId<GameData.NUM_CONTINENTS; continentId++ )
 			for ( int countryId : GameData.CONTINENT_COUNTRIES[continentId] )
@@ -248,11 +248,11 @@ public class Team42 implements Bot {
 
 			//how close are we to owning the continent			
 			pointSystemValues[2] = (float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
-						new Property(){ 
-							@Override public boolean satisfies(int id) {
-								return player.getId() == board.getOccupier(id);
-							}
-						}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
+					new Property(){ 
+				@Override public boolean satisfies(int id) {
+					return player.getId() == board.getOccupier(id);
+				}
+			}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			//point_system_is_border_country 
 			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
@@ -276,11 +276,11 @@ public class Team42 implements Bot {
 			//are they part of a opponent's continent?			
 			pointSystemValues[8] = 
 					(float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
-						new Property(){ 
-							@Override public boolean satisfies(int id) {
-								return occupierId == board.getOccupier(id);
-							}
-						}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
+							new Property(){ 
+						@Override public boolean satisfies(int id) {
+							return occupierId == board.getOccupier(id);
+						}
+					}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			this.country = country;
 			this.profile = profile;
@@ -482,6 +482,31 @@ public class Team42 implements Bot {
 			else unowned++;
 		}
 		return owned/(unowned + owned);
+	}
+	public boolean willMakeCluster(int countryId){
+		ArrayList<Integer> ownedAdj = new ArrayList<Integer>();
+		for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
+			if (countryId != i){
+				if (board.isAdjacent(countryId, i)){
+					if (board.getOccupier(i) == player.getId()) ownedAdj.add(i);
+				}
+
+			}
+		}
+		if (ownedAdj.size() < 2) return false;
+		else{
+			for (int i = 0; i < ownedAdj.size(); ++i){
+				for (int j = 0; j < ownedAdj.size(); ++j){
+					if (i != j){
+						if (board.isAdjacent(ownedAdj.get(i), ownedAdj.get(j))){} //micro optimization
+						else if (!board.isConnected(ownedAdj.get(i), ownedAdj.get(j))){
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }
