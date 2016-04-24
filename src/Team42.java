@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +66,11 @@ public class Team42 implements Bot {
 				it.remove();
 		return list;
 	}
+	int count ( int[] values, Property property ){
+		int c = 0;
+		for ( int v : values ) if ( property.satisfies(v) ) ++c;
+		return c;
+	}
 	interface Op<RET_T, PARAM_T>{ RET_T op ( RET_T a, PARAM_T b ); } // TxT -> T 
 	class SumArmies implements Op<Integer,Integer>{
 		@Override public Integer op ( Integer sum, Integer countryId ){ return sum + board.getNumUnits(countryId); }
@@ -75,6 +81,11 @@ public class Team42 implements Bot {
 	<RET_T, PARAM_T> RET_T foldl ( Iterable<PARAM_T> values, RET_T val, Op<RET_T,PARAM_T> operation ){
 		for ( PARAM_T t : values ) val = operation.op( val , t );
 		return val;
+	}
+	List<Integer> createListFromArray( int[] values ){
+		LinkedList <Integer> list = new LinkedList<Integer>();
+		for ( int v : values ) list.add(v);
+		return list;
 	}
 
 	List<Integer> getAllCountries(){
@@ -186,12 +197,18 @@ public class Team42 implements Bot {
 	//TODO fill the following list;
 	static int[] BORDER_STATES = {};
 	static int MAX_ADJACENT_STATES ;
+	static int[] COUNTRY_CONTINENT;
 	static {
 		Arrays.sort( BORDER_STATES );
 		int max = 0;
 		for ( int[] adj : GameData.ADJACENT )
 			max = Math.max( max , adj.length );
 		MAX_ADJACENT_STATES = max;
+		
+		COUNTRY_CONTINENT = new int[GameData.NUM_COUNTRIES];
+		for ( int continentId = 0 ; continentId<GameData.NUM_CONTINENTS; continentId++ )
+			for ( int countryId : GameData.CONTINENT_COUNTRIES[continentId] )
+				COUNTRY_CONTINENT[ countryId ] = continentId;
 	}
 
 	/*
@@ -210,6 +227,8 @@ public class Team42 implements Bot {
 			SumArmies sumArmies = new SumArmies();
 			int armiesInThisCountry = foldl( foeAdjacentStates, 0, sumArmies );
 			int myArmiesInTheJointStates = foldl( myJointCountries, 0, sumArmies );
+			int continentId = COUNTRY_CONTINENT[country];
+			int occupierId = board.getOccupier(country);
 
 
 			float[] pointSystemValues = new float[9];
@@ -232,7 +251,8 @@ public class Team42 implements Bot {
 
 			//how likely we are to win		
 			pointSystemValues[5] = Profile.howLikelyWeAreToWin( 
-					(int)( myArmiesInTheJointStates / Profile.coefficientForJointOwnedArmies( myJointCountries.size() ) ), // attacking
+					(int)( ( myArmiesInTheJointStates - myJointCountries.size() ) 
+							/ Profile.coefficientForJointOwnedArmies( myJointCountries.size() ) ), // attacking
 					armiesInThisCountry ); // defending
 
 			//if it connects two blocks		
@@ -243,7 +263,13 @@ public class Team42 implements Bot {
 					Math.min( 1.f , ( (float)( totalNumberOfAdjs - foeAdjacentStates.size()) ) / (float)foeAdjacentStates.size() );
 
 			//are they part of a opponent's continent?			
-			// pointSystemValues[8] = TODO
+			pointSystemValues[8] = 
+					count( GameData.CONTINENT_COUNTRIES[continentId] , 
+						new Property(){ 
+							@Override public boolean satisfies(int id) {
+								return occupierId != board.getOccupier(id);
+							}
+						})==0 ? 1.0f : 0.f;
 
 			this.country = country;
 			this.profile = profile;
