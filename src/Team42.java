@@ -189,9 +189,15 @@ public class Team42 implements Bot {
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
-	static final private Profile ATTACK_PROFILE = new Profile( new float[9]/*{ insert here values.... }*/ );
-	static final private Profile MOST_ADAPT_TO_ATTACK_PROFILE = new Profile( new float[9] );
-	static final private Profile REINFORCE_PROFILE = new Profile( new float[9] );
+	private Profile attackProfile = new Profile( new float[9]/*{ insert here values.... }*/ );
+	private Profile mostAdaptToAttackProfile = new Profile( new float[9] );
+	private Profile reinforceProfile = new Profile( new float[9] );
+	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
+		this(inBoard, inPlayer);
+		this.attackProfile = attack_profile;
+		this.mostAdaptToAttackProfile = most_adapt_to_attack_profile;
+		this.reinforceProfile = reinforce_profile;
+	}
 
 
 	//TODO fill the following list;
@@ -241,7 +247,12 @@ public class Team42 implements Bot {
 			pointSystemValues[1] = Profile.point_for_continent[ 0 ];
 
 			//how close are we to owning the continent			
-			// pointSystemValues[2] = TODO
+			pointSystemValues[2] = (float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
+						new Property(){ 
+							@Override public boolean satisfies(int id) {
+								return player.getId() == board.getOccupier(id);
+							}
+						}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			//point_system_is_border_country 
 			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
@@ -264,12 +275,12 @@ public class Team42 implements Bot {
 
 			//are they part of a opponent's continent?			
 			pointSystemValues[8] = 
-					count( GameData.CONTINENT_COUNTRIES[continentId] , 
+					(float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
 						new Property(){ 
 							@Override public boolean satisfies(int id) {
-								return occupierId != board.getOccupier(id);
+								return occupierId == board.getOccupier(id);
 							}
-						})==0 ? 1.0f : 0.f;
+						}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			this.country = country;
 			this.profile = profile;
@@ -325,7 +336,7 @@ public class Team42 implements Bot {
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
-								REINFORCE_PROFILE) 
+								reinforceProfile) 
 						);
 
 		int countryToAttackId  = list.get(0).country;
@@ -406,7 +417,7 @@ public class Team42 implements Bot {
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
-								ATTACK_PROFILE) 
+								attackProfile) 
 						);
 		if ( ! list.isEmpty() && this.numOfAttacksDoneInThisTurn < maxNumOfAttacks
 				&& ( list.get(0).isUpperTheThreshold(tresholdToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks ) ){
@@ -420,7 +431,7 @@ public class Team42 implements Bot {
 											this.getAdjacent( countryToAttackId ), 
 											properties.myCountryAbleToAttack 
 											),
-									MOST_ADAPT_TO_ATTACK_PROFILE
+									mostAdaptToAttackProfile
 									)
 							);
 			// the list can't be empty since list was filtered on the attackable country, then there is a country able to attacke this.
