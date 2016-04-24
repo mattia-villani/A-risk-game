@@ -15,16 +15,16 @@ public class Team42 implements Bot {
 	// YourTeamName may not alter the state of the board or the player objects
 	// It may only inspect the state of the board and the player objects
 	// So you can use player.getNumUnits() but you can't use player.addUnits(10000), for example
-	
+
 	private BoardAPI board;
 	private PlayerAPI player;
-	
+
 	private int numOfAttacksDoneInThisTurn = 0;
-	
+
 	/*
 	 * READING BOARDS
 	 */
-	
+
 	interface Property { boolean satisfies( int id ); }
 	class Properties {
 		final public Property validCountryId = new Property(){
@@ -53,8 +53,8 @@ public class Team42 implements Bot {
 		};
 	}
 	Properties properties = new Properties();
-			
-	
+
+
 	/**
 	 * MODIFIER!!!!! list is modified and returned ( the returned list is the same of the list param )
 	 */
@@ -76,7 +76,7 @@ public class Team42 implements Bot {
 		for ( PARAM_T t : values ) val = operation.op( val , t );
 		return val;
 	}
-	
+
 	List<Integer> getAllCountries(){
 		List<Integer> list = new LinkedList<>();
 		for (int i=0; i<GameData.NUM_COUNTRIES; i++)
@@ -89,13 +89,13 @@ public class Team42 implements Bot {
 			list.add(id);
 		return list;
 	}
-	
+
 	/* QUERIES */
 	List<Integer> getMyCountries()		
-		{ return this.filter( this.getAllCountries(), properties.myCountry ); }
+	{ return this.filter( this.getAllCountries(), properties.myCountry ); }
 	List<Integer> getFoesAdjacentTo( int countryId )
-		{ return this.filter( this.getAdjacent(countryId), properties.foeCountry ); }
-		
+	{ return this.filter( this.getAdjacent(countryId), properties.foeCountry ); }
+
 	Set<Integer> getAllAdjacentFoes(){
 		Set<Integer> set = new HashSet<>();
 		List<Integer> list = getMyCountries();
@@ -111,7 +111,7 @@ public class Team42 implements Bot {
 		return set;
 	}
 
-	
+
 	/*
 	 * GIVING VALUE TO A COUNTRY
 	 */
@@ -131,13 +131,13 @@ public class Team42 implements Bot {
 			new float[]{ 1f,  1.0f, .990f, .967f, .930f, .873f, .808f, .726f, .646f, .558f, .480f }, // 9 attacker 
 			new float[]{ 1f,  1.0f, .994f, .981f, .954f, .916f, .861f, .800f, .724f, .650f, .568f } // 10 attacker 
 		};
-		
+
 		//TODO: give meaning to the following
 		static float[] point_for_continent = { .5f , .5f , .5f , .5f , .5f , .5f };
 		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 15f; // TODO 
 		static float PENALIZATION_FOR_EXTRA_COUNTRY = 0.7f; // TODO 
 
-		
+
 		float[] coefficients;
 		public Profile ( float[]coeffs ){this.coefficients = coeffs;}
 		float eval( float[] points ){
@@ -182,7 +182,7 @@ public class Team42 implements Bot {
 	static final private Profile MOST_ADAPT_TO_ATTACK_PROFILE = new Profile( new float[9] );
 	static final private Profile REINFORCE_PROFILE = new Profile( new float[9] );
 
-	
+
 	//TODO fill the following list;
 	static int[] BORDER_STATES = {};
 	static int MAX_ADJACENT_STATES ;
@@ -193,7 +193,7 @@ public class Team42 implements Bot {
 			max = Math.max( max , adj.length );
 		MAX_ADJACENT_STATES = max;
 	}
-	
+
 	/*
 	 *  END OF PROFILING , COUNTRY VALUE PAIR TIME 
 	 */
@@ -203,30 +203,30 @@ public class Team42 implements Bot {
 		float value;
 		public CountryValuePair( int country, Profile profile ){
 			//TODO: use the profile coefficients to evaluate the value of the country with id countryID
-			
+
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
 			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
 			int armiesInThisCountry = foldl( foeAdjacentStates, 0, sumArmies );
 			int myArmiesInTheJointStates = foldl( myJointCountries, 0, sumArmies );
-			
-			
+
+
 			float[] pointSystemValues = new float[9];
-			
+
 			// point_system_adjacent_states_owned_by_the_other_player  
 			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
-			
+
 			//TODO: fix the following value 
 			//point_system_continent_value 
 			pointSystemValues[1] = Profile.point_for_continent[ 0 ];
-			
+
 			//how close are we to owning the continent			
 			// pointSystemValues[2] = TODO
-			
+
 			//point_system_is_border_country 
 			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
-			
+
 			// point_system_enemy_armies_around 
 			pointSystemValues[4] = armiesInThisCountry / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
 
@@ -234,17 +234,17 @@ public class Team42 implements Bot {
 			pointSystemValues[5] = Profile.howLikelyWeAreToWin( 
 					(int)( myArmiesInTheJointStates / Profile.coefficientForJointOwnedArmies( myJointCountries.size() ) ), // attacking
 					armiesInThisCountry ); // defending
-			
+
 			//if it connects two blocks		
 			// pointSystemValues[6] = TODO
-			
+
 			// point_system_would_we_be_more_protected  
 			pointSystemValues[7] = 
 					Math.min( 1.f , ( (float)( totalNumberOfAdjs - foeAdjacentStates.size()) ) / (float)foeAdjacentStates.size() );
-			
+
 			//are they part of a opponent's continent?			
 			// pointSystemValues[8] = TODO
-			
+
 			this.country = country;
 			this.profile = profile;
 			this.value = this.profile.eval( pointSystemValues );
@@ -258,14 +258,14 @@ public class Team42 implements Bot {
 			return this.country==cvp.country && this.profile==cvp.profile;
 		}
 	}
-	
+
 	List<CountryValuePair> getStrategyValueOf( Collection<Integer> countryIds, Profile profile ){
 		List<CountryValuePair> list = new LinkedList<>();
 		for ( int id : countryIds )
 			list.add( new CountryValuePair( id, profile ) );
 		return list;
 	}
-	
+
 	/**
 	 * MODIFIER!!!!
 	 */
@@ -273,18 +273,18 @@ public class Team42 implements Bot {
 		Collections.sort( list );
 		return list;
 	}
-	
+
 	/*
 	 * PUBLIC API 
 	 */
-	
+
 	Team42 (BoardAPI inBoard, PlayerAPI inPlayer) {
 		board = inBoard;	
 		player = inPlayer;
 		// put your code here
 		return;
 	}
-	
+
 	public String getName () {
 		String command = "";
 		// put your code here
@@ -299,18 +299,18 @@ public class Team42 implements Bot {
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
-						REINFORCE_PROFILE) 
-				);
-		
+								REINFORCE_PROFILE) 
+						);
+
 		int countryToAttackId  = list.get(0).country;
-		
-		
+
+
 		command = GameData.COUNTRY_NAMES[(int)countryToAttackId];
 		command = command.replaceAll("\\s", "");
 		command += " 1";
 		return(command);
 	}
-	
+
 	public String getPlacement (int forPlayer) {
 		String command = "";
 		// put your code here
@@ -318,91 +318,93 @@ public class Team42 implements Bot {
 		command = command.replaceAll("\\s", "");
 		return(command);
 	}
-	
+
 	public String getCardExchange () {
 		String command = "";
-		// put your code here
-		int [] cardTypes = new int [3]; //too small, creates positions [0], [1] and [2]. should be new int [4];
-		// may want a ' if getcards.size() <3 return "skip"; ' here since there's no point going through the below if you've less than 3 cards
-		for (int i = 0; i < player.getCards().size(); ++i){
-			cardTypes[player.getCards().get(i).getCountryId()]++; 
-			// getCountyId() returns from 0 to 43, you want getInsigniaId() which will give you 0,1,2 or 3 (inf, cav, arty, wild respectively)
-		}
-		if (cardTypes[0] == 3) command = "iii";
-		else if (cardTypes[1] == 3) command = "ccc";
-		else if (cardTypes[2] == 3) command = "aaa";
-		else if (cardTypes[1] >= 1 && cardTypes [2] == 1 && cardTypes [3] == 1 ) command = "ica";
-		// should that not be [0] >= 1 && [1] >= 1 && [2] >= 1   ?? if I understand it [3] is wilds, and the others need to be >= not == in case of for eg iicca
-		
-		else if (cardTypes[0] >= 2 && cardTypes[3] >= 1) command = "iiw";
-		else if (cardTypes[1] >= 2 && cardTypes[3] >= 1) command = "ccw";
-		else if (cardTypes[2] >= 2 && cardTypes[3] >= 1) command = "aaw";
-		
-		// should be if cardtypes[3] == 1. and then check for each type inside the loop. otherwise its assuming you have a wild that you don't. as is a hand of ii, ia, iia etc will be successful here...
-		else if (cardTypes[0] >= 1 && cardTypes[1] >= 1 || (cardTypes[0] >= 1 && cardTypes[2] >= 1) || (cardTypes[2] >= 1 && cardTypes[1] >= 1)){
-			command = "w";
-			if (cardTypes[0] >= 1 && cardTypes[1] >= 1){
-				command += "ic";
-			}
-			else if (cardTypes[0] >= 1 && cardTypes[2] >= 1){
-				command += "ia";
-			}
-			//needs if cardtypes[1] >=1 && cardtypes[2] >=1
-			else command += "ca";
-		}
-		// I should add you could just have if (whatever) return "xxx"; if (whatever2) return "xyz"; instead of else if else if else if return command;
-		else if (cardTypes[3] >= 2){
-			command = "ww";
-			if (cardTypes[0] >= 1) command += "i";
-			else if (cardTypes[1] >= 1) command += "c";
-			else if (cardTypes[2] >= 1) command += "a";	
-			
-		}
+		int [] cardTypes = new int [4]; //too small, creates positions [0], [1] and [2]. should be new int [4];
+
+		if (player.getCards().size() < 3) command = "skip";
+
 		else{
-			command = "skip";
+			for (int i = 0; i < player.getCards().size(); ++i){
+
+				cardTypes[player.getCards().get(i).getInsigniaId()]++; 
+			}
+			if (cardTypes[0] == 3) command = "iii";
+			else if (cardTypes[1] == 3) command = "ccc";
+			else if (cardTypes[2] == 3) command = "aaa";
+			else if (cardTypes[0] >= 1 && cardTypes [1] >= 1 && cardTypes [2] >= 1 ) command = "ica";
+
+			else if (cardTypes[0] >= 2 && cardTypes[3] >= 1) command = "iiw";
+			else if (cardTypes[1] >= 2 && cardTypes[3] >= 1) command = "ccw";
+			else if (cardTypes[2] >= 2 && cardTypes[3] >= 1) command = "aaw";
+
+			else if(cardTypes[3] >= 1){
+				if (cardTypes[0] >= 1 && cardTypes[1] >= 1 || (cardTypes[0] >= 1 && cardTypes[2] >= 1) || (cardTypes[2] >= 1 && cardTypes[1] >= 1)){
+
+					command = "w";
+					if (cardTypes[0] >= 1 && cardTypes[1] >= 1){
+						command += "ic";
+					}
+					else if (cardTypes[0] >= 1 && cardTypes[2] >= 1){
+						command += "ia";
+					}
+					else if (cardTypes[1] >=1 && cardTypes[2] >=1)
+						command += "ca";
+				}
+			}
+			else if (cardTypes[3] >= 2){
+				command = "ww";
+				if (cardTypes[0] >= 1) command += "i";
+				else if (cardTypes[1] >= 1) command += "c";
+				else if (cardTypes[2] >= 1) command += "a";	
+
+			}
+			else{
+				command = "skip";
+			}
+
 		}
-		
-		
 		return(command);
 	}
 
 	public String getBattle () {
 		String command = "skip";
-		
+
 		// TODO: fix this value as good as possible
-		
+
 		int minNumOfAttacks = 1, maxNumOfAttacks = 5;
 		final float tresholdToAttack = 0.7f;
 		final float tresholdToBeSelectedToAttack = 0.7f;
-		
+
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
-						ATTACK_PROFILE) 
-				);
+								ATTACK_PROFILE) 
+						);
 		if ( ! list.isEmpty() && this.numOfAttacksDoneInThisTurn < maxNumOfAttacks
 				&& ( list.get(0).isUpperTheThreshold(tresholdToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks ) ){
-	
+
 			int countryToAttackId  = list.get(0).country;
 
 			List<CountryValuePair> valuesOfAttackers = 
 					this.sortCountryValuePair(
-						this.getStrategyValueOf( 
-							this.filter( 	
-									this.getAdjacent( countryToAttackId ), 
-									properties.myCountryAbleToAttack 
-							),
-							MOST_ADAPT_TO_ATTACK_PROFILE
-						)
-					);
+							this.getStrategyValueOf( 
+									this.filter( 	
+											this.getAdjacent( countryToAttackId ), 
+											properties.myCountryAbleToAttack 
+											),
+									MOST_ADAPT_TO_ATTACK_PROFILE
+									)
+							);
 			// the list can't be empty since list was filtered on the attackable country, then there is a country able to attacke this.
 			if ( valuesOfAttackers.get(0).isUpperTheThreshold(tresholdToBeSelectedToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks  ){
 				command = 
-					GameData.CONTINENT_NAMES[countryToAttackId] +
-					" " +
-					GameData.CONTINENT_NAMES[valuesOfAttackers.get(0).country] +
-					" " +
-					( Math.min(3, board.getNumUnits(valuesOfAttackers.get(0).country)-1) );
+						GameData.CONTINENT_NAMES[countryToAttackId] +
+						" " +
+						GameData.CONTINENT_NAMES[valuesOfAttackers.get(0).country] +
+						" " +
+						( Math.min(3, board.getNumUnits(valuesOfAttackers.get(0).country)-1) );
 				numOfAttacksDoneInThisTurn++;
 			}
 		}		
@@ -444,6 +446,6 @@ public class Team42 implements Bot {
 		}
 		return owned/(unowned + owned);
 	}
-	
+
 }
 
