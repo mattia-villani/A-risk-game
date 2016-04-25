@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,12 +20,40 @@ public class Team42 implements Bot {
 	// YourTeamName may not alter the state of the board or the player objects
 	// It may only inspect the state of the board and the player objects
 	// So you can use player.getNumUnits() but you can't use player.addUnits(10000), for example
-
+	
 	private BoardAPI board;
 	private PlayerAPI player;
 
 	private int numOfAttacksDoneInThisTurn = 0;
 
+	/*
+	 * debugs
+	 */
+	
+	static public boolean 
+		VERBOSE_INPUT_LOCKER = false,
+		VERBOSE_TIME_POINT_SYSTEM = false, 
+		VERBOSE_BATTLE = false;
+	
+	static void GETCHAR( ){
+		if ( VERBOSE_INPUT_LOCKER ){
+			System.err.print("...press any key...");
+			new java.util.Scanner(System.in).nextLine();
+			System.err.flush();
+		}
+	}
+	
+	static <T>void PRINT( boolean verbose, List<T> list, String text ){
+		if ( verbose == false ) return;
+		if ( list == null ){
+			System.err.println(text); return;
+		}
+		System.err.print(text+" { ");
+		for ( T t : list ) System.err.print(t+" ");
+		System.err.println(" }");
+	}
+	
+	
 	/*
 	 * READING BOARDS
 	 */
@@ -181,19 +213,23 @@ public class Team42 implements Bot {
 			if ( attacking == defending -1 ) return 0.50650f;
 			if ( attacking == defending -2 ) return 0.50393f;
 			// unknown cases... try to reduce to a known situation
-			while ( attacking > WINNING_PROPABILITY.length || defending > WINNING_PROPABILITY[0].length ){
-				attacking *= 0.8f;
-				defending *= 0.8f;
+			while ( attacking >= WINNING_PROPABILITY.length || defending >= WINNING_PROPABILITY[0].length ){
+				attacking *= 0.9f;
+				defending *= 0.9f;
 			}
 			return Math.min(0, Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; // map the probability from 0.5 to 1 to from 0 to 1 		
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
-	private Profile attackProfile = new Profile( new float[9]/*{ insert here values.... }*/ );
-	private Profile mostAdaptToAttackProfile = new Profile( new float[9] );
-	private Profile reinforceProfile = new Profile( new float[9] );
+	private Profile attackProfile = null;
+	private Profile mostAdaptToAttackProfile = null;
+	private Profile reinforceProfile = null;
 	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
 		this(inBoard, inPlayer);
+		// TODO fixers
+		attack_profile.coefficients[5]+=4f;
+		most_adapt_to_attack_profile.coefficients[5]+=7f;
+		reinforce_profile.coefficients[0] *=-1f;
 		this.attackProfile = attack_profile;
 		this.mostAdaptToAttackProfile = most_adapt_to_attack_profile;
 		this.reinforceProfile = reinforce_profile;
@@ -225,7 +261,9 @@ public class Team42 implements Bot {
 		Profile profile;
 		float value;
 		public CountryValuePair( int country, Profile profile ){
-
+			long startFunction = 0;
+			if ( VERBOSE_TIME_POINT_SYSTEM ) startFunction = System.nanoTime();
+			
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
 			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
@@ -283,15 +321,18 @@ public class Team42 implements Bot {
 			this.country = country;
 			this.profile = profile;
 			this.value = this.profile.eval( pointSystemValues );
+			
+			if ( VERBOSE_TIME_POINT_SYSTEM ) System.err.println("Evaluating country id "+ country +" time("+(float)((System.nanoTime() - startFunction)/1000)/1000.0f+"ms)");
 		}
 		public int getCountry(){ return country; }
 		public float getValue(){ return value; }
 		public boolean isUpperTheThreshold( float treshold ){return value >= treshold;}
-		@Override public int compareTo(CountryValuePair arg0) {return Float.compare( value , arg0.getValue() );}
+		@Override public int compareTo(CountryValuePair arg0) {return - Float.compare( value , arg0.getValue() );}
 		@Override public boolean equals(Object obj){
 			CountryValuePair cvp = (CountryValuePair)obj;
 			return this.country==cvp.country && this.profile==cvp.profile;
 		}
+		@Override public String toString(){ return GameData.COUNTRY_NAMES[country]+"::"+value; }
 	}
 
 	List<CountryValuePair> getStrategyValueOf( Collection<Integer> countryIds, Profile profile ){
@@ -333,7 +374,7 @@ public class Team42 implements Bot {
 		// put your code here
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
-						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
+						this.getStrategyValueOf(getMyCountries(), 
 								reinforceProfile) 
 						);
 
@@ -411,16 +452,22 @@ public class Team42 implements Bot {
 		int minNumOfAttacks = 1, maxNumOfAttacks = 5;
 		final float tresholdToAttack = 0.7f;
 		final float tresholdToBeSelectedToAttack = 0.7f;
+		
+		if ( VERBOSE_BATTLE ) System.err.println(getName()+".pid("+player.getId()+"): Evaluating who to attack, this should be the "+this.numOfAttacksDoneInThisTurn+"th attack done in this turn");
 
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
 								attackProfile) 
 						);
+		
+		PRINT(VERBOSE_BATTLE, list, "strategy_value_of_attackable_joint_foes" );
+		
 		if ( ! list.isEmpty() && this.numOfAttacksDoneInThisTurn < maxNumOfAttacks
 				&& ( list.get(0).isUpperTheThreshold(tresholdToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks ) ){
 
 			int countryToAttackId  = list.get(0).country;
+			PRINT(VERBOSE_BATTLE, Arrays.asList(new CountryValuePair[]{list.get(0)}), "most_valuable_state_to_attack" );
 
 			List<CountryValuePair> valuesOfAttackers = 
 					this.sortCountryValuePair(
@@ -432,17 +479,21 @@ public class Team42 implements Bot {
 									mostAdaptToAttackProfile
 									)
 							);
+			PRINT(VERBOSE_BATTLE, valuesOfAttackers, "strategy_value_of_possibly_attackers" );
+
 			// the list can't be empty since list was filtered on the attackable country, then there is a country able to attacke this.
 			if ( valuesOfAttackers.get(0).isUpperTheThreshold(tresholdToBeSelectedToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks  ){
+				PRINT(VERBOSE_BATTLE, Arrays.asList(new CountryValuePair[]{valuesOfAttackers.get(0)}), "attacking_with" );
 				command = 
-						GameData.CONTINENT_NAMES[countryToAttackId] +
+						GameData.COUNTRY_NAMES[valuesOfAttackers.get(0).country].replaceAll("\\s", "") +
 						" " +
-						GameData.CONTINENT_NAMES[valuesOfAttackers.get(0).country] +
+						GameData.COUNTRY_NAMES[countryToAttackId].replaceAll("\\s", "") +
 						" " +
 						( Math.min(3, board.getNumUnits(valuesOfAttackers.get(0).country)-1) );
 				numOfAttacksDoneInThisTurn++;
 			}
 		}		
+		GETCHAR();
 		return(command);
 	}
 

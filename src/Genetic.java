@@ -1,14 +1,35 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
 
 public class Genetic {
 	static final int BOT_COUNT = 20;
 	static final int WINNING_BOT = 4;
+	static final double MUTATION_PROB = 0.5;
 	
-	static class Pair{
-		public Team42.Profile first, second ;
+	
+	static class Pair<T>{
+		public T first, second ;
+		public Pair(T first, T second){
+			this.first = first;
+			this.second = second;
+		}
 	}
+	static class PointPair extends Pair<Integer> implements Comparable<PointPair>{
+
+		public PointPair(Integer first, Integer second) {
+			super(first, second);
+		}
+
+		@Override
+		public int compareTo(PointPair arg0) {
+			return - Integer.compare( second, arg0.second );
+		}
+		
+	}
+	
 	
 	static class RandomProfile extends Team42.Profile{		
 		static float[] CREATE_LIST(int n){
@@ -20,24 +41,121 @@ public class Genetic {
 		public RandomProfile() {
 			super(CREATE_LIST(9));
 		}
+		
+		static Pair<Team42.Profile> NEW_GENERATION_PROFILES( Team42.Profile p1, Team42.Profile p2 ){
+			float[] f1 = p1.coefficients, f2 = p2.coefficients;
+			int n = f1.length;
+			int [] indexs = new int[n];
+			for ( int i=0; i<n; i++ ) indexs[i] = i;
+			for ( int i=0; i<n/2; i++){
+				int index ;
+				do{
+					index = (int)(Math.random()*n);
+				}while ( indexs[index] == -1 );
+				
+				float t = f1[ indexs[index] ];
+				f1[ indexs[index] ] = f2[ indexs[index] ];
+				f2[ indexs[index] ] = t;
+								
+				indexs[index] = -1;
+			}
+			if ( Math.random() < MUTATION_PROB/2 )
+				f1[ (int)(Math.random()*n) ] = (float)Math.random();
+			if ( Math.random() < MUTATION_PROB/2 )
+				f2[ (int)(Math.random()*n) ] = (float)Math.random();
+
+			return new Pair<Team42.Profile>(new Team42.Profile(f1), new Team42.Profile(f2));
+		}
+	}
+	
+	static Pair<List<Team42.Profile>> newSetGeneration(List<Team42.Profile> l1, List<Team42.Profile> l2){
+		List<Team42.Profile> ret1 = new LinkedList<>();
+		List<Team42.Profile> ret2 = new LinkedList<>();
+		for ( int i=0;i<l1.size() && i<l2.size();i++ ){
+			Pair<Team42.Profile> p = RandomProfile.NEW_GENERATION_PROFILES(l1.get(i), l2.get(i));
+			ret1.add(p.first);
+			ret2.add(p.second);
+		}
+		return new Pair<List<Team42.Profile>>( ret1, ret2 );
 	}
 	
 	
-	class TestBot extends Team42{
-
+	
+	static class TestBot extends Team42{
+		static int I = 0;
+		int i;
 		protected TestBot(BoardAPI inBoard, PlayerAPI inPlayer, List<Profile> profiles ) {
 			super(inBoard, inPlayer, profiles.get(0), profiles.get(1), profiles.get(2) );
+			this.i = I++;
 		}
 		
+		@Override public String getName(){
+			return "BOT_"+i;
+		}
+	}
+	
+	static List<Team42.Profile> new_profile_list(int n){
+		List<Team42.Profile> list = new LinkedList<>();
+		for ( int i=0; i<n; i++ ) list.add(new RandomProfile());
+		return list;
 	}
 	
 	
-	public static void main (String args[]) {
-		
-		
+	public static void main (String args[]) throws InterruptedException {
+		Team42.VERBOSE_TIME_POINT_SYSTEM = false;
+		Team42.VERBOSE_BATTLE = true;
+		Team42.VERBOSE_INPUT_LOCKER = true;
+		List< List<Team42.Profile> > list = new LinkedList<>();
+		PointPair[] points = new PointPair[ BOT_COUNT ];
+		int N = 3;
+
+		for ( int round=0; round<1000; round++){
+			while ( list.size() < BOT_COUNT )
+				list.add(new_profile_list(N) );
+
+			for ( int i=0; i<BOT_COUNT; i++){
+				points[i] = new PointPair ( i, 0 );
+			}
+			
+			for ( int i=0; i<BOT_COUNT; i++ )
+				for (int j=i+1;j<BOT_COUNT;j++){
+					int winner = run ( list.get(i), list.get(j) );
+					if ( winner == 0 ) winner = i ;
+					else winner = j;
+					points[winner] = new PointPair( points[winner].first, points[winner].second+1 );
+				}
+			
+			Arrays.sort( points );
+			List< List<Team42.Profile> > old = new LinkedList<>(list);
+			list.clear();
+			System.out.println("Round "+round+" winners : ");
+			for ( int i=0; i<Genetic.WINNING_BOT; i++ ){
+				System.out.print( points[i].first + " won "+points[i].second+" matchs) ");
+				dump ( old.get(points[i].first) );
+				for ( int j=i+1; j<WINNING_BOT; j++ ){
+					Pair<List<Team42.Profile>> p = newSetGeneration( old.get(points[i].first), old.get(points[j].first) );
+					list.add( p.first );
+					list.add( p.second );
+				}
+				System.out.println("");
+			}			
+
+		}
+				
+	}
+	static void dump ( List<Team42.Profile> l){
+		for ( Team42.Profile p : l ){
+			for ( float f : p.coefficients )
+				System.out.print(f+", ");
+			System.out.print("; ");
+		}		
 	}
 	
-	int run( List<Team42.Profile> bot1Profiles, List<Team42.Profile> bot2Profiles ){
+	
+	static int randomRun( List<Team42.Profile> bot1Profiles, List<Team42.Profile> bot2Profiles ) throws InterruptedException{
+		return (int)(Math.random()*2);
+	}
+	static int run( List<Team42.Profile> bot1Profiles, List<Team42.Profile> bot2Profiles ) throws InterruptedException{
 		int MAX = 100;
 		Board board = new Board();
 		UI ui = new UI(board);
@@ -53,10 +171,10 @@ public class Genetic {
 		ui.displayMap();
 		for (playerId=0; playerId<GameData.NUM_PLAYERS_PLUS_NEUTRALS; playerId++) {
 			players[playerId] = new Player (playerId);
-			if (playerId == 1) {
+			if (playerId == 0) {
 				players[playerId].setBot(new TestBot(board,players[playerId], bot1Profiles));
 			}
-			if (playerId == 2) {
+			if (playerId == 1) {
 				players[playerId].setBot(new TestBot(board,players[playerId], bot2Profiles));
 			}
 			if (playerId < GameData.NUM_PLAYERS) {
@@ -255,6 +373,13 @@ public class Genetic {
 		
 		ui.displayWinner(players[board.getWinner()]);
 		ui.displayString("GAME OVER");
+	
+		ui = null;
+
+		java.awt.Window win[] = java.awt.Window.getWindows(); 
+		for(int i=0;i<win.length;i++){ 
+			win[i].dispose(); 
+		} 
 		
 		return board.getWinner();
 	}
