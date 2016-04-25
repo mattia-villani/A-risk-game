@@ -265,7 +265,7 @@ public class Team42 implements Bot {
 					armiesInJointFoeCountries ); // defending
 
 			//if it connects two blocks		
-			// pointSystemValues[6] = TODO
+			// pointSystemValues[6] = if 
 
 			// point_system_would_we_be_more_protected  
 			pointSystemValues[7] = 
@@ -333,7 +333,7 @@ public class Team42 implements Bot {
 		// put your code here
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
-						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
+						this.getStrategyValueOf(getMyCountries(), 
 								reinforceProfile) 
 						);
 
@@ -349,7 +349,46 @@ public class Team42 implements Bot {
 	public String getPlacement (int forPlayer) {
 		String command = "";
 		// put your code here
-		command = GameData.COUNTRY_NAMES[(int)(Math.random() * GameData.NUM_COUNTRIES)];
+		
+		if (forPlayer!= player.getId()){
+			ArrayList<Integer> owned = new ArrayList<Integer>();
+			for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
+				if (forPlayer == board.getOccupier(i)){
+					owned.add(i);
+				}
+			}
+			int toPlace = 0;
+			int toPlaceEnemies = 0;
+			
+			for (int i = 0; i < owned.size(); ++i){
+				int enemies = 0;
+				int currOwned = owned.get(i);
+				for (int j = 0; j < GameData.NUM_COUNTRIES; ++j){
+					
+					
+					if (board.isAdjacent(currOwned, j) && board.getOccupier(j) != player.getId()){
+						enemies += board.getNumUnits(j);
+					}
+					
+				}
+				if (enemies > toPlaceEnemies){
+					toPlace = i;
+					toPlaceEnemies = enemies;
+				}
+			}
+			command = GameData.COUNTRY_NAMES[toPlace];
+		}
+		else{
+			List<CountryValuePair> list = 
+					this.sortCountryValuePair(
+							this.getStrategyValueOf(getMyCountries(), 
+									reinforceProfile) 
+							);
+
+			int countryToAttackId  = list.get(0).country;
+			command = GameData.COUNTRY_NAMES[(int)countryToAttackId];
+			
+		}
 		command = command.replaceAll("\\s", "");
 		return(command);
 	}
