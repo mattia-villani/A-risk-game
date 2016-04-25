@@ -181,11 +181,11 @@ public class Team42 implements Bot {
 			if ( attacking == defending -1 ) return 0.50650f;
 			if ( attacking == defending -2 ) return 0.50393f;
 			// unknown cases... try to reduce to a known situation
-			while ( attacking > 10 || defending > 10 ){
+			while ( attacking > WINNING_PROPABILITY.length || defending > WINNING_PROPABILITY[0].length ){
 				attacking *= 0.8f;
 				defending *= 0.8f;
 			}
-			return Profile.WINNING_PROPABILITY[attacking][defending];			
+			return Math.min(0, Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; // map the probability from 0.5 to 1 to from 0 to 1 		
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
@@ -225,13 +225,12 @@ public class Team42 implements Bot {
 		Profile profile;
 		float value;
 		public CountryValuePair( int country, Profile profile ){
-			//TODO: use the profile coefficients to evaluate the value of the country with id countryID
 
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
 			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
-			int armiesInThisCountry = foldl( foeAdjacentStates, 0, sumArmies );
+			int armiesInJointFoeCountries = foldl( foeAdjacentStates, 0, sumArmies );
 			int myArmiesInTheJointStates = foldl( myJointCountries, 0, sumArmies );
 			int continentId = COUNTRY_CONTINENT[country];
 			int occupierId = board.getOccupier(country);
@@ -242,9 +241,8 @@ public class Team42 implements Bot {
 			// point_system_adjacent_states_owned_by_the_other_player  
 			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
 
-			//TODO: fix the following value 
 			//point_system_continent_value 
-			pointSystemValues[1] = Profile.point_for_continent[ 0 ];
+			pointSystemValues[1] = Profile.point_for_continent[ continentId ];
 
 			//how close are we to owning the continent			
 			pointSystemValues[2] = (float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
@@ -258,13 +256,13 @@ public class Team42 implements Bot {
 			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
 
 			// point_system_enemy_armies_around 
-			pointSystemValues[4] = armiesInThisCountry / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
+			pointSystemValues[4] = armiesInJointFoeCountries / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
 
 			//how likely we are to win		
 			pointSystemValues[5] = Profile.howLikelyWeAreToWin( 
 					(int)( ( myArmiesInTheJointStates - myJointCountries.size() ) 
 							/ Profile.coefficientForJointOwnedArmies( myJointCountries.size() ) ), // attacking
-					armiesInThisCountry ); // defending
+					armiesInJointFoeCountries ); // defending
 
 			//if it connects two blocks		
 			// pointSystemValues[6] = TODO
