@@ -415,7 +415,7 @@ public class Team42 implements Bot {
 
 				}
 				if (enemies > toPlaceEnemies){
-					toPlace = i;
+					toPlace = owned.get(i);
 					toPlaceEnemies = enemies;
 				}
 			}
