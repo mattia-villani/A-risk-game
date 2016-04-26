@@ -20,21 +20,22 @@ public class Team42 implements Bot {
 	// YourTeamName may not alter the state of the board or the player objects
 	// It may only inspect the state of the board and the player objects
 	// So you can use player.getNumUnits() but you can't use player.addUnits(10000), for example
-	
+
 	private BoardAPI board;
 	private PlayerAPI player;
 
 	private int numOfAttacksDoneInThisTurn = 0;
+	private int lastAttack = 0;
 
 	/*
 	 * debugs
 	 */
-	
+
 	static public boolean 
-		VERBOSE_INPUT_LOCKER = false,
-		VERBOSE_TIME_POINT_SYSTEM = false, 
-		VERBOSE_BATTLE = false;
-	
+	VERBOSE_INPUT_LOCKER = false,
+	VERBOSE_TIME_POINT_SYSTEM = false, 
+	VERBOSE_BATTLE = false;
+
 	static void GETCHAR( ){
 		if ( VERBOSE_INPUT_LOCKER ){
 			System.err.print("...press any key...");
@@ -42,7 +43,7 @@ public class Team42 implements Bot {
 			System.err.flush();
 		}
 	}
-	
+
 	static <T>void PRINT( boolean verbose, List<T> list, String text ){
 		if ( verbose == false ) return;
 		if ( list == null ){
@@ -52,8 +53,8 @@ public class Team42 implements Bot {
 		for ( T t : list ) System.err.print(t+" ");
 		System.err.println(" }");
 	}
-	
-	
+
+
 	/*
 	 * READING BOARDS
 	 */
@@ -263,7 +264,7 @@ public class Team42 implements Bot {
 		public CountryValuePair( int country, Profile profile ){
 			long startFunction = 0;
 			if ( VERBOSE_TIME_POINT_SYSTEM ) startFunction = System.nanoTime();
-			
+
 			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
 			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
@@ -321,7 +322,7 @@ public class Team42 implements Bot {
 			this.country = country;
 			this.profile = profile;
 			this.value = this.profile.eval( pointSystemValues );
-			
+
 			if ( VERBOSE_TIME_POINT_SYSTEM ) System.err.println("Evaluating country id "+ country +" time("+(float)((System.nanoTime() - startFunction)/1000)/1000.0f+"ms)");
 		}
 		public int getCountry(){ return country; }
@@ -390,7 +391,7 @@ public class Team42 implements Bot {
 	public String getPlacement (int forPlayer) {
 		String command = "";
 		// put your code here
-		
+
 		if (forPlayer!= player.getId()){
 			ArrayList<Integer> owned = new ArrayList<Integer>();
 			for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
@@ -400,17 +401,17 @@ public class Team42 implements Bot {
 			}
 			int toPlace = 0;
 			int toPlaceEnemies = 0;
-			
+
 			for (int i = 0; i < owned.size(); ++i){
 				int enemies = 0;
 				int currOwned = owned.get(i);
 				for (int j = 0; j < GameData.NUM_COUNTRIES; ++j){
-					
-					
+
+
 					if (board.isAdjacent(currOwned, j) && board.getOccupier(j) != player.getId()){
 						enemies += board.getNumUnits(j);
 					}
-					
+
 				}
 				if (enemies > toPlaceEnemies){
 					toPlace = i;
@@ -428,7 +429,7 @@ public class Team42 implements Bot {
 
 			int countryToAttackId  = list.get(0).country;
 			command = GameData.COUNTRY_NAMES[(int)countryToAttackId];
-			
+
 		}
 		command = command.replaceAll("\\s", "");
 		return(command);
@@ -491,7 +492,7 @@ public class Team42 implements Bot {
 		int minNumOfAttacks = 1, maxNumOfAttacks = 5;
 		final float tresholdToAttack = 0.7f;
 		final float tresholdToBeSelectedToAttack = 0.7f;
-		
+
 		if ( VERBOSE_BATTLE ) System.err.println(getName()+".pid("+player.getId()+"): Evaluating who to attack, this should be the "+this.numOfAttacksDoneInThisTurn+"th attack done in this turn");
 
 		List<CountryValuePair> list = 
@@ -499,9 +500,9 @@ public class Team42 implements Bot {
 						this.getStrategyValueOf(getOnlyAttackableAdjacentFoes(), 
 								attackProfile) 
 						);
-		
+
 		PRINT(VERBOSE_BATTLE, list, "strategy_value_of_attackable_joint_foes" );
-		
+
 		if ( ! list.isEmpty() && this.numOfAttacksDoneInThisTurn < maxNumOfAttacks
 				&& ( list.get(0).isUpperTheThreshold(tresholdToAttack) || this.numOfAttacksDoneInThisTurn < minNumOfAttacks ) ){
 
@@ -548,15 +549,93 @@ public class Team42 implements Bot {
 		/*
 		 * look at if both states had one, what their values would be, then give each state ratio of points
 		 */
-		command = "0";
+		List<Integer> choices = new ArrayList <Integer>();
+		List<CountryValuePair> list = 
+				this.sortCountryValuePair(
+						this.getStrategyValueOf(choices, 
+								reinforceProfile) 
+						);
+		CountryValuePair valNew = new CountryValuePair(attackCountryId, reinforceProfile);
+		CountryValuePair valOld = new CountryValuePair(lastAttack, reinforceProfile);
+
+		float newNum = valNew.getValue();
+		float oldNum = valOld.getValue();
+
+		int commandInt = (int) (board.getNumUnits(lastAttack) * (newNum / (newNum + oldNum)));
+
+		command = Integer.toString(commandInt);
+
 		return(command);
 	}
 
 	public String getFortify () {
 		String command = "";
 		// put code here
-		command = "skip";
+		int currPlace = 0;
+		List<CountryValuePair> list = 
+				this.sortCountryValuePair(
+						this.getStrategyValueOf(getMyCountries(), 
+								reinforceProfile) 
+
+						);
+
+		boolean done = false;
+		int givingCountry = -1; 
+		int gettingCountry = -1;
+		while (!done){
+			for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
+				if (board.getNumUnits(i) > board.getNumUnits(list.get(currPlace).getCountry()) && board.getOccupier(i) != player.getId() 
+						&& board.isAdjacent(i,list.get(currPlace).getCountry())){
+
+					done = true;
+					gettingCountry = list.get(currPlace).getCountry();
+					break;
+
+				}
+
+			}
+			currPlace++;
+
+		}
+		if (givingCountry != -1){
+			int max = 0;
+			int maxId = 0;
+			for (int i = list.size() - 1; i >= 0; --i){
+				if (list.get(i).getCountry() != givingCountry){
+					if (board.isConnected(getMyCountries().get(i), givingCountry)){
+						givingCountry = list.get(i).getCountry();
+					}
+				}
+			}
+		}
+		if (givingCountry == -1 || gettingCountry == -1)
+			command = "skip";
+		else{
+			command = GameData.COUNTRY_NAMES[givingCountry] + " " + GameData.COUNTRY_NAMES[gettingCountry] + " " 
+		+  Integer.toString(moveRatio(gettingCountry, givingCountry));
+		}
 		return(command);
+	}
+
+	public int moveRatio (int newId, int oldId) {
+		String command = "";
+		/*
+		 * look at if both states had one, what their values would be, then give each state ratio of points
+		 */
+		List<Integer> choices = new ArrayList <Integer>();
+		List<CountryValuePair> list = 
+				this.sortCountryValuePair(
+						this.getStrategyValueOf(choices, 
+								reinforceProfile) 
+						);
+		CountryValuePair valNew = new CountryValuePair(newId, reinforceProfile);
+		CountryValuePair valOld = new CountryValuePair(oldId, reinforceProfile);
+
+		float newNum = valNew.getValue();
+		float oldNum = valOld.getValue();
+
+		int commandInt = (int) (board.getNumUnits(oldId) * (newNum / (newNum + oldNum)));
+		return commandInt;
 	}
 
 	public float howClosetoOwningContinent(int countryId){
