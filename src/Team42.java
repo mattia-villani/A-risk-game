@@ -227,9 +227,10 @@ public class Team42 implements Bot {
 	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
 		this(inBoard, inPlayer);
 		// TODO fixers
-		attack_profile.coefficients[5]+=4f;
-		most_adapt_to_attack_profile.coefficients[5]+=7f;
-		reinforce_profile.coefficients[0] *=-1f;
+		if ( attack_profile.coefficients[5] < 1f ) attack_profile.coefficients[5]*=5f;
+		if ( most_adapt_to_attack_profile.coefficients[5] < 1f ) most_adapt_to_attack_profile.coefficients[5]*=7f;
+		if ( reinforce_profile.coefficients[0] >= 0 ) reinforce_profile.coefficients[0] *=-1f;
+		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *=5f;
 		this.attackProfile = attack_profile;
 		this.mostAdaptToAttackProfile = most_adapt_to_attack_profile;
 		this.reinforceProfile = reinforce_profile;
