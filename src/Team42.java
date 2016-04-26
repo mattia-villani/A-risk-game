@@ -595,7 +595,12 @@ public class Team42 implements Bot {
 				}
 
 			}
+			
 			currPlace++;
+			if (currPlace == list.size()){
+				done = true;
+			}
+			
 
 		}
 		if (givingCountry != -1){
