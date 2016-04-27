@@ -34,7 +34,8 @@ public class Team42 implements Bot {
 	static public boolean 
 	VERBOSE_INPUT_LOCKER = false,
 	VERBOSE_TIME_POINT_SYSTEM = false, 
-	VERBOSE_BATTLE = false;
+	VERBOSE_BATTLE = false,
+	VERBOSE_WAIT = false;
 
 	static void GETCHAR( ){
 		if ( VERBOSE_INPUT_LOCKER ){
@@ -42,6 +43,12 @@ public class Team42 implements Bot {
 			new java.util.Scanner(System.in).nextLine();
 			System.err.flush();
 		}
+	}
+	static void WAIT( ){
+		if ( VERBOSE_WAIT )
+			try{
+				Thread.sleep(20);
+			}catch(Exception e){}
 	}
 
 	static <T>void PRINT( boolean verbose, List<T> list, String text ){
@@ -176,10 +183,12 @@ public class Team42 implements Bot {
 			new float[]{ 1f,  1.0f, .994f, .981f, .954f, .916f, .861f, .800f, .724f, .650f, .568f } // 10 attacker 
 		};
 
-		//TODO: give meaning to the following
-		static float[] point_for_continent = { .5f , .5f , .5f , .5f , .5f , .5f };
-		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 15f; // TODO 
-		static float PENALIZATION_FOR_EXTRA_COUNTRY = 0.7f; // TODO 
+		static float[] point_for_continent = { (float)GameData.CONTINENT_VALUES[0]/7f , (float)GameData.CONTINENT_VALUES[1]/7f ,
+				(float)GameData.CONTINENT_VALUES[2]/7f , (float)GameData.CONTINENT_VALUES[3]/7f , 
+				(float)GameData.CONTINENT_VALUES[4]/7f , (float)GameData.CONTINENT_VALUES[5]/7f };
+		static float DIVISOR_FOR_SOURANDING_ENEMY_COUNT = 10f;  
+		static float DIVISOR_FOR_ARMY_COUNT = 1f;
+		static float PENALIZATION_FOR_EXTRA_COUNTRY = 0.7f;  
 
 
 		float[] coefficients;
@@ -215,10 +224,23 @@ public class Team42 implements Bot {
 			if ( attacking == defending -2 ) return 0.50393f;
 			// unknown cases... try to reduce to a known situation
 			while ( attacking >= WINNING_PROPABILITY.length || defending >= WINNING_PROPABILITY[0].length ){
-				attacking *= 0.9f;
-				defending *= 0.9f;
+				attacking --;
+				defending --;
 			}
-			return Math.min(0, Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; // map the probability from 0.5 to 1 to from 0 to 1 		
+			if ( defending < 0 ) return 1f;
+			if ( attacking < 0 ) return 0f;
+			return (Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; 		
+		}
+	}
+	static class RandomProfile extends Team42.Profile{		
+		static float[] CREATE_LIST(int n){
+			float[] vals = new float[n];
+			for ( int i=0; i<n; i++)
+				vals[i] = (float) Math.random();
+			return vals;
+		}
+		public RandomProfile() {
+			super(CREATE_LIST(10));
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
@@ -226,24 +248,32 @@ public class Team42 implements Bot {
 	private Profile mostAdaptToAttackProfile = null;
 	private Profile reinforceProfile = null;
 	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
-		this(inBoard, inPlayer);
-		// TODO fixers
-		if ( attack_profile.coefficients[5] < 1f ) attack_profile.coefficients[5]*=5f;
-		if ( most_adapt_to_attack_profile.coefficients[5] < 1f ) most_adapt_to_attack_profile.coefficients[5]*=7f;
-		if ( reinforce_profile.coefficients[0] >= 0 ) reinforce_profile.coefficients[0] *=-1f;
-		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *=5f;
+		board = inBoard;	
+		player = inPlayer;
+
+		if ( attack_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *=5f;
+		if ( reinforce_profile.coefficients[0] < 1 ) reinforce_profile.coefficients[0] *=5f;
+		if ( reinforce_profile.coefficients[3] < 1 ) reinforce_profile.coefficients[3] *= 3f;
+		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *= 3f;
+		if ( reinforce_profile.coefficients[9] > 0 ) reinforce_profile.coefficients[9] *= -1f;
+
+
+		attack_profile.coefficients[5] = 5f;
+		attack_profile.coefficients[9] *= -0.8;
+
+		most_adapt_to_attack_profile.coefficients[5] = 5f;
+
+		reinforce_profile.coefficients[5] = 0f;
+		reinforce_profile.coefficients[6] = 0f;
+		reinforce_profile.coefficients[7] = -2f;
 		this.attackProfile = attack_profile;
 		this.mostAdaptToAttackProfile = most_adapt_to_attack_profile;
 		this.reinforceProfile = reinforce_profile;
 	}
 
-
-	//TODO fill the following list;
-	static int[] BORDER_STATES = {};
 	static int MAX_ADJACENT_STATES ;
 	static int[] COUNTRY_CONTINENT;
 	static {
-		Arrays.sort( BORDER_STATES );
 		int max = 0;
 		for ( int[] adj : GameData.ADJACENT )
 			max = Math.max( max , adj.length );
@@ -276,7 +306,7 @@ public class Team42 implements Bot {
 			int occupierId = board.getOccupier(country);
 
 
-			float[] pointSystemValues = new float[9];
+			float[] pointSystemValues = new float[10];
 
 			// point_system_adjacent_states_owned_by_the_other_player  
 			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
@@ -293,7 +323,12 @@ public class Team42 implements Bot {
 			}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			//point_system_is_border_country 
-			pointSystemValues[3] = Arrays.binarySearch(BORDER_STATES, country) >= 0.f ? 1.f : 0.f ;
+			pointSystemValues[3] = count( GameData.ADJACENT[country], new Property(){
+				@Override
+				public boolean satisfies(int id) {
+					return GameData.CONTINENT_IDS[id] != GameData.CONTINENT_IDS[country]; 
+				}				
+			}) != 0 ? 1.f : 0.f ;
 
 			// point_system_enemy_armies_around 
 			pointSystemValues[4] = armiesInJointFoeCountries / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
@@ -305,11 +340,11 @@ public class Team42 implements Bot {
 					armiesInJointFoeCountries ); // defending
 
 			//if it connects two blocks		
-			// pointSystemValues[6] = if 
+			pointSystemValues[6] = willMakeCluster(country) ? 1f : 0f;
 
 			// point_system_would_we_be_more_protected  
-			pointSystemValues[7] = 
-					Math.min( 1.f , ( (float)( totalNumberOfAdjs - foeAdjacentStates.size()) ) / (float)foeAdjacentStates.size() );
+			pointSystemValues[7] = foeAdjacentStates.size()!=0 ?
+					Math.min( 1.f , ( (float)( totalNumberOfAdjs - foeAdjacentStates.size()) ) / (float)foeAdjacentStates.size() ) : 1f;
 
 			//are they part of a opponent's continent?			
 			pointSystemValues[8] = 
@@ -319,6 +354,9 @@ public class Team42 implements Bot {
 							return occupierId == board.getOccupier(id);
 						}
 					}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
+
+			//how many armies there are inside?			
+			pointSystemValues[9] = (float)board.getNumUnits(country) / Profile.DIVISOR_FOR_ARMY_COUNT;
 
 			this.country = country;
 			this.profile = profile;
@@ -357,9 +395,7 @@ public class Team42 implements Bot {
 	 */
 
 	Team42 (BoardAPI inBoard, PlayerAPI inPlayer) {
-		board = inBoard;	
-		player = inPlayer;
-		// put your code here
+		this(inBoard, inPlayer, new RandomProfile(), new RandomProfile(), new RandomProfile());
 		return;
 	}
 
@@ -487,12 +523,10 @@ public class Team42 implements Bot {
 
 	public String getBattle () {
 		String command = "skip";
-
-		// TODO: fix this value as good as possible
-
+		
 		int minNumOfAttacks = 1, maxNumOfAttacks = 5;
-		final float tresholdToAttack = 0.7f;
-		final float tresholdToBeSelectedToAttack = 0.7f;
+		final float tresholdToAttack = 2f;
+		final float tresholdToBeSelectedToAttack = 1f;
 
 		if ( VERBOSE_BATTLE ) System.err.println(getName()+".pid("+player.getId()+"): Evaluating who to attack, this should be the "+this.numOfAttacksDoneInThisTurn+"th attack done in this turn");
 
@@ -531,9 +565,12 @@ public class Team42 implements Bot {
 						GameData.COUNTRY_NAMES[countryToAttackId].replaceAll("\\s", "") +
 						" " +
 						( Math.min(3, board.getNumUnits(valuesOfAttackers.get(0).country)-1) );
-				numOfAttacksDoneInThisTurn++;
+				if ( board.getOccupier(lastAttack) == player.getId() ) // then i conquered that before! 
+					numOfAttacksDoneInThisTurn++;
+				lastAttack = countryToAttackId ;
 			}
 		}		
+		WAIT();
 		GETCHAR();
 		return(command);
 	}
@@ -550,20 +587,22 @@ public class Team42 implements Bot {
 		/*
 		 * look at if both states had one, what their values would be, then give each state ratio of points
 		 */
-		List<Integer> choices = new ArrayList <Integer>();
-		List<CountryValuePair> list = 
-				this.sortCountryValuePair(
-						this.getStrategyValueOf(choices, 
-								reinforceProfile) 
-						);
 		CountryValuePair valNew = new CountryValuePair(attackCountryId, reinforceProfile);
 		CountryValuePair valOld = new CountryValuePair(lastAttack, reinforceProfile);
 
 		float newNum = valNew.getValue();
 		float oldNum = valOld.getValue();
+		if ( newNum < 0 ) {
+			newNum = 0;
+			oldNum += newNum;
+		}
+		if ( oldNum < 0 ){
+			oldNum = 0;
+			newNum += newNum;			
+		}
 
-		int commandInt = (int) (board.getNumUnits(lastAttack) * (newNum / (newNum + oldNum)));
-
+		int commandInt = (int) ((board.getNumUnits(attackCountryId)-1) * (newNum / (newNum + oldNum)));
+		commandInt = (int) Math.min( (board.getNumUnits(attackCountryId)-1) , Math.abs(commandInt) );
 		command = Integer.toString(commandInt);
 
 		return(command);
@@ -577,7 +616,6 @@ public class Team42 implements Bot {
 				this.sortCountryValuePair(
 						this.getStrategyValueOf(getMyCountries(), 
 								reinforceProfile) 
-
 						);
 
 		boolean done = false;
@@ -624,23 +662,28 @@ public class Team42 implements Bot {
 	}
 
 	public int moveRatio (int newId, int oldId) {
-		String command = "";
 		/*
 		 * look at if both states had one, what their values would be, then give each state ratio of points
 		 */
-		List<Integer> choices = new ArrayList <Integer>();
-		List<CountryValuePair> list = 
-				this.sortCountryValuePair(
-						this.getStrategyValueOf(choices, 
-								reinforceProfile) 
-						);
+
 		CountryValuePair valNew = new CountryValuePair(newId, reinforceProfile);
 		CountryValuePair valOld = new CountryValuePair(oldId, reinforceProfile);
 
 		float newNum = valNew.getValue();
 		float oldNum = valOld.getValue();
 
-		int commandInt = (int) (board.getNumUnits(oldId) * (newNum / (newNum + oldNum)));
+		if ( newNum < 0 ) {
+			newNum = 0;
+			oldNum += newNum;
+		}
+		if ( oldNum < 0 ){
+			oldNum = 0;
+			newNum += newNum;			
+		}
+
+		int commandInt = (int) ((board.getNumUnits(oldId)-1) * (newNum / (newNum + oldNum)));
+		commandInt = (int) Math.min( (board.getNumUnits(oldId)-1) , Math.abs(commandInt) );
+		
 		return commandInt;
 	}
 
@@ -657,28 +700,30 @@ public class Team42 implements Bot {
 		return owned/(unowned + owned);
 	}
 	public boolean willMakeCluster(int countryId){
-		ArrayList<Integer> ownedAdj = new ArrayList<Integer>();
-		for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
-			if (countryId != i){
-				if (board.isAdjacent(countryId, i)){
-					if (board.getOccupier(i) == player.getId()) ownedAdj.add(i);
+		try{
+			ArrayList<Integer> ownedAdj = new ArrayList<Integer>();
+			for (int i = 0; i < GameData.NUM_COUNTRIES; ++i){
+				if (countryId != i){
+					if (board.isAdjacent(countryId, i)){
+						if (board.getOccupier(i) == player.getId()) ownedAdj.add(i);
+					}
+	
 				}
-
 			}
-		}
-		if (ownedAdj.size() < 2) return false;
-		else{
-			for (int i = 0; i < ownedAdj.size(); ++i){
-				for (int j = 0; j < ownedAdj.size(); ++j){
-					if (i != j){
-						if (board.isAdjacent(ownedAdj.get(i), ownedAdj.get(j))){} //micro optimization
-						else if (!board.isConnected(ownedAdj.get(i), ownedAdj.get(j))){
-							return true;
+			if (ownedAdj.size() < 2) return false;
+			else{
+				for (int i = 0; i < ownedAdj.size(); ++i){
+					for (int j = 0; j < ownedAdj.size(); ++j){
+						if (i != j){
+							if (board.isAdjacent(ownedAdj.get(i), ownedAdj.get(j))){} //micro optimization
+							else if (!board.isConnected(ownedAdj.get(i), ownedAdj.get(j))){
+								return true;
+							}
 						}
 					}
 				}
 			}
-		}
+		}catch( Exception e ){}
 		return false;
 	}
 

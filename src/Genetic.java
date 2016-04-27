@@ -31,17 +31,8 @@ public class Genetic {
 	}
 	
 	
-	static class RandomProfile extends Team42.Profile{		
-		static float[] CREATE_LIST(int n){
-			float[] vals = new float[n];
-			for ( int i=0; i<n; i++)
-				vals[i] = (float) Math.random();
-			return vals;
-		}
-		public RandomProfile() {
-			super(CREATE_LIST(9));
-		}
-		
+	static class RandomProfile extends Team42.RandomProfile{		
+
 		static Pair<Team42.Profile> NEW_GENERATION_PROFILES( Team42.Profile p1, Team42.Profile p2 ){
 			float[] f1 = p1.coefficients, f2 = p2.coefficients;
 			int n = f1.length;
@@ -103,8 +94,9 @@ public class Genetic {
 	
 	public static void main (String args[]) throws InterruptedException {
 		Team42.VERBOSE_TIME_POINT_SYSTEM = false;
-		Team42.VERBOSE_BATTLE = true;
-		Team42.VERBOSE_INPUT_LOCKER = true;
+		Team42.VERBOSE_BATTLE = false;
+		Team42.VERBOSE_INPUT_LOCKER = false;
+		Team42.VERBOSE_WAIT = false;
 		List< List<Team42.Profile> > list = new LinkedList<>();
 		PointPair[] points = new PointPair[ BOT_COUNT ];
 		int N = 3;
@@ -121,8 +113,9 @@ public class Genetic {
 				for (int j=i+1;j<BOT_COUNT;j++){
 					int winner = run ( list.get(i), list.get(j) );
 					if ( winner == 0 ) winner = i ;
-					else winner = j;
-					points[winner] = new PointPair( points[winner].first, points[winner].second+1 );
+					else if (winner == 1 ) winner = j;
+					if ( winner >= 0 ) // could be -1 (match unfinished)
+						points[winner] = new PointPair( points[winner].first, points[winner].second+1 );
 				}
 			
 			Arrays.sort( points );
