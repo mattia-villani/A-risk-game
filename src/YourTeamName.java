@@ -14,7 +14,12 @@ import java.util.Set;
 
 // put your code here
 
-public class Team42 implements Bot {
+public class YourTeamName implements Bot {
+	
+	/*
+	 * Team Name: 42
+	 */
+	
 	// The public API of YourTeamName must not change
 	// You cannot change any other classes
 	// YourTeamName may not alter the state of the board or the player objects
@@ -249,7 +254,7 @@ public class Team42 implements Bot {
 			return (Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; 		
 		}
 	}
-	static class RandomProfile extends Team42.Profile{		
+	static class RandomProfile extends YourTeamName.Profile{		
 		static float[] CREATE_LIST(int n){
 			float[] vals = new float[n];
 			for ( int i=0; i<n; i++)
@@ -264,7 +269,7 @@ public class Team42 implements Bot {
 	private Profile attackProfile = null;
 	private Profile mostAdaptToAttackProfile = null;
 	private Profile reinforceProfile = null;
-	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
+	protected YourTeamName(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
 		board = inBoard;	
 		player = inPlayer;
 
@@ -316,8 +321,8 @@ public class Team42 implements Bot {
 			long startFunction = 0;
 			if ( VERBOSE_TIME_POINT_SYSTEM ) startFunction = System.nanoTime();
 
-			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
-			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
+			List<Integer> foeAdjacentStates = YourTeamName.this.getFoesAdjacentTo( country );
+			List<Integer> myJointCountries = YourTeamName.this.filter( YourTeamName.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
 			int armiesInJointFoeCountries = foldl( foeAdjacentStates, 0, sumArmies );
@@ -417,7 +422,7 @@ public class Team42 implements Bot {
 	 * PUBLIC API 
 	 */
 
-	Team42 (BoardAPI inBoard, PlayerAPI inPlayer) {
+	YourTeamName (BoardAPI inBoard, PlayerAPI inPlayer) {
 		this(inBoard, inPlayer, new RandomProfile(), new RandomProfile(), new RandomProfile());
 		return;
 	}
