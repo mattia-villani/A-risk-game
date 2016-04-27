@@ -443,9 +443,8 @@ public class Team42 implements Bot {
 				int enemies = 0;
 				int currOwned = owned.get(i);
 				for (int j = 0; j < GameData.NUM_COUNTRIES; ++j){
-
-
-					if (board.isAdjacent(currOwned, j) && board.getOccupier(j) != player.getId()){
+					if (board.isAdjacent(currOwned, j) && board.getOccupier(j) != player.getId() 
+							&& board.getOccupier(j) != forPlayer && (board.getOccupier(j) == 1 || board.getOccupier(j) == 0)){
 						enemies += board.getNumUnits(j);
 					}
 
