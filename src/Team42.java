@@ -47,7 +47,7 @@ public class Team42 implements Bot {
 	static void WAIT( ){
 		if ( VERBOSE_WAIT )
 			try{
-				Thread.sleep(20);
+				Thread.sleep(1);
 			}catch(Exception e){}
 	}
 
@@ -416,6 +416,7 @@ public class Team42 implements Bot {
 								reinforceProfile) 
 						);
 
+		if ( list.size() == 0 ) return "";
 		int countryToAttackId  = list.get(0).country;
 
 

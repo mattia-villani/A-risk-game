@@ -5,8 +5,8 @@ import java.util.List;
 
 
 public class Genetic {
-	static final int BOT_COUNT = 20;
-	static final int WINNING_BOT = 4;
+	static final int BOT_COUNT = 5;
+	static final int WINNING_BOT = 3;
 	static final double MUTATION_PROB = 0.5;
 	
 	
@@ -96,7 +96,7 @@ public class Genetic {
 		Team42.VERBOSE_TIME_POINT_SYSTEM = false;
 		Team42.VERBOSE_BATTLE = false;
 		Team42.VERBOSE_INPUT_LOCKER = false;
-		Team42.VERBOSE_WAIT = false;
+		Team42.VERBOSE_WAIT = true;
 		List< List<Team42.Profile> > list = new LinkedList<>();
 		PointPair[] points = new PointPair[ BOT_COUNT ];
 		int N = 3;
