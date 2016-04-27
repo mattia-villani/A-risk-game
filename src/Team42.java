@@ -134,18 +134,35 @@ public class Team42 implements Bot {
 			list.add(i);
 		return list;
 	}
-	List<Integer> getAdjacent( int countryId ){
-		List<Integer> list = new LinkedList<>();
-		for ( int id : GameData.ADJACENT[countryId] )
-			list.add(id);
-		return list;
-	}
+	
+	
 
 	/* QUERIES */
 	List<Integer> getMyCountries()		
 	{ return this.filter( this.getAllCountries(), properties.myCountry ); }
 	List<Integer> getFoesAdjacentTo( int countryId )
 	{ return this.filter( this.getAdjacent(countryId), properties.foeCountry ); }
+	
+	List<Integer> getAllBorderCountries(){
+		List<Integer> list = new LinkedList<>();
+		for (int i=0; i<GameData.NUM_COUNTRIES; i++){
+			if (board.getOccupier(i) == player.getId()){
+				Set <Integer> foes = getAllAdjacentFoes();
+				if(foes.isEmpty()){}
+				else list.add(i);
+			}
+		}
+		return list;
+	}
+
+	
+	
+	List<Integer> getAdjacent( int countryId ){
+		List<Integer> list = new LinkedList<>();
+		for ( int id : GameData.ADJACENT[countryId] )
+			list.add(id);
+		return list;
+	}
 
 	Set<Integer> getAllAdjacentFoes(){
 		Set<Integer> set = new HashSet<>();
@@ -418,7 +435,7 @@ public class Team42 implements Bot {
 		// put your code here
 		List<CountryValuePair> list = 
 				this.sortCountryValuePair(
-						this.getStrategyValueOf(getMyCountries(), 
+						this.getStrategyValueOf(getAllBorderCountries(), 
 								reinforceProfile) 
 						);
 
