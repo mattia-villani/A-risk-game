@@ -258,7 +258,7 @@ public class Team42 implements Bot {
 		if ( reinforce_profile.coefficients[3] < 1 ) reinforce_profile.coefficients[3] *= 3f;
 		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *= 3f;
 		if ( reinforce_profile.coefficients[9] > 0 ) reinforce_profile.coefficients[9] *= -0.3f;
-		if ( reinforce_profile.coefficients[10] < 1 ) reinforce_profile.coefficients[10] *= 10f;
+		if ( reinforce_profile.coefficients[10] < 1 ) reinforce_profile.coefficients[10] *= 50f;
 
 
 		attack_profile.coefficients[5] = 5f;
