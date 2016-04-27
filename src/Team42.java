@@ -240,7 +240,7 @@ public class Team42 implements Bot {
 			return vals;
 		}
 		public RandomProfile() {
-			super(CREATE_LIST(10));
+			super(CREATE_LIST(11));
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
@@ -251,11 +251,14 @@ public class Team42 implements Bot {
 		board = inBoard;	
 		player = inPlayer;
 
+		if ( attack_profile.coefficients[2] < 1 ) reinforce_profile.coefficients[2] *=3f;
 		if ( attack_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *=5f;
+		if ( attack_profile.coefficients[10] < 1 ) reinforce_profile.coefficients[10] *=1f;
 		if ( reinforce_profile.coefficients[0] < 1 ) reinforce_profile.coefficients[0] *=5f;
 		if ( reinforce_profile.coefficients[3] < 1 ) reinforce_profile.coefficients[3] *= 3f;
 		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *= 3f;
-		if ( reinforce_profile.coefficients[9] > 0 ) reinforce_profile.coefficients[9] *= -1f;
+		if ( reinforce_profile.coefficients[9] > 0 ) reinforce_profile.coefficients[9] *= -0.3f;
+		if ( reinforce_profile.coefficients[10] < 1 ) reinforce_profile.coefficients[10] *= 10f;
 
 
 		attack_profile.coefficients[5] = 5f;
@@ -306,7 +309,7 @@ public class Team42 implements Bot {
 			int occupierId = board.getOccupier(country);
 
 
-			float[] pointSystemValues = new float[10];
+			float[] pointSystemValues = new float[11];
 
 			// point_system_adjacent_states_owned_by_the_other_player  
 			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
@@ -340,7 +343,7 @@ public class Team42 implements Bot {
 					armiesInJointFoeCountries ); // defending
 
 			//if it connects two blocks		
-			pointSystemValues[6] = willMakeCluster(country) ? 1f : 0f;
+			pointSystemValues[6] = 0f; //willMakeCluster(country) ? 1f : 0f; effoicensy reasons
 
 			// point_system_would_we_be_more_protected  
 			pointSystemValues[7] = foeAdjacentStates.size()!=0 ?
@@ -357,6 +360,9 @@ public class Team42 implements Bot {
 
 			//how many armies there are inside?			
 			pointSystemValues[9] = (float)board.getNumUnits(country) / Profile.DIVISOR_FOR_ARMY_COUNT;
+			
+			// if there is an anemy around
+			pointSystemValues[10] = foeAdjacentStates.isEmpty() ? 0f: 1f;
 
 			this.country = country;
 			this.profile = profile;

@@ -358,10 +358,16 @@ public class Genetic {
 				ui.displayCardDraw(currPlayer,card);
 			}
 
+			int old = currPlayer.getId();
 			playerId = (playerId+1)%GameData.NUM_PLAYERS;
 			currPlayer = players[playerId];			
 
 			if ( (count++) == MAX ) return -1;
+			boolean thereIsACountry = false;
+			for ( int i=0;!thereIsACountry && i<GameData.NUM_COUNTRIES; i++)
+				thereIsACountry = currPlayer.getId() == board.getOccupier(i);
+			if ( ! thereIsACountry ) return old;
+
 		} while (!board.isGameOver() );
 		
 		ui.displayWinner(players[board.getWinner()]);
