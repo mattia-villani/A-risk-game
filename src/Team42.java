@@ -14,15 +14,15 @@ import java.util.Set;
 
 // put your code here
 
-public class YourTeamName implements Bot {
+public class Team42 implements Bot {
 	
 	/*
 	 * Team Name: 42
 	 */
 	
-	// The public API of YourTeamName must not change
+	// The public API of Team42 must not change
 	// You cannot change any other classes
-	// YourTeamName may not alter the state of the board or the player objects
+	// Team42 may not alter the state of the board or the player objects
 	// It may only inspect the state of the board and the player objects
 	// So you can use player.getNumUnits() but you can't use player.addUnits(10000), for example
 
@@ -254,7 +254,7 @@ public class YourTeamName implements Bot {
 			return (Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; 		
 		}
 	}
-	static class RandomProfile extends YourTeamName.Profile{		
+	static class RandomProfile extends Team42.Profile{		
 		static float[] CREATE_LIST(int n){
 			float[] vals = new float[n];
 			for ( int i=0; i<n; i++)
@@ -269,7 +269,7 @@ public class YourTeamName implements Bot {
 	private Profile attackProfile = null;
 	private Profile mostAdaptToAttackProfile = null;
 	private Profile reinforceProfile = null;
-	protected YourTeamName(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
+	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
 		board = inBoard;	
 		player = inPlayer;
 
@@ -321,8 +321,8 @@ public class YourTeamName implements Bot {
 			long startFunction = 0;
 			if ( VERBOSE_TIME_POINT_SYSTEM ) startFunction = System.nanoTime();
 
-			List<Integer> foeAdjacentStates = YourTeamName.this.getFoesAdjacentTo( country );
-			List<Integer> myJointCountries = YourTeamName.this.filter( YourTeamName.this.getAdjacent( country ), properties.myCountry );
+			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
+			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
 			int armiesInJointFoeCountries = foldl( foeAdjacentStates, 0, sumArmies );
@@ -422,7 +422,7 @@ public class YourTeamName implements Bot {
 	 * PUBLIC API 
 	 */
 
-	YourTeamName (BoardAPI inBoard, PlayerAPI inPlayer) {
+	Team42 (BoardAPI inBoard, PlayerAPI inPlayer) {
 		this(inBoard, inPlayer, new RandomProfile(), new RandomProfile(), new RandomProfile());
 		return;
 	}
