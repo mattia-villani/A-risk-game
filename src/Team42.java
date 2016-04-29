@@ -309,6 +309,27 @@ public class Team42 implements Bot {
 			for ( int countryId : GameData.CONTINENT_COUNTRIES[continentId] )
 				COUNTRY_CONTINENT[ countryId ] = continentId;
 	}
+	
+	class PropertyEqualsContinentID implements Property{
+		int country;
+		public PropertyEqualsContinentID( int country ){
+			this.country = country;
+		}
+		@Override
+		public boolean satisfies(int id) {
+			return GameData.CONTINENT_IDS[id] != GameData.CONTINENT_IDS[country]; 
+		}		
+	}
+	class PropertySameOccupier implements Property{
+		int occupierId;
+		public PropertySameOccupier(int occupierId){
+			this.occupierId = occupierId;
+		}
+		
+		@Override public boolean satisfies(int id) {
+			return occupierId == board.getOccupier(id);
+		}
+	}
 
 	/*
 	 *  END OF PROFILING , COUNTRY VALUE PAIR TIME 
@@ -348,12 +369,7 @@ public class Team42 implements Bot {
 			}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			//point_system_is_border_country 
-			pointSystemValues[3] = count( GameData.ADJACENT[country], new Property(){
-				@Override
-				public boolean satisfies(int id) {
-					return GameData.CONTINENT_IDS[id] != GameData.CONTINENT_IDS[country]; 
-				}				
-			}) != 0 ? 1.f : 0.f ;
+			pointSystemValues[3] = count( GameData.ADJACENT[country], new PropertyEqualsContinentID(country)) != 0 ? 1.f : 0.f ;
 
 			// point_system_enemy_armies_around 
 			pointSystemValues[4] = armiesInJointFoeCountries / Profile.DIVISOR_FOR_SOURANDING_ENEMY_COUNT ;
@@ -374,11 +390,7 @@ public class Team42 implements Bot {
 			//are they part of a opponent's continent?			
 			pointSystemValues[8] = 
 					(float) count( GameData.CONTINENT_COUNTRIES[continentId] , 
-							new Property(){ 
-						@Override public boolean satisfies(int id) {
-							return occupierId == board.getOccupier(id);
-						}
-					}) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
+							new PropertySameOccupier(occupierId)) / (float)GameData.CONTINENT_COUNTRIES[continentId].length;
 
 			//how many armies there are inside?			
 			pointSystemValues[9] = (float)board.getNumUnits(country) / Profile.DIVISOR_FOR_ARMY_COUNT;
