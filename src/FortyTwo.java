@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,15 +13,15 @@ import java.util.Set;
 
 // put your code here
 
-public class Team42 implements Bot {
+public class FortyTwo implements Bot {
 	
 	/*
 	 * Team Name: 42
 	 */
 	
-	// The public API of Team42 must not change
+	// The public API of FortyTwo must not change
 	// You cannot change any other classes
-	// Team42 may not alter the state of the board or the player objects
+	// FortyTwo may not alter the state of the board or the player objects
 	// It may only inspect the state of the board and the player objects
 	// So you can use player.getNumUnits() but you can't use player.addUnits(10000), for example
 
@@ -254,7 +253,7 @@ public class Team42 implements Bot {
 			return (Profile.WINNING_PROPABILITY[attacking][defending]-0.5f) * 2; 		
 		}
 	}
-	static class RandomProfile extends Team42.Profile{		
+	static class RandomProfile extends FortyTwo.Profile{		
 		static float[] CREATE_LIST(int n){
 			float[] vals = new float[n];
 			for ( int i=0; i<n; i++)
@@ -262,20 +261,22 @@ public class Team42 implements Bot {
 			return vals;
 		}
 		public RandomProfile() {
-			super(CREATE_LIST(11));
+			super(CREATE_LIST(12));
 		}
 	}
 	//TODO: initialize the profiles with the right coefficients
 	private Profile attackProfile = null;
 	private Profile mostAdaptToAttackProfile = null;
 	private Profile reinforceProfile = null;
-	protected Team42(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
+	protected FortyTwo(BoardAPI inBoard, PlayerAPI inPlayer, Profile attack_profile, Profile most_adapt_to_attack_profile, Profile reinforce_profile ){
 		board = inBoard;	
 		player = inPlayer;
 
-		if ( attack_profile.coefficients[2] < 1 ) reinforce_profile.coefficients[2] *=3f;
-		if ( attack_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *=5f;
-		if ( attack_profile.coefficients[10] < 1 ) reinforce_profile.coefficients[10] *=1f;
+		if ( attack_profile.coefficients[2] < 1 ) attack_profile.coefficients[2] *=3f;
+		if ( attack_profile.coefficients[4] < 1 ) attack_profile.coefficients[4] *=5f;
+		if ( attack_profile.coefficients[10] < 1 ) attack_profile.coefficients[10] *=1f;
+		if ( attack_profile.coefficients[6] < 1 ) attack_profile.coefficients[6] *=3f;
+		if ( attack_profile.coefficients[11] < 1 ) attack_profile.coefficients[11] *=3f;
 		if ( reinforce_profile.coefficients[0] < 1 ) reinforce_profile.coefficients[0] *=5f;
 		if ( reinforce_profile.coefficients[3] < 1 ) reinforce_profile.coefficients[3] *= 3f;
 		if ( reinforce_profile.coefficients[4] < 1 ) reinforce_profile.coefficients[4] *= 3f;
@@ -288,8 +289,11 @@ public class Team42 implements Bot {
 
 		most_adapt_to_attack_profile.coefficients[5] = 5f;
 
+		reinforce_profile.coefficients[11] = 0f;
+		most_adapt_to_attack_profile.coefficients[11] = 0f;
 		reinforce_profile.coefficients[5] = 0f;
 		reinforce_profile.coefficients[6] = 0f;
+		most_adapt_to_attack_profile.coefficients[6] = 0f;
 		reinforce_profile.coefficients[7] = -2f;
 		this.attackProfile = attack_profile;
 		this.mostAdaptToAttackProfile = most_adapt_to_attack_profile;
@@ -342,8 +346,8 @@ public class Team42 implements Bot {
 			long startFunction = 0;
 			if ( VERBOSE_TIME_POINT_SYSTEM ) startFunction = System.nanoTime();
 
-			List<Integer> foeAdjacentStates = Team42.this.getFoesAdjacentTo( country );
-			List<Integer> myJointCountries = Team42.this.filter( Team42.this.getAdjacent( country ), properties.myCountry );
+			List<Integer> foeAdjacentStates = FortyTwo.this.getFoesAdjacentTo( country );
+			List<Integer> myJointCountries = FortyTwo.this.filter( FortyTwo.this.getAdjacent( country ), properties.myCountry );
 			int totalNumberOfAdjs = GameData.ADJACENT[ country ].length;
 			SumArmies sumArmies = new SumArmies();
 			int armiesInJointFoeCountries = foldl( foeAdjacentStates, 0, sumArmies );
@@ -352,7 +356,7 @@ public class Team42 implements Bot {
 			int occupierId = board.getOccupier(country);
 
 
-			float[] pointSystemValues = new float[11];
+			float[] pointSystemValues = new float[12];
 
 			// point_system_adjacent_states_owned_by_the_other_player  
 			pointSystemValues[0] = ( (float)foeAdjacentStates.size() ) / (float) MAX_ADJACENT_STATES; // to bring it to the interval 0..1
@@ -381,7 +385,7 @@ public class Team42 implements Bot {
 					armiesInJointFoeCountries ); // defending
 
 			//if it connects two blocks		
-			pointSystemValues[6] = 0f; //willMakeCluster(country) ? 1f : 0f; effoicensy reasons
+			pointSystemValues[6] = profile.coefficients[6] == 0f ? 0f : (willMakeCluster(country) ? 1f : 0f);// effoicensy reasons
 
 			// point_system_would_we_be_more_protected  
 			pointSystemValues[7] = foeAdjacentStates.size()!=0 ?
@@ -397,6 +401,9 @@ public class Team42 implements Bot {
 			
 			// if there is an anemy around
 			pointSystemValues[10] = foeAdjacentStates.isEmpty() ? 0f: 1f;
+			
+			// is it an enemy
+			pointSystemValues[11] = board.getOccupier(country ) < 2 ? 1.0f : 0.0f;
 
 			this.country = country;
 			this.profile = profile;
@@ -434,7 +441,7 @@ public class Team42 implements Bot {
 	 * PUBLIC API 
 	 */
 
-	Team42 (BoardAPI inBoard, PlayerAPI inPlayer) {
+	FortyTwo (BoardAPI inBoard, PlayerAPI inPlayer) {
 		this(inBoard, inPlayer, new RandomProfile(), new RandomProfile(), new RandomProfile());
 		return;
 	}
@@ -532,7 +539,7 @@ public class Team42 implements Bot {
 			else if (cardTypes[1] >= 2 && cardTypes[3] >= 1) command = "ccw";
 			else if (cardTypes[2] >= 2 && cardTypes[3] >= 1) command = "aaw";
 
-			else if(cardTypes[3] >= 1){
+			else if(cardTypes[3] == 1){
 				if (cardTypes[0] >= 1 && cardTypes[1] >= 1 || (cardTypes[0] >= 1 && cardTypes[2] >= 1) || (cardTypes[2] >= 1 && cardTypes[1] >= 1)){
 
 					command = "w";
@@ -558,7 +565,7 @@ public class Team42 implements Bot {
 			}
 
 		}
-		return(command);
+		return command.length()==3?(command):"skip";
 	}
 
 	public String getBattle () {

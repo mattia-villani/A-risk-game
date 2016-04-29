@@ -31,9 +31,9 @@ public class Genetic {
 	}
 	
 	
-	static class RandomProfile extends Team42.RandomProfile{		
+	static class RandomProfile extends FortyTwo.RandomProfile{		
 
-		static Pair<Team42.Profile> NEW_GENERATION_PROFILES( Team42.Profile p1, Team42.Profile p2 ){
+		static Pair<FortyTwo.Profile> NEW_GENERATION_PROFILES( FortyTwo.Profile p1, FortyTwo.Profile p2 ){
 			float[] f1 = p1.coefficients, f2 = p2.coefficients;
 			int n = f1.length;
 			int [] indexs = new int[n];
@@ -55,24 +55,24 @@ public class Genetic {
 			if ( Math.random() < MUTATION_PROB/2 )
 				f2[ (int)(Math.random()*n) ] = (float)Math.random();
 
-			return new Pair<Team42.Profile>(new Team42.Profile(f1), new Team42.Profile(f2));
+			return new Pair<FortyTwo.Profile>(new FortyTwo.Profile(f1), new FortyTwo.Profile(f2));
 		}
 	}
 	
-	static Pair<List<Team42.Profile>> newSetGeneration(List<Team42.Profile> l1, List<Team42.Profile> l2){
-		List<Team42.Profile> ret1 = new LinkedList<>();
-		List<Team42.Profile> ret2 = new LinkedList<>();
+	static Pair<List<FortyTwo.Profile>> newSetGeneration(List<FortyTwo.Profile> l1, List<FortyTwo.Profile> l2){
+		List<FortyTwo.Profile> ret1 = new LinkedList<>();
+		List<FortyTwo.Profile> ret2 = new LinkedList<>();
 		for ( int i=0;i<l1.size() && i<l2.size();i++ ){
-			Pair<Team42.Profile> p = RandomProfile.NEW_GENERATION_PROFILES(l1.get(i), l2.get(i));
+			Pair<FortyTwo.Profile> p = RandomProfile.NEW_GENERATION_PROFILES(l1.get(i), l2.get(i));
 			ret1.add(p.first);
 			ret2.add(p.second);
 		}
-		return new Pair<List<Team42.Profile>>( ret1, ret2 );
+		return new Pair<List<FortyTwo.Profile>>( ret1, ret2 );
 	}
 	
 	
 	
-	static class TestBot extends Team42{
+	static class TestBot extends FortyTwo{
 		static int I = 0;
 		int i;
 		protected TestBot(BoardAPI inBoard, PlayerAPI inPlayer, List<Profile> profiles ) {
@@ -85,23 +85,23 @@ public class Genetic {
 		}
 	}
 	
-	static List<Team42.Profile> new_profile_list(int n){
-		List<Team42.Profile> list = new LinkedList<>();
+	static List<FortyTwo.Profile> new_profile_list(int n){
+		List<FortyTwo.Profile> list = new LinkedList<>();
 		for ( int i=0; i<n; i++ ) list.add(new RandomProfile());
 		return list;
 	}
 	
 	
 	public static void main (String args[]) throws InterruptedException {
-		Team42.VERBOSE_TIME_POINT_SYSTEM = false;
-		Team42.VERBOSE_BATTLE = false;
-		Team42.VERBOSE_INPUT_LOCKER = false;
-		Team42.VERBOSE_WAIT = true;
-		List< List<Team42.Profile> > list = new LinkedList<>();
+		FortyTwo.VERBOSE_TIME_POINT_SYSTEM = false;
+		FortyTwo.VERBOSE_BATTLE = false;
+		FortyTwo.VERBOSE_INPUT_LOCKER = false;
+		FortyTwo.VERBOSE_WAIT = true;
+		List< List<FortyTwo.Profile> > list = new LinkedList<>();
 		PointPair[] points = new PointPair[ BOT_COUNT ];
 		int N = 3;
 
-		for ( int round=0; round<1000; round++){
+		for ( int round=0; round<100; round++){
 			while ( list.size() < BOT_COUNT )
 				list.add(new_profile_list(N) );
 
@@ -119,14 +119,14 @@ public class Genetic {
 				}
 			
 			Arrays.sort( points );
-			List< List<Team42.Profile> > old = new LinkedList<>(list);
+			List< List<FortyTwo.Profile> > old = new LinkedList<>(list);
 			list.clear();
 			System.out.println("Round "+round+" winners : ");
 			for ( int i=0; i<Genetic.WINNING_BOT; i++ ){
 				System.out.print( points[i].first + " won "+points[i].second+" matchs) ");
 				dump ( old.get(points[i].first) );
 				for ( int j=i+1; j<WINNING_BOT; j++ ){
-					Pair<List<Team42.Profile>> p = newSetGeneration( old.get(points[i].first), old.get(points[j].first) );
+					Pair<List<FortyTwo.Profile>> p = newSetGeneration( old.get(points[i].first), old.get(points[j].first) );
 					list.add( p.first );
 					list.add( p.second );
 				}
@@ -136,8 +136,8 @@ public class Genetic {
 		}
 				
 	}
-	static void dump ( List<Team42.Profile> l){
-		for ( Team42.Profile p : l ){
+	static void dump ( List<FortyTwo.Profile> l){
+		for ( FortyTwo.Profile p : l ){
 			for ( float f : p.coefficients )
 				System.out.print(f+", ");
 			System.out.print("; ");
@@ -145,10 +145,10 @@ public class Genetic {
 	}
 	
 	
-	static int randomRun( List<Team42.Profile> bot1Profiles, List<Team42.Profile> bot2Profiles ) throws InterruptedException{
+	static int randomRun( List<FortyTwo.Profile> bot1Profiles, List<FortyTwo.Profile> bot2Profiles ) throws InterruptedException{
 		return (int)(Math.random()*2);
 	}
-	static int run( List<Team42.Profile> bot1Profiles, List<Team42.Profile> bot2Profiles ) throws InterruptedException{
+	static int run( List<FortyTwo.Profile> bot1Profiles, List<FortyTwo.Profile> bot2Profiles ) throws InterruptedException{
 		int MAX = 100;
 		Board board = new Board();
 		UI ui = new UI(board);
